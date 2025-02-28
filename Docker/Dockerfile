@@ -30,7 +30,7 @@ COPY --from=build /app/out .
 
 # Expose ports for the app
 EXPOSE 8080
-EXPOSE 5001
+EXPOSE 8081
 
 # Start the application
 ENTRYPOINT ["dotnet", "Dirassati-Backend.dll"]
