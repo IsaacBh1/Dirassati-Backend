@@ -1,13 +1,18 @@
 #!/bin/bash
 
-echo "Pulling the latest code..."
-git pull origin main  # Update this to your branch name if needed
+# Colors for output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
 
-echo ✅ After the container is started the Backend will run at:
-echo "   📡 HTTP:  http://localhost:5000"
-echo "   🔒 HTTPS: https://localhost:5001"
-
-echo "Starting backend using Docker Compose..."
-docker-compose up --build
+echo -e "${BLUE}📡 Pulling latest code...${NC}"
+git pull origin MohamedIslam
 
 
+echo -e "${GREEN}✅ Backend will run at:${NC}"
+echo -e "   🌐 HTTP:  http://localhost:5080"
+echo -e "   🔒 HTTPS: https://localhost:5081"
+
+echo -e "${BLUE}🚀 Starting backend...${NC}"
+docker-compose up

@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using Persistence;
 using Dirassati_Backend.Dtos;
+using Microsoft.EntityFrameworkCore;
 [ApiController]
 [Route("api/auth")]
 public class EmployeeAuthController : ControllerBase
@@ -41,7 +42,7 @@ public class EmployeeAuthController : ControllerBase
             return Unauthorized("User identifier is not valid");
         }
 
-        var employee = _context.Employees.FirstOrDefault(e => Guid.Parse(e.UserId) == userGuid);
+        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == user.Id);
         if (employee == null) return Unauthorized("Employee record not found.");
 
 
