@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dirassati_Backend.Domain.Models;
 
 public partial class Absence
 {
-    public Guid AbsenceId { get; set; } =Guid.Empty;
+    [Key]
+    public Guid AbsenceId { get; set; } = Guid.Empty;
 
-    public DateTime DateTime { get; set; }
+    public DateTime DateTIme { get; set; } = DateTime.Now;
 
-    public string? StudentId { get; set; }
+    public Guid StudentId { get; set; }
 
     public bool IsJustified { get; set; }
 

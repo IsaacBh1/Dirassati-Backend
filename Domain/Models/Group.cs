@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dirassati_Backend.Domain.Models;
 
 public partial class Group
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
     public int GroupId { get; set; }
 
     public string GorupName { get; set; } = null!;
@@ -15,7 +20,7 @@ public partial class Group
 
     public int GroupCapacity { get; set; }
 
-    public string SchoolId { get; set; } = null!;
+    public Guid SchoolId { get; set; } = Guid.Empty;
 
     public int? StreamId { get; set; }
 
@@ -25,5 +30,5 @@ public partial class Group
 
     public virtual School School { get; set; } = null!;
 
-    public virtual Stream? Stream { get; set; }
+    public virtual Specialization? Stream { get; set; }
 }

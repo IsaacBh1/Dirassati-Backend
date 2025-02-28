@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dirassati_Backend.Domain.Models;
 
 public partial class AcademicYear
 {
-    public string StartDate { get; set; } = null!;
-
+    public DateOnly StartDate { get; set; } 
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int AcademicYearId { get; set; }
+    public DateOnly EndDate { get; set; } 
 
-    public string EndDate { get; set; } = null!;
-
-    public string SchoolId { get; set; } = null!;
+    public Guid SchoolId { get; set; } 
 
     public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
 

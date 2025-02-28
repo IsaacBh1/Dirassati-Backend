@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dirassati_Backend.Domain.Models;
 
 public partial class SchoolLevel
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int LevelId { get; set; }
 
     public string LevelType { get; set; } = null!;
@@ -13,5 +17,5 @@ public partial class SchoolLevel
 
     public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
 
-    public virtual ICollection<Stream> Streams { get; set; } = new List<Stream>();
+    public virtual ICollection<Specialization> Streams { get; set; } = new List<Specialization>();
 }

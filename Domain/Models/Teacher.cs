@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Dirassati_Backend.Domain.Models;
 
 public partial class Teacher
 {
-    public string TeacherId { get; set; } = null!;
+    [Key]
+    public Guid TeacherId { get; set; } = new Guid();
 
-    public string UserId { get; set; } = null!;
+    public Guid UserId { get; set; } = Guid.Empty;
 
-    public string HireDate { get; set; } = null!;
+    public DateOnly HireDate { get; set; }
 
     public int ContractTypeId { get; set; }
 
-    public string SchoolId { get; set; } = null!;
+    public Guid SchoolId { get; set; }
 
     public virtual ContractType ContractType { get; set; } = null!;
 
     public virtual School School { get; set; } = null!;
 
-    public virtual AspNetUser User { get; set; } = null!;
+    public virtual AppUser User { get; set; } = null!;
 
     public virtual ICollection<Subject> Subjects { get; set; } = new List<Subject>();
 }
