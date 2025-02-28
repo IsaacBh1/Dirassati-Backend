@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace Dirassati_Backend.Domain.Models;
 
 public partial class Teacher
 {
     [Key]
-    public Guid TeacherId { get; set; } = new Guid();
+    public Guid TeacherId { get; set; } = Guid.NewGuid();
 
-    public Guid UserId { get; set; } = Guid.Empty;
+    public string UserId { get; set; } = string.Empty;
 
     public DateOnly HireDate { get; set; }
 

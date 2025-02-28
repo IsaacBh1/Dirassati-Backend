@@ -11,7 +11,7 @@ public partial class School
 
     public required string Name { get; set; } = null!;
 
-    public required int AddressId { get; set; }
+    public int AddressId { get; set; }
 
     public string Email { get; set; } = null!;
 

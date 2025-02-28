@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  backend:
+    build: .
+    container_name: Dirasati-Backend
+    ports:
+      - "8080:5000"
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=dirasatiDb.db
+    restart: always

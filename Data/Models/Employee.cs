@@ -1,27 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dirassati_Backend.Domain.Models;
 
 public partial class Employee
 {
     [Key]
-    public Guid EmployeeId { get; set; } = new Guid();
+    public Guid EmployeeId { get; set; } = Guid.NewGuid();
 
-    public Guid UserId { get; set; }
+    [ForeignKey(nameof(User))]
+    public string UserId { get; set; } = null!;
 
     public string Position { get; set; } = string.Empty;
 
-    public string HireDate { get; set; } = string.Empty;
+    public DateOnly HireDate { get; set; }
 
     public string ContractType { get; set; } = string.Empty;
 
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
 
     public int Permissions { get; set; }
+    [ForeignKey(nameof(School))]
+    public Guid SchoolId { get; set; } = Guid.Empty;
 
-    public string SchoolId { get; set; } = string.Empty;
 
     public virtual School School { get; set; } = null!;
 
