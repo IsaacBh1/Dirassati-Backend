@@ -8,7 +8,7 @@ using System.Text;
 using Persistence;
 using Dirassati_Backend.Dtos;
 [ApiController]
-[Route("api/employee/auth")]
+[Route("api/auth")]
 public class EmployeeAuthController : ControllerBase
 {
     private readonly UserManager<AppUser> _userManager;
@@ -41,11 +41,11 @@ public class EmployeeAuthController : ControllerBase
             return Unauthorized("User identifier is not valid");
         }
 
-        var employee = _context.Employees.FirstOrDefault(e => e.UserId == userGuid);
-        if (employee == null)  return Unauthorized("Employee record not found.");
-        
+        var employee = _context.Employees.FirstOrDefault(e => Guid.Parse(e.UserId) == userGuid);
+        if (employee == null) return Unauthorized("Employee record not found.");
 
-        
+
+
         var token = GenerateJwtToken(user, employee);
         return Ok(new { Token = token });
     }

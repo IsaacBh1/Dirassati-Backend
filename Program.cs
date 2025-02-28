@@ -1,22 +1,11 @@
-using Dirasati_Backend.Configurations;
-using Microsoft.AspNetCore.Mvc.Controllers;
+using Dirassati_Backend.Common;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServices();
 
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerWithJwtAuth();
-builder.Services.AddDbContext<AppDbContext>(opt =>
-{
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-builder.Services.AddIdentityCore<AppUser>()
-.AddEntityFrameworkStores<AppDbContext>();
-builder.Services.AddAuthentication();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -29,21 +18,23 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-if (app.Environment.IsDevelopment())
+using var scope = app.Services.CreateScope();
+var service = scope.ServiceProvider;
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dirasati API v1");
-    });
+    var context = service.GetRequiredService<AppDbContext>();
+    await context.Database.MigrateAsync();
+
+}
+catch (Exception e)
+{
+    var logger = service.GetRequiredService<ILogger<Program>>();
+    logger.LogError(e, "A problem occured when Migrating database");
+    throw;
 }
 
-
-
+app.MapControllers();
 
 app.UseHttpsRedirection();
-
-
-
 app.Run();
 
