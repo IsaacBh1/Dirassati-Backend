@@ -23,7 +23,7 @@ public partial class Employee
 
     public string SchoolId { get; set; } = string.Empty;
 
-    public virtual School School { get; set; }=null!; 
+    public virtual School School { get; set; } = null!;
 
-    public virtual AppUser User { get; set; }  =null!; 
+    public virtual AppUser User { get; set; } = null!;
 }

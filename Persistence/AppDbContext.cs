@@ -7,42 +7,23 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
     public AppDbContext(DbContextOptions options) : base(options)
     {
     }
-
     public virtual DbSet<Absence> Absences { get; set; }
-
     public virtual DbSet<AcademicYear> AcademicYears { get; set; }
-
     public virtual DbSet<Address> Adresses { get; set; }
-
-
     public virtual DbSet<Classroom> Classrooms { get; set; }
-
     public virtual DbSet<ContractType> ContractTypes { get; set; }
-
     public virtual DbSet<Employee> Employees { get; set; }
-
     public virtual DbSet<Group> Groups { get; set; }
-
     public virtual DbSet<Parent> Parents { get; set; }
-
     public virtual DbSet<PhoneNumber> PhoneNumbers { get; set; }
-
     public virtual DbSet<RelationshipToStudent> RelationshipToStudents { get; set; }
-
     public virtual DbSet<School> Schools { get; set; }
-
     public virtual DbSet<SchoolLevel> SchoolLevels { get; set; }
-
     public virtual DbSet<Specialization> Specializations { get; set; }
-
     public virtual DbSet<Student> Students { get; set; }
-
     public virtual DbSet<Subject> Subjects { get; set; }
-
     public virtual DbSet<Teach> Teaches { get; set; }
-
     public virtual DbSet<Teacher> Teachers { get; set; }
-
 
 
 
