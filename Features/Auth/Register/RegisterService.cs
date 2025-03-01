@@ -76,7 +76,7 @@ public class RegisterService
             var newEmployee = await _dbContext.Employees.AddAsync(employee);
             await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
-            Console.WriteLine("Good");
+
             return newEmployee.ToEmployeeResponceDto();
 
         }

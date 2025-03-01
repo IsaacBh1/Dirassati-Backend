@@ -6,7 +6,7 @@ services:
     container_name: Dirasati-Backend
     ports:
       - "5080:8080"
-      - "5081:8081"
+      - "5081:5081"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Data Source=dirasatiDb.db

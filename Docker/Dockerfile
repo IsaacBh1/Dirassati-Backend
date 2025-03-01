@@ -6,7 +6,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y git
 
 # Pull the latest version of the code from GitHub
-RUN git clone https://github.com/IsaacBh1/Dirassati-Backend.git .
+
+RUN if [ -d ".git" ]; then git pull origin main; else git clone  https://github.com/IsaacBh1/Dirassati-Backend.git .; fi
 
 # Restore dependencies
 RUN dotnet restore
