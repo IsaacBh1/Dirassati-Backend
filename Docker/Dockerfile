@@ -16,21 +16,12 @@ ENV ASPNETCORE_ENVIRONMENT=Development
 
 # Build the project
 RUN dotnet build -c Debug --no-restore
-RUN dotnet publish -c Debug -o out
 
-# Stage 2: Run the application
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
-WORKDIR /app
 
-# Set environment to development mode (again, for runtime)
-ENV ASPNETCORE_ENVIRONMENT=Development
-
-# Copy the built application from the build stage
-COPY --from=build /app/out .
 
 # Expose ports for the app
 EXPOSE 8080
 EXPOSE 8081
 
 # Start the application
-ENTRYPOINT ["dotnet", "Dirassati-Backend.dll"]
+ENTRYPOINT ["dotnet", "run"]
