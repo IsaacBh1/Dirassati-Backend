@@ -1,7 +1,6 @@
 
 using System.Net;
 using Dirassati_Backend.Domain.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.Auth.SignUp

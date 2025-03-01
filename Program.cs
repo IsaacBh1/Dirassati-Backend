@@ -2,11 +2,24 @@ using Dirassati_Backend.Common;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
-
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServices();
 
+// ✅ Move AddCors BEFORE builder.Build()
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
+
+// ✅ Ensure CORS middleware is applied early
+app.UseCors("AllowAll");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -24,17 +37,14 @@ try
 {
     var context = service.GetRequiredService<AppDbContext>();
     await context.Database.MigrateAsync();
-
 }
 catch (Exception e)
 {
     var logger = service.GetRequiredService<ILogger<Program>>();
-    logger.LogError(e, "A problem occured when Migrating database");
+    logger.LogError(e, "A problem occurred when migrating database");
     throw;
 }
 
 app.MapControllers();
-
 app.UseHttpsRedirection();
 app.Run();
-

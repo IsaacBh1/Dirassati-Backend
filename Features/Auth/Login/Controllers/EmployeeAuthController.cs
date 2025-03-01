@@ -8,6 +8,7 @@ using System.Text;
 using Persistence;
 using Dirassati_Backend.Dtos;
 using Microsoft.EntityFrameworkCore;
+
 [ApiController]
 [Route("api/auth")]
 public class EmployeeAuthController : ControllerBase
@@ -37,15 +38,18 @@ public class EmployeeAuthController : ControllerBase
         {
             return Unauthorized("Invalid email or password");
         }
+        
         if (!Guid.TryParse(user.Id, out Guid userGuid))
         {
             return Unauthorized("User identifier is not valid");
         }
-
-        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == user.Id);
-        if (employee == null) return Unauthorized("Employee record not found.");
-
-
+        
+        // Compare by converting userGuid to string
+        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == userGuid.ToString());
+        if (employee == null)
+        {
+            return Unauthorized("Employee record not found.");
+        }
 
         var token = GenerateJwtToken(user, employee);
         return Ok(new { Token = token });
