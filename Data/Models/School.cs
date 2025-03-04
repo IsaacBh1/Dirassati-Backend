@@ -20,9 +20,7 @@ public partial class School
     public string WebsiteUrl { get; set; } = null!;
 
     public string SchoolConfig { get; set; } = null!;
-
-
-
+    
     public string SchoolType { get; set; } = null!;
     public Address Address { get; set; } = new Address();
 

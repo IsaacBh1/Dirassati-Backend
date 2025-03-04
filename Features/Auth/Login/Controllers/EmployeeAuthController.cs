@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("api/auth")]
+[Tags("Employee Authentication")]
 public class EmployeeAuthController : ControllerBase
 {
     private readonly UserManager<AppUser> _userManager;

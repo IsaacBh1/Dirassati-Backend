@@ -7,6 +7,9 @@ using Persistence;
 
 namespace Dirassati_Backend.Features.Auth.SignUp;
 
+
+[Tags("Employee Authentication")]
+
 public class RegisterService
 {
     private readonly UserManager<AppUser> _userManager;

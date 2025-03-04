@@ -1,4 +1,5 @@
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -15,6 +16,8 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
+
+builder.Services.AddRepositories();
 
 var app = builder.Build();
 

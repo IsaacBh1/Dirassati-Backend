@@ -7,6 +7,7 @@ namespace Dirassati_Backend.Features.Auth.SignUp
 {
 
 
+    [Tags("Employee Authentication")]
     [Route("api/auth")]
     [ApiController]
     [Produces("application/json")]
