@@ -33,13 +33,26 @@ namespace Dirassati_Backend.Features.Parents.Repositories
 
         public async Task<Parent?> UpdateAsync(Parent parent)
         {
-            var existingParent = await _context.Parents.FindAsync(parent.ParentId);
+            // Load the existing parent including the associated User.
+            var existingParent = await _context.Parents
+                                                 .Include(p => p.User)
+                                                 .FirstOrDefaultAsync(p => p.ParentId == parent.ParentId);
+
             if (existingParent == null)
                 return null;
 
-            existingParent.UserId = parent.UserId;
+            // Update Parent's own properties.
             existingParent.Occupation = parent.Occupation;
             existingParent.RelationshipToStudentId = parent.RelationshipToStudentId;
+
+           
+            if (parent.User != null && existingParent.User != null)
+            {
+                existingParent.User.FirstName = parent.User.FirstName;
+                existingParent.User.LastName = parent.User.LastName;
+                existingParent.User.Email = parent.User.Email;
+                existingParent.User.PhoneNumber = parent.User.PhoneNumber;
+            }
 
             await _context.SaveChangesAsync();
             return existingParent;
