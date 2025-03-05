@@ -39,12 +39,12 @@ public class EmployeeAuthController : ControllerBase
         {
             return Unauthorized("Invalid email or password");
         }
-        
+
         if (!Guid.TryParse(user.Id, out Guid userGuid))
         {
             return Unauthorized("User identifier is not valid");
         }
-        
+
         // Compare by converting userGuid to string
         var employee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == userGuid.ToString());
         if (employee == null)
@@ -53,7 +53,7 @@ public class EmployeeAuthController : ControllerBase
         }
 
         var token = GenerateJwtToken(user, employee);
-        return Ok(new { Token = token });
+        return Ok(new { Token = token  , FirstName = user.FirstName, LastName = user.LastName});
     }
 
     private string GenerateJwtToken(AppUser user, Employee employee)
@@ -62,18 +62,21 @@ public class EmployeeAuthController : ControllerBase
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-            new Claim("EmployeeId", employee.EmployeeId.ToString()),
-            new Claim("Permission", employee.Permissions.ToString())
-        };
+    {
+        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+        new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+        new Claim("EmployeeId", employee.EmployeeId.ToString()),
+        new Claim("Permission", employee.Permissions.ToString()),
+        new Claim("SchoolID", employee.SchoolId.ToString()), 
+        // new Claim("FirstName", employee.User.FirstName),
+        // new Claim("LastName", employee.LastName)
+    };
 
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(2),
+            expires: DateTime.UtcNow.AddHours(12),
             signingCredentials: creds
         );
 

@@ -45,7 +45,7 @@ namespace Dirassati_Backend.Features.Parents.Repositories
             existingParent.Occupation = parent.Occupation;
             existingParent.RelationshipToStudentId = parent.RelationshipToStudentId;
 
-           
+
             if (parent.User != null && existingParent.User != null)
             {
                 existingParent.User.FirstName = parent.User.FirstName;
@@ -67,6 +67,11 @@ namespace Dirassati_Backend.Features.Parents.Repositories
             _context.Parents.Remove(parent);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<IEnumerable<Student>> GetStudentsByParentIdAsync(Guid parentId)
+        {
+            return await _context.Students.Where(s => s.ParentId == parentId).ToListAsync();
         }
     }
 }

@@ -61,5 +61,16 @@ namespace Dirassati_Backend.Features.Parents.Controllers
             if (!success) return NotFound();
             return NoContent();
         }
+
+        [HttpGet("{parentId:guid}/students")]
+        public async Task<IActionResult> GetStudentsByParent(Guid parentId)
+        {
+            var students = await _parentRepository.GetStudentsByParentIdAsync(parentId);
+
+            if (students == null || !students.Any())
+                return NotFound("No students found for the provided parent ID.");
+
+            return Ok(students);
+        }
     }
 }

@@ -31,13 +31,13 @@ public partial class Student
     public DateOnly EnrollmentDate { get; set; }
 
     public Guid ParentId { get; set; } = Guid.Empty;
+    public Parent parent { get; set; } = null!;
 
     public bool IsActive { get; set; }
 
     public int StreamId { get; set; }
 
     public virtual ICollection<Absence> Absences { get; set; } = new List<Absence>();
-
     public virtual Specialization Stream { get; set; } = null!;
     public virtual AcademicYear AcademicYear { get; set; } = null!;
 }
