@@ -1,3 +1,4 @@
+using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Domain.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
     public virtual DbSet<Subject> Subjects { get; set; }
     public virtual DbSet<Teach> Teaches { get; set; }
     public virtual DbSet<Teacher> Teachers { get; set; }
+    public virtual DbSet<SchoolType> SchoolTypes { get; set; }
 
 
 
