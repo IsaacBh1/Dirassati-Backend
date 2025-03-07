@@ -1,4 +1,5 @@
 using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Features.Parents.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -69,9 +70,20 @@ namespace Dirassati_Backend.Features.Parents.Repositories
             return true;
         }
 
-        public async Task<IEnumerable<Student>> GetStudentsByParentIdAsync(Guid parentId)
+
+        public async Task<IEnumerable<getStudentDto>> GetStudentsByParentIdAsync(Guid parentId)
         {
-            return await _context.Students.Where(s => s.ParentId == parentId).ToListAsync();
+            var students = await _context.Students.Where(s => s.ParentId == parentId).ToListAsync();
+            return students.Select(s => new getStudentDto
+            {
+                StudentId = s.StudentId,
+                FirstName = s.FirstName,
+                LastName = s.LastName,
+                EnrollmentDate = s.EnrollmentDate,
+                Grade = s.LevelYear + " " + s.Stream?.Name,
+                IsActive = s.IsActive
+            });
+
         }
     }
 }

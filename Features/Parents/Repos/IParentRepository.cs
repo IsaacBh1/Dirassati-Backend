@@ -1,4 +1,5 @@
 using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Features.Parents.Dtos;
 
 namespace Dirassati_Backend.Features.Parents.Repositories
 {
@@ -9,6 +10,6 @@ namespace Dirassati_Backend.Features.Parents.Repositories
         Task<Parent> CreateAsync(Parent parent);
         Task<Parent?> UpdateAsync(Parent parent);
         Task<bool> DeleteAsync(Guid id);
-        Task<IEnumerable<Student>> GetStudentsByParentIdAsync(Guid parentId);
+        Task<IEnumerable<getStudentDto>> GetStudentsByParentIdAsync(Guid parentId);
     }
 }

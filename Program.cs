@@ -6,7 +6,6 @@ using Persistence;
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServices();
 
-// ✅ Move AddCors BEFORE builder.Build()
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
