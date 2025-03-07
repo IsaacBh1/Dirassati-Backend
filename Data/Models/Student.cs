@@ -23,9 +23,6 @@ public partial class Student
     public Parent parent { get; set; } = null!;
     public bool IsActive { get; set; }
     public int StreamId { get; set; }
-
-
-
     public byte LevelYear { get; set; }
     public virtual ICollection<Absence> Absences { get; set; } = new List<Absence>();
     public virtual Specialization Stream { get; set; } = null!;

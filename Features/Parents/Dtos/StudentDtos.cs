@@ -14,4 +14,6 @@ namespace Dirassati_Backend.Features.Parents.Dtos
         public string Grade { get; set; } = string.Empty;
         public bool IsActive { get; set; }
     }
+
+    
 }

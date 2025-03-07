@@ -15,6 +15,7 @@ public partial class Parent
 
     public int RelationshipToStudentId { get; set; }
 
+
     public virtual AppUser User { get; set; } = null!;
     public RelationshipToStudent relationshipToStudent { get; set; } = null!;
 }
