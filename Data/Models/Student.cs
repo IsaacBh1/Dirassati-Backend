@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Dirassati_Backend.Domain.Models;
 
@@ -14,6 +11,8 @@ public partial class Student
     public string Address { get; set; } = null!;
     public string BirthDate { get; set; } = null!;
     public string BirthPlace { get; set; } = null!;
+    public Guid SchoolId { get; set; } = Guid.Empty; // note : we fogot to add this when we created the models
+    public virtual School School { get; set; } = null!; // note : we fogot to add this when we created the models
     public string? StudentIdNumber { get; set; }
     public string EmergencyContact { get; set; } = null!;
     public int AcademicYearId { get; set; }

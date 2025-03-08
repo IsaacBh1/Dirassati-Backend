@@ -1,5 +1,6 @@
 using AutoMapper;
 using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Features.Common;
 using Dirassati_Backend.Features.Parents.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -16,16 +17,42 @@ namespace Dirassati_Backend.Features.Parents.Repositories
             _context = context;
             _mapper = mapper;
         }
-        public async Task<IEnumerable<GetParentDto>> GetAllAsync()
+        public async Task<IEnumerable<GetParentDto>> GetAllBySchoolIdAsync(Guid schoolId)
         {
             var parents = await _context.Parents
-                .Include(p => p.User)
-                .Include(p => p.relationshipToStudent)
-                .ToListAsync();
+            .Include(p => p.User)
+            .Include(p => p.relationshipToStudent)
+            .Where(p => _context.Students.Any(s => s.ParentId == p.ParentId && s.SchoolId == schoolId))
+            .ToListAsync();
 
             return _mapper.Map<IEnumerable<GetParentDto>>(parents);
         }
 
+
+
+        public async Task<PaginatedResult<GetParentDto>> GetAllBySchoolIdAsync(Guid schoolId, int pageNumber, int pageSize)
+        {
+            var query = _context.Parents
+            .Include(p => p.User)
+            .Include(p => p.relationshipToStudent)
+            .Where(p => _context.Students.Any(s => s.ParentId == p.ParentId && s.SchoolId == schoolId));
+
+            var totalRecords = await query.CountAsync();
+            var parents = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+            var parentDtos = _mapper.Map<IEnumerable<GetParentDto>>(parents);
+
+            return new PaginatedResult<GetParentDto>
+            {
+            Items = parentDtos,
+            TotalRecords = totalRecords,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+            };
+        }
 
 
         public async Task<GetParentDto?> GetParentByIdAsync(Guid parentId)

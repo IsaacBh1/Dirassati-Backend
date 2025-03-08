@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence;
 
@@ -10,9 +11,11 @@ using Persistence;
 namespace Dirassati_Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250308002147_changeStudentTableMigration")]
+    partial class changeStudentTableMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -482,8 +485,6 @@ namespace Dirassati_Backend.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.HasIndex("SchoolId");
-
                     b.HasIndex("StreamId");
 
                     b.ToTable("Students");
@@ -854,12 +855,6 @@ namespace Dirassati_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dirassati_Backend.Domain.Models.School", "School")
-                        .WithMany()
-                        .HasForeignKey("SchoolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Dirassati_Backend.Domain.Models.Specialization", "Stream")
                         .WithMany("Students")
                         .HasForeignKey("StreamId")
@@ -867,8 +862,6 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("AcademicYear");
-
-                    b.Navigation("School");
 
                     b.Navigation("Stream");
 

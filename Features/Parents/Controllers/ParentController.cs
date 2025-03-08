@@ -17,10 +17,17 @@ namespace Dirassati_Backend.Features.Parents.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(Guid SchoolId)
         {
-            var parents = await _parentRepository.GetAllAsync();
+            var parents = await _parentRepository.GetAllBySchoolIdAsync(SchoolId);
             return Ok(parents);
+        }
+
+        [HttpGet("paginated")]
+        public async Task<IActionResult> GetAllPaginated(Guid SchoolId, int pageNumber, int pageSize)
+        {
+            var paginatedParents = await _parentRepository.GetAllBySchoolIdAsync(SchoolId, pageNumber, pageSize);
+            return Ok(paginatedParents);
         }
 
         [HttpGet("{id:guid}")]
