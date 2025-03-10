@@ -60,7 +60,7 @@
 1. Make the script executable:
 
 ```bash
-chmod +x Docker/run-backend.sh
+chmod +x Docker/Backend_Docker/run-backend.sh
 ```
 
 2. Run the project:
@@ -110,6 +110,7 @@ docker-compose down
 ### 🔄 Development Workflow
 
 1. Access Swagger UI at `http://localhost:5080/swagger`
+2. Access the Email Ui at `http://localhost:6080`
 
 ### 🐞 Troubleshooting
 

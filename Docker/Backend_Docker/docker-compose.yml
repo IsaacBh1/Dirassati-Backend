@@ -2,7 +2,9 @@ version: "3.8"
 
 services:
   backend:
-    build: .
+    build:
+      context: ../.. # Points to solution root
+      dockerfile: Docker/Backend_Docker/Dockerfile
     container_name: Dirasati-Backend
     ports:
       - "5080:8080"
@@ -12,7 +14,7 @@ services:
       - ConnectionStrings__DefaultConnection=Data Source=dirasatiDb.db
       - Email__SenderEmail=mohamed@dirasati.org
       - Email__SenderName=Dirasati
-      - Email__Host=smtp4dev
+      - Email__Host=smtp4dev_mail
       - Email__Port=25
     networks:
       - app-network
@@ -22,10 +24,10 @@ services:
 
   mailserver:
     image: rnwood/smtp4dev:latest
-    container_name: smtp4dev
+    container_name: smtp4dev_mail
     ports:
       - "5025:25"
-      - "5080:80"
+      - "6080:80"
     networks:
       - app-network
     restart: always
