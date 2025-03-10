@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dirassati_Backend.Domain.Models;
@@ -16,7 +14,7 @@ public partial class Employee
     public string ContractType { get; set; } = string.Empty;
     public bool IsActive { get; set; } = true;
     public int Permissions { get; set; }
-    
+
     [ForeignKey(nameof(School))]
     public Guid SchoolId { get; set; } = Guid.Empty;
     public virtual School School { get; set; } = null!;

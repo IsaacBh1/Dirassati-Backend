@@ -1,4 +1,3 @@
-using System;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 
 namespace Dirassati_Backend.Features.Auth.SignUp;

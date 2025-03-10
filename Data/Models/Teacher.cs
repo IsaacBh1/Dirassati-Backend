@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Dirassati_Backend.Domain.Models;
 

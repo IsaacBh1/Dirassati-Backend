@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  backend:
+    build: .
+    container_name: Dirasati-Backend
+    ports:
+      - "5080:8080"
+      - "5081:5081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=dirasatiDb.db
+      - Email__SenderEmail=mohamed@dirasati.org
+      - Email__SenderName=Dirasati
+      - Email__Host=smtp4dev
+      - Email__Port=25
+    networks:
+      - app-network
+    restart: always
+    depends_on:
+      - mailserver
+
+  mailserver:
+    image: rnwood/smtp4dev:latest
+    container_name: smtp4dev
+    ports:
+      - "5025:25"
+      - "5080:80"
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge

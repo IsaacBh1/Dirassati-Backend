@@ -15,12 +15,12 @@ namespace Dirassati_Backend.Features.Parents.Repositories
 
         public async Task<IEnumerable<Parent>> GetAllAsync()
         {
-            return await _context.Parents.Include(p => p.User).Include(p => p.relationshipToStudent).ToListAsync();
+            return await _context.Parents.Include(p => p.User).ToListAsync();
         }
 
         public async Task<Parent?> GetByIdAsync(Guid id)
         {
-            return await _context.Parents.Include(p => p.User).Include(p => p.relationshipToStudent)
+            return await _context.Parents.Include(p => p.User)
                                          .FirstOrDefaultAsync(p => p.ParentId == id);
         }
 
@@ -43,9 +43,8 @@ namespace Dirassati_Backend.Features.Parents.Repositories
 
             // Update Parent's own properties.
             existingParent.Occupation = parent.Occupation;
-            existingParent.RelationshipToStudentId = parent.RelationshipToStudentId;
 
-           
+
             if (parent.User != null && existingParent.User != null)
             {
                 existingParent.User.FirstName = parent.User.FirstName;

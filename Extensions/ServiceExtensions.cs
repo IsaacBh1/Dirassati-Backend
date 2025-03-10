@@ -1,5 +1,4 @@
 using Dirassati_Backend.Features.Parents.Repositories;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Dirassati_Backend.Extensions
 {

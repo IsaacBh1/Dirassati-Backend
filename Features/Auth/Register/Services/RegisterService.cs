@@ -1,4 +1,4 @@
-using System;
+using Dirassati_Backend.Common;
 using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Extensions;
@@ -17,11 +17,12 @@ public class RegisterService
 
     public RegisterService(UserManager<AppUser> userManager, AppDbContext dbContext)
     {
-        this._userManager = userManager;
-        this._dbContext = dbContext;
+        _userManager = userManager;
+        _dbContext = dbContext;
     }
-    public async Task<CreatedEmployeeDto?> Register(RegisterDto dto)
+    public async Task<Result<CreatedEmployeeDto, IEnumerable<IdentityError>>> Register(RegisterDto dto)
     {
+        var result = new Result<CreatedEmployeeDto, IEnumerable<IdentityError>>();
         using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
@@ -34,14 +35,10 @@ public class RegisterService
                 UserName = dto.Employee.Email
             };
 
-            var result = await _userManager.CreateAsync(user, dto.Employee.Password);
-            if (!result.Succeeded)
+            var CreateResult = await _userManager.CreateAsync(user, dto.Employee.Password);
+            if (!CreateResult.Succeeded)
             {
-                foreach (var error in result.Errors)
-                {
-                    Console.WriteLine($"Error: {error.Code} - {error.Description}");
-                }
-                return null;
+                return result.Failure(CreateResult.Errors, 400);
             }
 
             var address = new Address
@@ -55,7 +52,7 @@ public class RegisterService
             var school = new School
             {
                 Name = dto.School.SchoolName,
-                SchoolType = dto.School.SchoolType,
+                SchoolTypeId = dto.School.SchoolTypeId,
                 Address = address,
                 Email = dto.School.SchoolEmail,
                 Logo = string.Empty,
@@ -80,7 +77,7 @@ public class RegisterService
             await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            return newEmployee.ToEmployeeResponceDto();
+            return result.Success(newEmployee.ToEmployeeResponceDto());
 
         }
         catch (Exception)

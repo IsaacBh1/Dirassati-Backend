@@ -1,5 +1,3 @@
-using System;
-
 namespace Dirassati_Backend.Features.Levels.DTOs;
 
 public class LevelDTO

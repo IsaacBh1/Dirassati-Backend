@@ -39,12 +39,12 @@ public class EmployeeAuthController : ControllerBase
         {
             return Unauthorized("Invalid email or password");
         }
-        
+
         if (!Guid.TryParse(user.Id, out Guid userGuid))
         {
             return Unauthorized("User identifier is not valid");
         }
-        
+
         // Compare by converting userGuid to string
         var employee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == userGuid.ToString());
         if (employee == null)
@@ -66,7 +66,8 @@ public class EmployeeAuthController : ControllerBase
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
             new Claim("EmployeeId", employee.EmployeeId.ToString()),
-            new Claim("Permission", employee.Permissions.ToString())
+            new Claim("Permission", employee.Permissions.ToString()),
+            new Claim("SchoolId", employee.SchoolId.ToString().ToUpper())
         };
 
         var token = new JwtSecurityToken(

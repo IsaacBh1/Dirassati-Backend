@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y git
 
 # Pull the latest version of the code from GitHub
 
-RUN if [ -d ".git" ]; then git pull origin main; else git clone  https://github.com/IsaacBh1/Dirassati-Backend.git .; fi
+RUN if [ -d ".git" ]; then git pull origin main; else git clone -b MohamedIslam  https://github.com/IsaacBh1/Dirassati-Backend.git .; fi
 
 # Restore dependencies
 RUN dotnet restore

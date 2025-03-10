@@ -5,9 +5,9 @@ public class Result<TResult, TError>
     public bool IsSuccess { get; private set; }
     public TError? Errors { get; private set; }
     public TResult? Value { get; private set; }
-    public int? ErrorCode { get; private set; }
+    public int StatusCode { get; private set; }
 
-    public static Result<TResult, TError> Success(TResult value)
+    public Result<TResult, TError> Success(TResult value, int statusCode = 200)
     {
         ArgumentNullException.ThrowIfNull(value);
         return
@@ -18,7 +18,7 @@ public class Result<TResult, TError>
          };
 
     }
-    public static Result<TResult, TError> Failure(int errorCode, TError errors)
+    public Result<TResult, TError> Failure(TError errors, int statusCode)
     {
         ArgumentNullException.ThrowIfNull(errors);
 
@@ -26,7 +26,7 @@ public class Result<TResult, TError>
         {
             IsSuccess = false,
             Errors = errors,
-            ErrorCode = errorCode
+            StatusCode = statusCode
         };
     }
 }

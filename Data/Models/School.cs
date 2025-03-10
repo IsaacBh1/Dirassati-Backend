@@ -32,15 +32,22 @@ public partial class School
     [ForeignKey(nameof(SchoolType))]
     public int SchoolTypeId { get; set; }
 
+
+    public int AcademicYearId { get; set; }
+
     // Navigation properties
     public virtual Address Address { get; set; } = new();
     public virtual SchoolType SchoolType { get; set; } = null!;
 
     // Collections
-    public virtual ICollection<AcademicYear> AcademicYears { get; set; } = new List<AcademicYear>();
+    public virtual ICollection<Student> Student { get; set; } = [];
+
+    public virtual ICollection<AcademicYear> AcademicYear { get; set; } = null!;
     public virtual ICollection<Classroom> Classrooms { get; set; } = new List<Classroom>();
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
     public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
     public virtual ICollection<PhoneNumber> PhoneNumbers { get; set; } = new List<PhoneNumber>();
     public virtual ICollection<Teacher> Teachers { get; set; } = new List<Teacher>();
+    public virtual ICollection<Specialization> Specializations { get; set; } = new List<Specialization>();
+
 }

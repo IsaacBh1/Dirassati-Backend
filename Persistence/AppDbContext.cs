@@ -1,4 +1,5 @@
 using Dirassati_Backend.Data.Models;
+using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Domain.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
     public virtual DbSet<Group> Groups { get; set; }
     public virtual DbSet<Parent> Parents { get; set; }
     public virtual DbSet<PhoneNumber> PhoneNumbers { get; set; }
-    public virtual DbSet<RelationshipToStudent> RelationshipToStudents { get; set; }
+    public virtual DbSet<ParentRelationshipToStudentType> ParentRelationshipToStudentTypes { get; set; }
     public virtual DbSet<School> Schools { get; set; }
     public virtual DbSet<SchoolLevel> SchoolLevels { get; set; }
     public virtual DbSet<Specialization> Specializations { get; set; }
@@ -29,10 +30,58 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
 
 
 
-    // protected override void OnModelCreating(ModelBuilder builder)
-    // {
-    //     builder.Entity<Teach>().HasKey(e => new { e.GroupId, e.SubjectId, e.TeacherId });
-    // }
+
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        SpecializationSeeder.SeedSpecializations(builder);
+        SchoolTypeSeeders.SeedSchoolTypes(builder);
+        SchoolLevelSeeder.SeedSchoolLevels(builder);
+        ParentRelationshipSeeder.SeedParentRelationships(builder);
+
+        base.OnModelCreating(builder);
+        builder.Entity<School>()
+        .HasMany(sch => sch.Specializations)
+        .WithMany(sp => sp.Schools);
+
+        builder.Entity<Student>()
+        .HasOne(s => s.ParentRelationshipToStudentType)
+        .WithMany(r => r.Students)
+        .OnDelete(DeleteBehavior.Restrict);
+
+
+        builder.Entity<School>()
+       .HasMany(sch => sch.Specializations)
+       .WithMany(sp => sp.Schools);
+
+        builder.Entity<Student>()
+            .HasOne(s => s.ParentRelationshipToStudentType)
+            .WithMany(r => r.Students)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Configure one-to-many relationship between School and Classroom
+        builder.Entity<Classroom>()
+            .HasOne(c => c.School)
+            .WithMany(s => s.Classrooms)
+            .HasForeignKey(c => c.SchoolId)
+            .OnDelete(DeleteBehavior.ClientSetNull);
+
+        // Configure one-to-one relationship between Parent and AppUser
+        builder.Entity<Parent>()
+            .HasOne(p => p.User)
+            .WithOne()
+            .HasForeignKey<Parent>(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure one-to-many relationship between School and AcademicYear
+        builder.Entity<AcademicYear>()
+            .HasOne(ay => ay.School)
+            .WithMany(s => s.AcademicYear)
+            .HasForeignKey(s => s.SchoolId)
+            .OnDelete(DeleteBehavior.ClientSetNull);
+
+
+    }
 
     //     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     // #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.

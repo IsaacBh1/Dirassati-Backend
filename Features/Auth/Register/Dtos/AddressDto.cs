@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.Auth.Register.Dtos;
 

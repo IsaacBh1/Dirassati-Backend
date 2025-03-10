@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Dirassati_Backend.Domain.Models;
 
 public partial class Specialization
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int StreamId { get; set; }
+
+    public int SpecializationId { get; set; }
 
     public string Name { get; set; } = null!;
 
@@ -17,5 +14,6 @@ public partial class Specialization
 
     public virtual ICollection<Student> Students { get; set; } = new List<Student>();
 
-    public virtual ICollection<SchoolLevel> SchoolLevels { get; set; } = new List<SchoolLevel>();
+    public virtual ICollection<School> Schools { get; set; } = new List<School>();
+
 }

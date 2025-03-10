@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dirassati_Backend.Domain.Models;
 
 public partial class Student
 {
     [Key]
-    public Guid StudentId { get; set; } = new Guid();
+    public Guid StudentId { get; set; } = Guid.NewGuid();
 
     public string FirstName { get; set; } = null!;
 
@@ -16,7 +14,7 @@ public partial class Student
 
     public string Address { get; set; } = null!;
 
-    public string BirthDate { get; set; } = null!;
+    public DateOnly BirthDate { get; set; }
 
     public string BirthPlace { get; set; } = null!;
 
@@ -24,20 +22,34 @@ public partial class Student
 
     public string EmergencyContact { get; set; } = null!;
 
-    public int AcademicYearId { get; set; }
 
-    public byte[]? PhotoURL;
+    [ForeignKey(nameof(SchoolLevel))]
+    public int SchoolLevelId { get; set; }
+
+    [ForeignKey(nameof(Specialization))]
+    public int? SpecializationId { get; set; }
+
+    public int ParentRelationshipToStudentTypeId { get; set; }
+
+    public byte[]? PhotoUrl { get; set; }
 
     public DateOnly EnrollmentDate { get; set; }
 
-    public Guid ParentId { get; set; } = Guid.Empty;
+    [ForeignKey("Parent")]
+    public Guid ParentId { get; set; }
 
-    public bool IsActive { get; set; }
+    public bool IsActive { get; set; } = true;
 
-    public int StreamId { get; set; }
+    public Guid SchoolId { get; set; }
 
+    public ParentRelationshipToStudentType ParentRelationshipToStudentType { get; set; } = null!;
+
+    // Navigation properties
+    public virtual School School { get; set; } = null!;
+
+    public virtual SchoolLevel SchoolLevel { get; set; } = null!;
+    public virtual Specialization? Specialization { get; set; }
+    public virtual Parent Parent { get; set; } = null!;
     public virtual ICollection<Absence> Absences { get; set; } = new List<Absence>();
 
-    public virtual Specialization Stream { get; set; } = null!;
-    public virtual AcademicYear AcademicYear { get; set; } = null!;
 }

@@ -7,7 +7,6 @@ namespace Dirassati_Backend.Domain.Models;
 public partial class SchoolLevel
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int LevelId { get; set; }
 
     [Required]
@@ -15,7 +14,7 @@ public partial class SchoolLevel
     public int SchoolTypeId { get; set; }
 
     [Required]
-    [Range(1, 12)] // Assuming years 1-12 for school levels
+    [Range(1, 5)]
     public int LevelYear { get; set; }
 
     // Navigation properties
@@ -23,5 +22,5 @@ public partial class SchoolLevel
 
     public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
 
-    public virtual ICollection<Specialization> Specializations { get; set; } = new List<Specialization>();
+
 }

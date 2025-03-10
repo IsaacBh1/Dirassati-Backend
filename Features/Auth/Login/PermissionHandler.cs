@@ -1,7 +1,5 @@
 // Dirassati_Backend/Shared/Authorization/PermissionHandler.cs
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
 {

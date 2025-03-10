@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  mailserver:
+    image: rnwood/smtp4dev:latest
+    container_name: smtp4dev
+    ports:
+      - "5025:25" # SMTP port
+      - "5080:80" # Web interface
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
