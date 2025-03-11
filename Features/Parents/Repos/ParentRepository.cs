@@ -1,13 +1,13 @@
 using AutoMapper;
-using AutoMapper;
 using Dirassati_Backend.Domain.Models;
-using Dirassati_Backend.Features.Common;
-using Dirassati_Backend.Features.Parents.Dtos;
-using Dirassati_Backend.Features.Common;
+using Dirassati_Backend.Features.Common; // Contains PaginatedResult<T>
 using Dirassati_Backend.Features.Parents.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-using static Dirassati_Backend.Features.Parents.Dtos.ParentDtos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using static Dirassati_Backend.Features.Parents.Dtos.ParentDtos;
 
 namespace Dirassati_Backend.Features.Parents.Repositories
@@ -16,77 +16,62 @@ namespace Dirassati_Backend.Features.Parents.Repositories
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        public ParentRepository(AppDbContext context, IMapper mapper)
-        private readonly IMapper _mapper;
+
         public ParentRepository(AppDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
-            _mapper = mapper;
         }
-        public async Task<IEnumerable<GetParentDto>> GetAllBySchoolIdAsync(Guid schoolId)
+
+        // Gets all parents for a given school (non-paginated)
         public async Task<IEnumerable<GetParentDto>> GetAllBySchoolIdAsync(Guid schoolId)
         {
             var parents = await _context.Parents
-            .Include(p => p.User)
-            .Include(p => p.relationshipToStudent)
-            .Where(p => _context.Students.Any(s => s.ParentId == p.ParentId && s.SchoolId == schoolId))
-            .ToListAsync();
+                .Include(p => p.User)
+                // Removed relationshipToStudent include, since it's now determined from Student.
+                .Where(p => _context.Students.Any(s => s.ParentId == p.ParentId && s.SchoolId == schoolId))
+                .ToListAsync();
 
             return _mapper.Map<IEnumerable<GetParentDto>>(parents);
         }
 
-
-
-        public async Task<PaginatedResult<GetParentDto>> GetAllBySchoolIdAsync(Guid schoolId, int pageNumber, int pageSize)
-            var parents = await _context.Parents
-            .Include(p => p.User)
-            .Include(p => p.relationshipToStudent)
-            .Where(p => _context.Students.Any(s => s.ParentId == p.ParentId && s.SchoolId == schoolId))
-            .ToListAsync();
-
-            return _mapper.Map<IEnumerable<GetParentDto>>(parents);
-        }
-
-
-
+        // Gets all parents for a given school, paginated
         public async Task<PaginatedResult<GetParentDto>> GetAllBySchoolIdAsync(Guid schoolId, int pageNumber, int pageSize)
         {
             var query = _context.Parents
-            .Include(p => p.User)
-            .Include(p => p.relationshipToStudent)
-            .Where(p => _context.Students.Any(s => s.ParentId == p.ParentId && s.SchoolId == schoolId));
+                .Include(p => p.User)
+                // Removed relationshipToStudent include.
+                .Where(p => _context.Students.Any(s => s.ParentId == p.ParentId && s.SchoolId == schoolId));
 
             var totalRecords = await query.CountAsync();
             var parents = await query
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
             var parentDtos = _mapper.Map<IEnumerable<GetParentDto>>(parents);
 
             return new PaginatedResult<GetParentDto>
             {
-            Items = parentDtos,
-            TotalRecords = totalRecords,
-            PageNumber = pageNumber,
-            PageSize = pageSize
+                Items = parentDtos,
+                TotalRecords = totalRecords,
+                PageNumber = pageNumber,
+                PageSize = pageSize
             };
         }
 
-
+        // Gets a single parent by its ID
         public async Task<GetParentDto?> GetParentByIdAsync(Guid parentId)
         {
             var parent = await _context.Parents
                 .Include(p => p.User)
-                .Include(p => p.relationshipToStudent)
+                //.Include(p => p.relationshipToStudent) // Removed as per new logic.
                 .FirstOrDefaultAsync(p => p.ParentId == parentId);
 
             return parent == null ? null : _mapper.Map<GetParentDto>(parent);
         }
 
-
-
+        // Creates a new parent record
         public async Task<Parent> CreateAsync(Parent parent)
         {
             _context.Parents.Add(parent);
@@ -94,48 +79,24 @@ namespace Dirassati_Backend.Features.Parents.Repositories
             return parent;
         }
 
-        public async Task<GetParentDto?> UpdateAsync(UpdateParentDto updateDto)
+        // Updates an existing parent record based on a DTO
         public async Task<GetParentDto?> UpdateAsync(UpdateParentDto updateDto)
         {
             var existingParent = await _context.Parents
-                .Include(p => p.User)
-                .FirstOrDefaultAsync(p => p.ParentId == updateDto.ParentId);
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(p => p.ParentId == updateDto.ParentId);
 
             if (existingParent == null)
                 return null;
 
-
-            // note , this is for front end if he send a wrong RelationshipToStudentId
-
-            bool isValidRelationship = await _context.RelationshipToStudents
-        .AnyAsync(r => r.Id == updateDto.RelationshipToStudentId);
-
-            if (!isValidRelationship)
-                throw new InvalidOperationException("Invalid RelationshipToStudentId.");
-
-
-            _mapper.Map(updateDto, existingParent);
-
-            // note , this is for front end if he send a wrong RelationshipToStudentId
-
-            bool isValidRelationship = await _context.RelationshipToStudents
-        .AnyAsync(r => r.Id == updateDto.RelationshipToStudentId);
-
-            if (!isValidRelationship)
-                throw new InvalidOperationException("Invalid RelationshipToStudentId.");
-
-
+            // Relationship validation removed since parent's relationship logic is now in Student.
             _mapper.Map(updateDto, existingParent);
 
             await _context.SaveChangesAsync();
             return _mapper.Map<GetParentDto>(existingParent);
-            return _mapper.Map<GetParentDto>(existingParent);
         }
 
-
-
+        // Deletes a parent record
         public async Task<bool> DeleteAsync(Guid id)
         {
             var parent = await _context.Parents.FindAsync(id);
@@ -147,86 +108,47 @@ namespace Dirassati_Backend.Features.Parents.Repositories
             return true;
         }
 
-
+        // Gets students by a parent's ID (returns a collection of getStudentDto)
         public async Task<IEnumerable<getStudentDto>> GetStudentsByParentIdAsync(Guid parentId)
         {
-            var students = await _context.Students.Where(s => s.ParentId == parentId).ToListAsync();
+            var students = await _context.Students
+                .Where(s => s.ParentId == parentId)
+                .ToListAsync();
+
             return students.Select(s => new getStudentDto
             {
                 StudentId = s.StudentId,
                 FirstName = s.FirstName,
                 LastName = s.LastName,
                 EnrollmentDate = s.EnrollmentDate,
-                Grade = s.LevelYear + " " + s.Stream?.Name,
+                Grade = s.SchoolLevel.LevelYear.ToString()+" "+s.Specialization?.Name ?? string.Empty,
                 IsActive = s.IsActive
             });
-
         }
 
-
+        // Gets a parent by a student's ID (returns getStudentParentDto)
         public async Task<getStudentParentDto?> GetParentByStudentIdAsync(Guid studentId)
         {
             var student = await _context.Students
-            .Include(s => s.parent)
-                .ThenInclude(p => p.User)
-            .FirstOrDefaultAsync(s => s.StudentId == studentId);
+                .Include(s => s.Parent)   // Navigation property in Student
+                    .ThenInclude(p => p.User)
+                .Include(s => s.ParentRelationshipToStudentType) // Use the student's relationship type
+                .FirstOrDefaultAsync(s => s.StudentId == studentId);
 
-            if (student?.parent == null)
+            if (student?.Parent == null)
                 return null;
 
             return new getStudentParentDto
             {
-                ParentId = student.parent.ParentId,
-                FirstName = student.parent.User.FirstName,
-                LastName = student.parent.User.LastName,
-                Occupation = student.parent.Occupation,
-                RelationshipToStudent = student.parent.relationshipToStudent?.Name ?? string.Empty,
-                Email = student.parent?.User?.Email ?? string.Empty,
-                PhoneNumber = student.parent?.User?.PhoneNumber ?? string.Empty,
+                ParentId = student.Parent.ParentId,
+                FirstName = student.Parent.User.FirstName,
+                LastName = student.Parent.User.LastName,
+                Occupation = student.Parent.Occupation,
+                // Use the relationship type from the Student entity
+                RelationshipToStudent = student.ParentRelationshipToStudentType?.Name ?? string.Empty,
+                Email = student.Parent.User.Email ?? string.Empty,
+                PhoneNumber = student.Parent.User.PhoneNumber ?? string.Empty,
             };
         }
-
-
-
-
-        public async Task<IEnumerable<getStudentDto>> GetStudentsByParentIdAsync(Guid parentId)
-        {
-            var students = await _context.Students.Where(s => s.ParentId == parentId).ToListAsync();
-            return students.Select(s => new getStudentDto
-            {
-                StudentId = s.StudentId,
-                FirstName = s.FirstName,
-                LastName = s.LastName,
-                EnrollmentDate = s.EnrollmentDate,
-                Grade = s.LevelYear + " " + s.Stream?.Name,
-                IsActive = s.IsActive
-            });
-
-        }
-
-
-        public async Task<getStudentParentDto?> GetParentByStudentIdAsync(Guid studentId)
-        {
-            var student = await _context.Students
-            .Include(s => s.parent)
-                .ThenInclude(p => p.User)
-            .FirstOrDefaultAsync(s => s.StudentId == studentId);
-
-            if (student?.parent == null)
-                return null;
-
-            return new getStudentParentDto
-            {
-                ParentId = student.parent.ParentId,
-                FirstName = student.parent.User.FirstName,
-                LastName = student.parent.User.LastName,
-                Occupation = student.parent.Occupation,
-                RelationshipToStudent = student.parent.relationshipToStudent?.Name ?? string.Empty,
-                Email = student.parent?.User?.Email ?? string.Empty,
-                PhoneNumber = student.parent?.User?.PhoneNumber ?? string.Empty,
-            };
-        }
-
-
     }
 }
