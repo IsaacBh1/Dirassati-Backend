@@ -1,11 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
+
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
 namespace Dirassati_Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class ConfigureTypesV2 : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -83,7 +86,7 @@ namespace Dirassati_Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RelationshipToStudents",
+                name: "ParentRelationshipToStudentTypes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -92,34 +95,33 @@ namespace Dirassati_Backend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RelationshipToStudents", x => x.Id);
+                    table.PrimaryKey("PK_ParentRelationshipToStudentTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "SchoolLevels",
+                name: "SchoolTypes",
                 columns: table => new
                 {
-                    LevelId = table.Column<int>(type: "INTEGER", nullable: false)
+                    SchoolTypeId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    LevelType = table.Column<string>(type: "TEXT", nullable: false),
-                    LevelYear = table.Column<int>(type: "INTEGER", nullable: false)
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SchoolLevels", x => x.LevelId);
+                    table.PrimaryKey("PK_SchoolTypes", x => x.SchoolTypeId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Specializations",
                 columns: table => new
                 {
-                    StreamId = table.Column<int>(type: "INTEGER", nullable: false)
+                    SpecializationId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Specializations", x => x.StreamId);
+                    table.PrimaryKey("PK_Specializations", x => x.SpecializationId);
                 });
 
             migrationBuilder.CreateTable(
@@ -133,30 +135,6 @@ namespace Dirassati_Backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Subjects", x => x.SubjectId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Schools",
-                columns: table => new
-                {
-                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    AddressId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Logo = table.Column<string>(type: "TEXT", nullable: false),
-                    WebsiteUrl = table.Column<string>(type: "TEXT", nullable: false),
-                    SchoolConfig = table.Column<string>(type: "TEXT", nullable: false),
-                    SchoolType = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Schools", x => x.SchoolId);
-                    table.ForeignKey(
-                        name: "FK_Schools_Adresses_AddressId",
-                        column: x => x.AddressId,
-                        principalTable: "Adresses",
-                        principalColumn: "AdresseId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -270,48 +248,69 @@ namespace Dirassati_Backend.Migrations
                 columns: table => new
                 {
                     ParentId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
                     Occupation = table.Column<string>(type: "TEXT", nullable: false),
-                    RelationshipToStudentId = table.Column<int>(type: "INTEGER", nullable: false),
-                    UserId1 = table.Column<string>(type: "TEXT", nullable: true)
+                    NationalIdentityNumber = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Parents", x => x.ParentId);
                     table.ForeignKey(
-                        name: "FK_Parents_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
+                        name: "FK_Parents_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Parents_RelationshipToStudents_RelationshipToStudentId",
-                        column: x => x.RelationshipToStudentId,
-                        principalTable: "RelationshipToStudents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "SchoolLevelSpecialization",
+                name: "SchoolLevels",
                 columns: table => new
                 {
-                    SchoolLevelsLevelId = table.Column<int>(type: "INTEGER", nullable: false),
-                    StreamsStreamId = table.Column<int>(type: "INTEGER", nullable: false)
+                    LevelId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SchoolTypeId = table.Column<int>(type: "INTEGER", nullable: false),
+                    LevelYear = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SchoolLevelSpecialization", x => new { x.SchoolLevelsLevelId, x.StreamsStreamId });
+                    table.PrimaryKey("PK_SchoolLevels", x => x.LevelId);
                     table.ForeignKey(
-                        name: "FK_SchoolLevelSpecialization_SchoolLevels_SchoolLevelsLevelId",
-                        column: x => x.SchoolLevelsLevelId,
-                        principalTable: "SchoolLevels",
-                        principalColumn: "LevelId",
+                        name: "FK_SchoolLevels_SchoolTypes_SchoolTypeId",
+                        column: x => x.SchoolTypeId,
+                        principalTable: "SchoolTypes",
+                        principalColumn: "SchoolTypeId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Schools",
+                columns: table => new
+                {
+                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    AddressId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Logo = table.Column<string>(type: "TEXT", nullable: false),
+                    WebsiteUrl = table.Column<string>(type: "TEXT", nullable: false),
+                    SchoolConfig = table.Column<string>(type: "TEXT", nullable: false),
+                    SchoolTypeId = table.Column<int>(type: "INTEGER", nullable: false),
+                    AcademicYearId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Schools", x => x.SchoolId);
+                    table.ForeignKey(
+                        name: "FK_Schools_Adresses_AddressId",
+                        column: x => x.AddressId,
+                        principalTable: "Adresses",
+                        principalColumn: "AdresseId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SchoolLevelSpecialization_Specializations_StreamsStreamId",
-                        column: x => x.StreamsStreamId,
-                        principalTable: "Specializations",
-                        principalColumn: "StreamId",
+                        name: "FK_Schools_SchoolTypes_SchoolTypeId",
+                        column: x => x.SchoolTypeId,
+                        principalTable: "SchoolTypes",
+                        principalColumn: "SchoolTypeId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -332,8 +331,7 @@ namespace Dirassati_Backend.Migrations
                         name: "FK_AcademicYears_Schools_SchoolId",
                         column: x => x.SchoolId,
                         principalTable: "Schools",
-                        principalColumn: "SchoolId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "SchoolId");
                 });
 
             migrationBuilder.CreateTable(
@@ -343,18 +341,16 @@ namespace Dirassati_Backend.Migrations
                     ClassroomId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     ClassName = table.Column<string>(type: "TEXT", nullable: false),
-                    SchoolId = table.Column<string>(type: "TEXT", nullable: false),
-                    SchoolId1 = table.Column<Guid>(type: "TEXT", nullable: false)
+                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Classrooms", x => x.ClassroomId);
                     table.ForeignKey(
-                        name: "FK_Classrooms_Schools_SchoolId1",
-                        column: x => x.SchoolId1,
+                        name: "FK_Classrooms_Schools_SchoolId",
+                        column: x => x.SchoolId,
                         principalTable: "Schools",
-                        principalColumn: "SchoolId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "SchoolId");
                 });
 
             migrationBuilder.CreateTable(
@@ -405,6 +401,85 @@ namespace Dirassati_Backend.Migrations
                         principalTable: "Schools",
                         principalColumn: "SchoolId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SchoolSpecialization",
+                columns: table => new
+                {
+                    SchoolsSchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SpecializationsSpecializationId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SchoolSpecialization", x => new { x.SchoolsSchoolId, x.SpecializationsSpecializationId });
+                    table.ForeignKey(
+                        name: "FK_SchoolSpecialization_Schools_SchoolsSchoolId",
+                        column: x => x.SchoolsSchoolId,
+                        principalTable: "Schools",
+                        principalColumn: "SchoolId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SchoolSpecialization_Specializations_SpecializationsSpecializationId",
+                        column: x => x.SpecializationsSpecializationId,
+                        principalTable: "Specializations",
+                        principalColumn: "SpecializationId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Students",
+                columns: table => new
+                {
+                    StudentId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
+                    LastName = table.Column<string>(type: "TEXT", nullable: false),
+                    Address = table.Column<string>(type: "TEXT", nullable: false),
+                    BirthDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    BirthPlace = table.Column<string>(type: "TEXT", nullable: false),
+                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    StudentIdNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    EmergencyContact = table.Column<string>(type: "TEXT", nullable: false),
+                    SchoolLevelId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SpecializationId = table.Column<int>(type: "INTEGER", nullable: true),
+                    ParentRelationshipToStudentTypeId = table.Column<int>(type: "INTEGER", nullable: false),
+                    PhotoUrl = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    EnrollmentDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    ParentId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Students", x => x.StudentId);
+                    table.ForeignKey(
+                        name: "FK_Students_ParentRelationshipToStudentTypes_ParentRelationshipToStudentTypeId",
+                        column: x => x.ParentRelationshipToStudentTypeId,
+                        principalTable: "ParentRelationshipToStudentTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Students_Parents_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "Parents",
+                        principalColumn: "ParentId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Students_SchoolLevels_SchoolLevelId",
+                        column: x => x.SchoolLevelId,
+                        principalTable: "SchoolLevels",
+                        principalColumn: "LevelId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Students_Schools_SchoolId",
+                        column: x => x.SchoolId,
+                        principalTable: "Schools",
+                        principalColumn: "SchoolId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Students_Specializations_SpecializationId",
+                        column: x => x.SpecializationId,
+                        principalTable: "Specializations",
+                        principalColumn: "SpecializationId");
                 });
 
             migrationBuilder.CreateTable(
@@ -477,41 +552,27 @@ namespace Dirassati_Backend.Migrations
                         name: "FK_Groups_Specializations_StreamId",
                         column: x => x.StreamId,
                         principalTable: "Specializations",
-                        principalColumn: "StreamId");
+                        principalColumn: "SpecializationId");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Students",
+                name: "Absences",
                 columns: table => new
                 {
+                    AbsenceId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DateTIme = table.Column<DateTime>(type: "TEXT", nullable: false),
                     StudentId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
-                    LastName = table.Column<string>(type: "TEXT", nullable: false),
-                    Address = table.Column<string>(type: "TEXT", nullable: false),
-                    BirthDate = table.Column<string>(type: "TEXT", nullable: false),
-                    BirthPlace = table.Column<string>(type: "TEXT", nullable: false),
-                    StudentIdNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    EmergencyContact = table.Column<string>(type: "TEXT", nullable: false),
-                    AcademicYearId = table.Column<int>(type: "INTEGER", nullable: false),
-                    EnrollmentDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    ParentId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
-                    StreamId = table.Column<int>(type: "INTEGER", nullable: false)
+                    IsJustified = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Remark = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Students", x => x.StudentId);
+                    table.PrimaryKey("PK_Absences", x => x.AbsenceId);
                     table.ForeignKey(
-                        name: "FK_Students_AcademicYears_AcademicYearId",
-                        column: x => x.AcademicYearId,
-                        principalTable: "AcademicYears",
-                        principalColumn: "AcademicYearId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Students_Specializations_StreamId",
-                        column: x => x.StreamId,
-                        principalTable: "Specializations",
-                        principalColumn: "StreamId",
+                        name: "FK_Absences_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "StudentId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -572,25 +633,64 @@ namespace Dirassati_Backend.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Absences",
-                columns: table => new
+            migrationBuilder.InsertData(
+                table: "ParentRelationshipToStudentTypes",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
                 {
-                    AbsenceId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    DateTIme = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    StudentId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    IsJustified = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Remark = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
+                    { 1, "Père" },
+                    { 2, "Mère" },
+                    { 3, "Tuteur légal" },
+                    { 4, "Grand-parent" },
+                    { 5, "Oncle/Tante" },
+                    { 6, "Frère/Sœur majeur(e)" },
+                    { 7, "Autre famille" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "SchoolTypes",
+                columns: new[] { "SchoolTypeId", "Name" },
+                values: new object[,]
                 {
-                    table.PrimaryKey("PK_Absences", x => x.AbsenceId);
-                    table.ForeignKey(
-                        name: "FK_Absences_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
-                        principalColumn: "StudentId",
-                        onDelete: ReferentialAction.Cascade);
+                    { 1, "Primaire" },
+                    { 2, "Moyenne" },
+                    { 3, "Lycee" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Specializations",
+                columns: new[] { "SpecializationId", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Science" },
+                    { 2, "Lettres" },
+                    { 3, "Gestion et Économie" },
+                    { 4, "Mathématiques" },
+                    { 5, "Sciences Expérimentales" },
+                    { 6, "Technique Mathématiques - Génie Civil" },
+                    { 7, "Technique Mathématiques - Génie Électrique" },
+                    { 8, "Technique Mathématiques - Génie Mécanique" },
+                    { 9, "Lettres et Philosophie" },
+                    { 10, "Langues Etrangeres" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "SchoolLevels",
+                columns: new[] { "LevelId", "LevelYear", "SchoolTypeId" },
+                values: new object[,]
+                {
+                    { 1, 1, 1 },
+                    { 2, 2, 1 },
+                    { 3, 3, 1 },
+                    { 4, 4, 1 },
+                    { 5, 5, 1 },
+                    { 6, 1, 2 },
+                    { 7, 2, 2 },
+                    { 8, 3, 2 },
+                    { 9, 4, 2 },
+                    { 10, 1, 3 },
+                    { 11, 2, 3 },
+                    { 12, 3, 3 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -641,9 +741,9 @@ namespace Dirassati_Backend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Classrooms_SchoolId1",
+                name: "IX_Classrooms_SchoolId",
                 table: "Classrooms",
-                column: "SchoolId1");
+                column: "SchoolId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_SchoolId",
@@ -676,14 +776,10 @@ namespace Dirassati_Backend.Migrations
                 column: "StreamId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Parents_RelationshipToStudentId",
+                name: "IX_Parents_UserId",
                 table: "Parents",
-                column: "RelationshipToStudentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Parents_UserId1",
-                table: "Parents",
-                column: "UserId1");
+                column: "UserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_PhoneNumbers_SchoolId",
@@ -691,9 +787,9 @@ namespace Dirassati_Backend.Migrations
                 column: "SchoolId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SchoolLevelSpecialization_StreamsStreamId",
-                table: "SchoolLevelSpecialization",
-                column: "StreamsStreamId");
+                name: "IX_SchoolLevels_SchoolTypeId",
+                table: "SchoolLevels",
+                column: "SchoolTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Schools_AddressId",
@@ -702,14 +798,39 @@ namespace Dirassati_Backend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_AcademicYearId",
-                table: "Students",
-                column: "AcademicYearId");
+                name: "IX_Schools_SchoolTypeId",
+                table: "Schools",
+                column: "SchoolTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_StreamId",
+                name: "IX_SchoolSpecialization_SpecializationsSpecializationId",
+                table: "SchoolSpecialization",
+                column: "SpecializationsSpecializationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_ParentId",
                 table: "Students",
-                column: "StreamId");
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_ParentRelationshipToStudentTypeId",
+                table: "Students",
+                column: "ParentRelationshipToStudentTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_SchoolId",
+                table: "Students",
+                column: "SchoolId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_SchoolLevelId",
+                table: "Students",
+                column: "SchoolLevelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_SpecializationId",
+                table: "Students",
+                column: "SpecializationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SubjectTeacher_TeachersTeacherId",
@@ -775,13 +896,10 @@ namespace Dirassati_Backend.Migrations
                 name: "Employees");
 
             migrationBuilder.DropTable(
-                name: "Parents");
-
-            migrationBuilder.DropTable(
                 name: "PhoneNumbers");
 
             migrationBuilder.DropTable(
-                name: "SchoolLevelSpecialization");
+                name: "SchoolSpecialization");
 
             migrationBuilder.DropTable(
                 name: "SubjectTeacher");
@@ -796,9 +914,6 @@ namespace Dirassati_Backend.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "RelationshipToStudents");
-
-            migrationBuilder.DropTable(
                 name: "Groups");
 
             migrationBuilder.DropTable(
@@ -806,6 +921,12 @@ namespace Dirassati_Backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Teachers");
+
+            migrationBuilder.DropTable(
+                name: "ParentRelationshipToStudentTypes");
+
+            migrationBuilder.DropTable(
+                name: "Parents");
 
             migrationBuilder.DropTable(
                 name: "AcademicYears");
@@ -817,16 +938,19 @@ namespace Dirassati_Backend.Migrations
                 name: "Specializations");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "ContractTypes");
 
             migrationBuilder.DropTable(
-                name: "ContractTypes");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Schools");
 
             migrationBuilder.DropTable(
                 name: "Adresses");
+
+            migrationBuilder.DropTable(
+                name: "SchoolTypes");
         }
     }
 }

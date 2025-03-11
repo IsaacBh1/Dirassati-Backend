@@ -17,9 +17,9 @@ namespace Dirassati_Backend.Features.ParentRelationShip
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RelationshipToStudent>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ParentRelationshipToStudentType>>> GetAll()
         {
-            var relationships = await _context.RelationshipToStudents.ToListAsync();
+            var relationships = await _context.ParentRelationshipToStudentTypes.ToListAsync();
             return Ok(relationships);
         }
     }

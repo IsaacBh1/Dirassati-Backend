@@ -18,8 +18,7 @@ namespace Dirassati_Backend.Mappings
                 .ForMember(dest => dest.NormalizedEmail, opt => opt.MapFrom(src => src.User.NormalizedEmail))
                 .ForMember(dest => dest.EmailConfirmed, opt => opt.MapFrom(src => src.User.EmailConfirmed))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
-                .ForMember(dest => dest.PhoneNumberConfirmed, opt => opt.MapFrom(src => src.User.PhoneNumberConfirmed))
-                .ForMember(dest => dest.RelationshipName, opt => opt.MapFrom(src => src.relationshipToStudent.Name));
+                .ForMember(dest => dest.PhoneNumberConfirmed, opt => opt.MapFrom(src => src.User.PhoneNumberConfirmed));
         
             CreateMap<UpdateParentDto, Parent>()
             .ForMember(dest => dest.User, opt => opt.Ignore())

@@ -11,8 +11,8 @@ using Persistence;
 namespace Dirassati_Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250308002147_changeStudentTableMigration")]
-    partial class changeStudentTableMigration
+    [Migration("20250311014916_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,6 +93,38 @@ namespace Dirassati_Backend.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("Dirassati_Backend.Data.Models.SchoolType", b =>
+                {
+                    b.Property<int>("SchoolTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("SchoolTypeId");
+
+                    b.ToTable("SchoolTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            SchoolTypeId = 1,
+                            Name = "Primaire"
+                        },
+                        new
+                        {
+                            SchoolTypeId = 2,
+                            Name = "Moyenne"
+                        },
+                        new
+                        {
+                            SchoolTypeId = 3,
+                            Name = "Lycee"
+                        });
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.Absence", b =>
@@ -182,16 +214,12 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("SchoolId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("SchoolId1")
+                    b.Property<Guid>("SchoolId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ClassroomId");
 
-                    b.HasIndex("SchoolId1");
+                    b.HasIndex("SchoolId");
 
                     b.ToTable("Classrooms");
                 });
@@ -294,26 +322,76 @@ namespace Dirassati_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("NationalIdentityNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Occupation")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("RelationshipToStudentId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId1")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("ParentId");
 
-                    b.HasIndex("RelationshipToStudentId");
-
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Parents");
+                });
+
+            modelBuilder.Entity("Dirassati_Backend.Domain.Models.ParentRelationshipToStudentType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ParentRelationshipToStudentTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Père"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Mère"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Tuteur légal"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Grand-parent"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Oncle/Tante"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Frère/Sœur majeur(e)"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Autre famille"
+                        });
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.PhoneNumber", b =>
@@ -336,26 +414,14 @@ namespace Dirassati_Backend.Migrations
                     b.ToTable("PhoneNumbers");
                 });
 
-            modelBuilder.Entity("Dirassati_Backend.Domain.Models.RelationshipToStudent", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RelationshipToStudents");
-                });
-
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.School", b =>
                 {
                     b.Property<Guid>("SchoolId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("AcademicYearId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("AddressId")
                         .HasColumnType("INTEGER");
@@ -370,15 +436,15 @@ namespace Dirassati_Backend.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SchoolConfig")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("SchoolType")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("SchoolTypeId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("WebsiteUrl")
                         .IsRequired()
@@ -389,6 +455,8 @@ namespace Dirassati_Backend.Migrations
                     b.HasIndex("AddressId")
                         .IsUnique();
 
+                    b.HasIndex("SchoolTypeId");
+
                     b.ToTable("Schools");
                 });
 
@@ -398,21 +466,96 @@ namespace Dirassati_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("LevelType")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("LevelYear")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SchoolTypeId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("LevelId");
 
+                    b.HasIndex("SchoolTypeId");
+
                     b.ToTable("SchoolLevels");
+
+                    b.HasData(
+                        new
+                        {
+                            LevelId = 1,
+                            LevelYear = 1,
+                            SchoolTypeId = 1
+                        },
+                        new
+                        {
+                            LevelId = 2,
+                            LevelYear = 2,
+                            SchoolTypeId = 1
+                        },
+                        new
+                        {
+                            LevelId = 3,
+                            LevelYear = 3,
+                            SchoolTypeId = 1
+                        },
+                        new
+                        {
+                            LevelId = 4,
+                            LevelYear = 4,
+                            SchoolTypeId = 1
+                        },
+                        new
+                        {
+                            LevelId = 5,
+                            LevelYear = 5,
+                            SchoolTypeId = 1
+                        },
+                        new
+                        {
+                            LevelId = 6,
+                            LevelYear = 1,
+                            SchoolTypeId = 2
+                        },
+                        new
+                        {
+                            LevelId = 7,
+                            LevelYear = 2,
+                            SchoolTypeId = 2
+                        },
+                        new
+                        {
+                            LevelId = 8,
+                            LevelYear = 3,
+                            SchoolTypeId = 2
+                        },
+                        new
+                        {
+                            LevelId = 9,
+                            LevelYear = 4,
+                            SchoolTypeId = 2
+                        },
+                        new
+                        {
+                            LevelId = 10,
+                            LevelYear = 1,
+                            SchoolTypeId = 3
+                        },
+                        new
+                        {
+                            LevelId = 11,
+                            LevelYear = 2,
+                            SchoolTypeId = 3
+                        },
+                        new
+                        {
+                            LevelId = 12,
+                            LevelYear = 3,
+                            SchoolTypeId = 3
+                        });
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.Specialization", b =>
                 {
-                    b.Property<int>("StreamId")
+                    b.Property<int>("SpecializationId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -420,9 +563,61 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("StreamId");
+                    b.HasKey("SpecializationId");
 
                     b.ToTable("Specializations");
+
+                    b.HasData(
+                        new
+                        {
+                            SpecializationId = 1,
+                            Name = "Science"
+                        },
+                        new
+                        {
+                            SpecializationId = 2,
+                            Name = "Lettres"
+                        },
+                        new
+                        {
+                            SpecializationId = 3,
+                            Name = "Gestion et Économie"
+                        },
+                        new
+                        {
+                            SpecializationId = 4,
+                            Name = "Mathématiques"
+                        },
+                        new
+                        {
+                            SpecializationId = 5,
+                            Name = "Sciences Expérimentales"
+                        },
+                        new
+                        {
+                            SpecializationId = 6,
+                            Name = "Technique Mathématiques - Génie Civil"
+                        },
+                        new
+                        {
+                            SpecializationId = 7,
+                            Name = "Technique Mathématiques - Génie Électrique"
+                        },
+                        new
+                        {
+                            SpecializationId = 8,
+                            Name = "Technique Mathématiques - Génie Mécanique"
+                        },
+                        new
+                        {
+                            SpecializationId = 9,
+                            Name = "Lettres et Philosophie"
+                        },
+                        new
+                        {
+                            SpecializationId = 10,
+                            Name = "Langues Etrangeres"
+                        });
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.Student", b =>
@@ -431,15 +626,11 @@ namespace Dirassati_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("AcademicYearId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("BirthDate")
-                        .IsRequired()
+                    b.Property<DateOnly>("BirthDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("BirthPlace")
@@ -464,16 +655,22 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<byte>("LevelYear")
-                        .HasColumnType("INTEGER");
-
                     b.Property<Guid>("ParentId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("ParentRelationshipToStudentTypeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("PhotoUrl")
+                        .HasColumnType("BLOB");
 
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("StreamId")
+                    b.Property<int>("SchoolLevelId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SpecializationId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("StudentIdNumber")
@@ -481,11 +678,15 @@ namespace Dirassati_Backend.Migrations
 
                     b.HasKey("StudentId");
 
-                    b.HasIndex("AcademicYearId");
-
                     b.HasIndex("ParentId");
 
-                    b.HasIndex("StreamId");
+                    b.HasIndex("ParentRelationshipToStudentTypeId");
+
+                    b.HasIndex("SchoolId");
+
+                    b.HasIndex("SchoolLevelId");
+
+                    b.HasIndex("SpecializationId");
 
                     b.ToTable("Students");
                 });
@@ -689,19 +890,19 @@ namespace Dirassati_Backend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SchoolLevelSpecialization", b =>
+            modelBuilder.Entity("SchoolSpecialization", b =>
                 {
-                    b.Property<int>("SchoolLevelsLevelId")
+                    b.Property<Guid>("SchoolsSchoolId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SpecializationsSpecializationId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("StreamsStreamId")
-                        .HasColumnType("INTEGER");
+                    b.HasKey("SchoolsSchoolId", "SpecializationsSpecializationId");
 
-                    b.HasKey("SchoolLevelsLevelId", "StreamsStreamId");
+                    b.HasIndex("SpecializationsSpecializationId");
 
-                    b.HasIndex("StreamsStreamId");
-
-                    b.ToTable("SchoolLevelSpecialization");
+                    b.ToTable("SchoolSpecialization");
                 });
 
             modelBuilder.Entity("SubjectTeacher", b =>
@@ -733,9 +934,8 @@ namespace Dirassati_Backend.Migrations
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.AcademicYear", b =>
                 {
                     b.HasOne("Dirassati_Backend.Domain.Models.School", "School")
-                        .WithMany("AcademicYears")
+                        .WithMany("AcademicYear")
                         .HasForeignKey("SchoolId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("School");
@@ -745,8 +945,7 @@ namespace Dirassati_Backend.Migrations
                 {
                     b.HasOne("Dirassati_Backend.Domain.Models.School", "School")
                         .WithMany("Classrooms")
-                        .HasForeignKey("SchoolId1")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("SchoolId")
                         .IsRequired();
 
                     b.Navigation("School");
@@ -804,19 +1003,13 @@ namespace Dirassati_Backend.Migrations
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.Parent", b =>
                 {
-                    b.HasOne("Dirassati_Backend.Domain.Models.RelationshipToStudent", "relationshipToStudent")
-                        .WithMany()
-                        .HasForeignKey("RelationshipToStudentId")
+                    b.HasOne("AppUser", "User")
+                        .WithOne()
+                        .HasForeignKey("Dirassati_Backend.Domain.Models.Parent", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
-
                     b.Navigation("User");
-
-                    b.Navigation("relationshipToStudent");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.PhoneNumber", b =>
@@ -838,34 +1031,67 @@ namespace Dirassati_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Dirassati_Backend.Data.Models.SchoolType", "SchoolType")
+                        .WithMany()
+                        .HasForeignKey("SchoolTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Address");
+
+                    b.Navigation("SchoolType");
+                });
+
+            modelBuilder.Entity("Dirassati_Backend.Domain.Models.SchoolLevel", b =>
+                {
+                    b.HasOne("Dirassati_Backend.Data.Models.SchoolType", "SchoolType")
+                        .WithMany()
+                        .HasForeignKey("SchoolTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SchoolType");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.Student", b =>
                 {
-                    b.HasOne("Dirassati_Backend.Domain.Models.AcademicYear", "AcademicYear")
-                        .WithMany()
-                        .HasForeignKey("AcademicYearId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dirassati_Backend.Domain.Models.Parent", "parent")
+                    b.HasOne("Dirassati_Backend.Domain.Models.Parent", "Parent")
                         .WithMany()
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dirassati_Backend.Domain.Models.Specialization", "Stream")
+                    b.HasOne("Dirassati_Backend.Domain.Models.ParentRelationshipToStudentType", "ParentRelationshipToStudentType")
                         .WithMany("Students")
-                        .HasForeignKey("StreamId")
+                        .HasForeignKey("ParentRelationshipToStudentTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Dirassati_Backend.Domain.Models.School", "School")
+                        .WithMany("Student")
+                        .HasForeignKey("SchoolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AcademicYear");
+                    b.HasOne("Dirassati_Backend.Domain.Models.SchoolLevel", "SchoolLevel")
+                        .WithMany()
+                        .HasForeignKey("SchoolLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Stream");
+                    b.HasOne("Dirassati_Backend.Domain.Models.Specialization", "Specialization")
+                        .WithMany("Students")
+                        .HasForeignKey("SpecializationId");
 
-                    b.Navigation("parent");
+                    b.Navigation("Parent");
+
+                    b.Navigation("ParentRelationshipToStudentType");
+
+                    b.Navigation("School");
+
+                    b.Navigation("SchoolLevel");
+
+                    b.Navigation("Specialization");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.Teach", b =>
@@ -973,17 +1199,17 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SchoolLevelSpecialization", b =>
+            modelBuilder.Entity("SchoolSpecialization", b =>
                 {
-                    b.HasOne("Dirassati_Backend.Domain.Models.SchoolLevel", null)
+                    b.HasOne("Dirassati_Backend.Domain.Models.School", null)
                         .WithMany()
-                        .HasForeignKey("SchoolLevelsLevelId")
+                        .HasForeignKey("SchoolsSchoolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Dirassati_Backend.Domain.Models.Specialization", null)
                         .WithMany()
-                        .HasForeignKey("StreamsStreamId")
+                        .HasForeignKey("SpecializationsSpecializationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1018,9 +1244,14 @@ namespace Dirassati_Backend.Migrations
                     b.Navigation("Teachers");
                 });
 
+            modelBuilder.Entity("Dirassati_Backend.Domain.Models.ParentRelationshipToStudentType", b =>
+                {
+                    b.Navigation("Students");
+                });
+
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.School", b =>
                 {
-                    b.Navigation("AcademicYears");
+                    b.Navigation("AcademicYear");
 
                     b.Navigation("Classrooms");
 
@@ -1029,6 +1260,8 @@ namespace Dirassati_Backend.Migrations
                     b.Navigation("Groups");
 
                     b.Navigation("PhoneNumbers");
+
+                    b.Navigation("Student");
 
                     b.Navigation("Teachers");
                 });

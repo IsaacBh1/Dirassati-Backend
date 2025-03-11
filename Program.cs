@@ -18,7 +18,6 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddRepositories();
-
 var app = builder.Build();
 
 // ✅ Ensure CORS middleware is applied early

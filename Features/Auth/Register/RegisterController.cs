@@ -60,7 +60,7 @@ namespace Dirassati_Backend.Features.Auth.SignUp
                 : Ok("Email sent successfully!");
 
             }
-            catch (System.Exception e)
+            catch (System.Exception)
             {
                 throw;
 

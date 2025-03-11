@@ -652,16 +652,22 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<byte>("LevelYear")
-                        .HasColumnType("INTEGER");
-
                     b.Property<Guid>("ParentId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("ParentRelationshipToStudentTypeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("PhotoUrl")
+                        .HasColumnType("BLOB");
 
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("StreamId")
+                    b.Property<int>("SchoolLevelId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SpecializationId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("StudentIdNumber")
@@ -669,7 +675,13 @@ namespace Dirassati_Backend.Migrations
 
                     b.HasKey("StudentId");
 
-                    b.HasIndex("AcademicYearId");
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("ParentRelationshipToStudentTypeId");
+
+                    b.HasIndex("SchoolId");
+
+                    b.HasIndex("SchoolLevelId");
 
                     b.HasIndex("SpecializationId");
 
@@ -1046,7 +1058,7 @@ namespace Dirassati_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dirassati_Backend.Domain.Models.Specialization", "Stream")
+                    b.HasOne("Dirassati_Backend.Domain.Models.ParentRelationshipToStudentType", "ParentRelationshipToStudentType")
                         .WithMany("Students")
                         .HasForeignKey("ParentRelationshipToStudentTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -1058,13 +1070,25 @@ namespace Dirassati_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AcademicYear");
+                    b.HasOne("Dirassati_Backend.Domain.Models.SchoolLevel", "SchoolLevel")
+                        .WithMany()
+                        .HasForeignKey("SchoolLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dirassati_Backend.Domain.Models.Specialization", "Specialization")
+                        .WithMany("Students")
+                        .HasForeignKey("SpecializationId");
+
+                    b.Navigation("Parent");
+
+                    b.Navigation("ParentRelationshipToStudentType");
 
                     b.Navigation("School");
 
-                    b.Navigation("Stream");
+                    b.Navigation("SchoolLevel");
 
-                    b.Navigation("parent");
+                    b.Navigation("Specialization");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.Teach", b =>
