@@ -53,7 +53,7 @@ public class EmployeeAuthController : ControllerBase
         }
 
         var token = GenerateJwtToken(user, employee);
-        return Ok(new { Token = token  , FirstName = user.FirstName, LastName = user.LastName});
+        return Ok(new { Token = token, FirstName = user.FirstName, LastName = user.LastName });
     }
 
     private string GenerateJwtToken(AppUser user, Employee employee)
@@ -67,7 +67,7 @@ public class EmployeeAuthController : ControllerBase
         new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
         new Claim("EmployeeId", employee.EmployeeId.ToString()),
         new Claim("Permission", employee.Permissions.ToString()),
-        new Claim("SchoolID", employee.SchoolId.ToString()), 
+        new Claim("SchoolId", employee.SchoolId.ToString().ToUpper()), 
         // new Claim("FirstName", employee.User.FirstName),
         // new Claim("LastName", employee.LastName)
     };

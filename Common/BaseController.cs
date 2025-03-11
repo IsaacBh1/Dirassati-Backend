@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 [ApiController]
+
 public class BaseController : ControllerBase
 {
     /// <summary>

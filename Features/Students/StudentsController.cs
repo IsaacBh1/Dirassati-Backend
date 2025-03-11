@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dirassati_Backend.Features.Students;
 
 [Authorize]
-// [Route("api/students")] // add them later 
-// [ApiController]
+[Route("api/students")] // add them later 
+
 public class StudentsController(StudentServices studentServices) : BaseController
 {
     private readonly StudentServices _studentServices = studentServices;
