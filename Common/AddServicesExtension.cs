@@ -1,7 +1,15 @@
-using System;
+using System.Net.Mail;
+using System.Text;
 using Dirasati_Backend.Configurations;
+using Dirassati_Backend.Common.Services;
+using Dirassati_Backend.Features.Auth.Register.Services;
 using Dirassati_Backend.Features.Auth.SignUp;
+using Dirassati_Backend.Features.SchoolLevels.Services;
+using Dirassati_Backend.Features.Students.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Persistence;
 
 namespace Dirassati_Backend.Common;
@@ -19,9 +27,42 @@ public static class AddServicesExtension
             opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string not found."));
         });
         builder.Services.AddIdentityCore<AppUser>()
-        .AddEntityFrameworkStores<AppDbContext>();
-        builder.Services.AddAuthentication();
+        .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+        //cinfigure Authentication
+        string key = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT key not found");
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(opt =>
+        {
+            opt.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+        });
+
+
         builder.Services.AddScoped<RegisterService>();
+        builder.Services.AddScoped<SchoolLevelServices>();
+        // builder.Services.AddFluentEmail(builder.Configuration["Email:SenderEmail"], builder.Configuration["Email:SenderName"])
+        // .AddSmtpSender(builder.Configuration["Email:Host"], builder.Configuration.GetValue<int>("[Email:Port]"));
+        builder.Services.AddHttpContextAccessor();
+        builder.Services
+    .AddFluentEmail(builder.Configuration["Email:SenderEmail"], builder.Configuration["Email:SenderName"])
+    .AddSmtpSender(new SmtpClient
+    {
+        Host = builder.Configuration["Email:Host"] ?? throw new InvalidOperationException("Check the SMTP server configuration"),
+        Port = builder.Configuration.GetValue<int?>("Email:Port") ?? throw new InvalidOperationException("Check the SMTP server configuration"),
+        EnableSsl = false,
+        DeliveryMethod = SmtpDeliveryMethod.Network
+    });
+        builder.Services.AddScoped<IEmailService, EmailServices>();
+        builder.Services.AddScoped<ParentServices>();
+        builder.Services.AddScoped<StudentServices>();
+        builder.Services.AddScoped<VerifyEmailService>();
+        builder.Services.AddScoped<SendCridentialsService>();
+
         return builder;
     }
 

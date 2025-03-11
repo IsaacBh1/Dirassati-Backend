@@ -1,17 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Dirassati_Backend.Data.Models;
 
 namespace Dirassati_Backend.Domain.Models;
 
 public partial class SchoolLevel
 {
     [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int LevelId { get; set; }
-    public string LevelType { get; set; } = null!;
+
+
+    [Required]
+    [ForeignKey(nameof(SchoolType))]
+    public int SchoolTypeId { get; set; }
+
+    [Required]
+    [Range(1, 5)]
     public int LevelYear { get; set; }
+
+    // Navigation properties
+    public virtual SchoolType SchoolType { get; set; } = null!;
+
     public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
-    public virtual ICollection<Specialization> Streams { get; set; } = new List<Specialization>();
+
+
+
 }

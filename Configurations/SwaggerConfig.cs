@@ -1,6 +1,4 @@
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
 
 namespace Dirasati_Backend.Configurations
 {
