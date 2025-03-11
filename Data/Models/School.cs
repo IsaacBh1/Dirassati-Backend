@@ -28,6 +28,7 @@ public partial class School
 
     public string SchoolConfig { get; set; } = null!;
 
+
     [Required]
     [ForeignKey(nameof(SchoolType))]
     public int SchoolTypeId { get; set; }

@@ -6,8 +6,6 @@ using Persistence;
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServices();
 
-
-// ✅ Move AddCors BEFORE builder.Build()
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -18,6 +16,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddRepositories();
 
 var app = builder.Build();

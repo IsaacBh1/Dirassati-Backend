@@ -6,20 +6,19 @@ namespace Dirassati_Backend.Domain.Models;
 public partial class Student
 {
     [Key]
+
     public Guid StudentId { get; set; } = Guid.NewGuid();
 
     public string FirstName { get; set; } = null!;
-
     public string LastName { get; set; } = null!;
-
     public string Address { get; set; } = null!;
 
+
     public DateOnly BirthDate { get; set; }
-
     public string BirthPlace { get; set; } = null!;
-
+    public Guid SchoolId { get; set; } = Guid.Empty; // note : we fogot to add this when we created the models
+    public virtual School School { get; set; } = null!; // note : we fogot to add this when we created the models
     public string? StudentIdNumber { get; set; }
-
     public string EmergencyContact { get; set; } = null!;
 
 
@@ -40,12 +39,10 @@ public partial class Student
 
     public bool IsActive { get; set; } = true;
 
-    public Guid SchoolId { get; set; }
 
     public ParentRelationshipToStudentType ParentRelationshipToStudentType { get; set; } = null!;
 
     // Navigation properties
-    public virtual School School { get; set; } = null!;
 
     public virtual SchoolLevel SchoolLevel { get; set; } = null!;
     public virtual Specialization? Specialization { get; set; }

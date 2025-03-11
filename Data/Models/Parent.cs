@@ -13,5 +13,6 @@ public partial class Parent
 
     public string NationalIdentityNumber { get; set; } = null!;
 
+
     public virtual AppUser User { get; set; } = null!;
 }

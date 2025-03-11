@@ -1,6 +1,7 @@
 using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Features.Parents.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using static Dirassati_Backend.Features.Parents.Dtos.ParentDtos;
 
 namespace Dirassati_Backend.Features.Parents.Controllers
 {
@@ -16,16 +17,23 @@ namespace Dirassati_Backend.Features.Parents.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(Guid SchoolId)
         {
-            var parents = await _parentRepository.GetAllAsync();
+            var parents = await _parentRepository.GetAllBySchoolIdAsync(SchoolId);
             return Ok(parents);
+        }
+
+        [HttpGet("paginated")]
+        public async Task<IActionResult> GetAllPaginated(Guid SchoolId, int pageNumber, int pageSize)
+        {
+            var paginatedParents = await _parentRepository.GetAllBySchoolIdAsync(SchoolId, pageNumber, pageSize);
+            return Ok(paginatedParents);
         }
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var parent = await _parentRepository.GetByIdAsync(id);
+            var parent = await _parentRepository.GetParentByIdAsync(id);
             if (parent == null) return NotFound();
             return Ok(parent);
         }
@@ -41,7 +49,7 @@ namespace Dirassati_Backend.Features.Parents.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] Parent parent)
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateParentDto parent)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -60,6 +68,28 @@ namespace Dirassati_Backend.Features.Parents.Controllers
             var success = await _parentRepository.DeleteAsync(id);
             if (!success) return NotFound();
             return NoContent();
+        }
+
+        [HttpGet("{parentId:guid}/students")]
+        public async Task<IActionResult> GetStudentsByParent(Guid parentId)
+        {
+            var students = await _parentRepository.GetStudentsByParentIdAsync(parentId);
+
+            if (students == null || !students.Any())
+                return NotFound("No students found for the provided parent ID.");
+
+            return Ok(students);
+        }
+        
+        [HttpGet("{studentId:guid}/parent")]
+        public async Task<IActionResult> GetParentByStudentId(Guid studentId)
+        {
+            var parent = await _parentRepository.GetParentByStudentIdAsync(studentId);
+
+            if (parent == null)
+                return NotFound("No parent found for the provided student ID.");
+
+            return Ok(parent);
         }
     }
 }
