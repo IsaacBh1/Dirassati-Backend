@@ -1,7 +1,6 @@
 using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Features.Common;
 using Dirassati_Backend.Features.Parents.Dtos;
-using static Dirassati_Backend.Features.Parents.Dtos.ParentDtos;
 
 namespace Dirassati_Backend.Features.Parents.Repositories
 {

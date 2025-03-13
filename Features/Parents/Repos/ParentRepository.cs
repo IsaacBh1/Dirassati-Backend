@@ -4,11 +4,6 @@ using Dirassati_Backend.Features.Common; // Contains PaginatedResult<T>
 using Dirassati_Backend.Features.Parents.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using static Dirassati_Backend.Features.Parents.Dtos.ParentDtos;
 
 namespace Dirassati_Backend.Features.Parents.Repositories
 {
@@ -121,7 +116,7 @@ namespace Dirassati_Backend.Features.Parents.Repositories
                 FirstName = s.FirstName,
                 LastName = s.LastName,
                 EnrollmentDate = s.EnrollmentDate,
-                Grade = s.SchoolLevel.LevelYear.ToString()+" "+s.Specialization?.Name ?? string.Empty,
+                Grade = s.SchoolLevel.LevelYear.ToString() + " " + s.Specialization?.Name ?? string.Empty,
                 IsActive = s.IsActive
             });
         }

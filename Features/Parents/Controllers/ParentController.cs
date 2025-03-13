@@ -1,7 +1,7 @@
 using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Features.Parents.Dtos;
 using Dirassati_Backend.Features.Parents.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using static Dirassati_Backend.Features.Parents.Dtos.ParentDtos;
 
 namespace Dirassati_Backend.Features.Parents.Controllers
 {
