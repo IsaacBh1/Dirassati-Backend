@@ -1,4 +1,5 @@
 using AutoMapper;
+using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Features.Common; // Contains PaginatedResult<T>
 using Dirassati_Backend.Features.Parents.Dtos;
@@ -121,7 +122,7 @@ namespace Dirassati_Backend.Features.Parents.Repositories
                 FirstName = s.FirstName,
                 LastName = s.LastName,
                 EnrollmentDate = s.EnrollmentDate,
-                Grade = s.SchoolLevel.LevelYear.ToString()+" "+s.Specialization?.Name ?? string.Empty,
+                Grade = s.SchoolLevel.LevelYear.ToString() + " " + s.Specialization?.Name ?? string.Empty,
                 IsActive = s.IsActive
             });
         }

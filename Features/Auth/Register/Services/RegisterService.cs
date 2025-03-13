@@ -1,4 +1,5 @@
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Extensions;
@@ -49,7 +50,7 @@ public class RegisterService
                 Street = dto.School.Address.Street
             };
 
-            var school = new School
+            var school = new Data.Models.School
             {
                 Name = dto.School.SchoolName,
                 SchoolTypeId = dto.School.SchoolTypeId,

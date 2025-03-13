@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Dirassati_Backend.Domain.Models;
+namespace Dirassati_Backend.Data.Models;
 
 public partial class Specialization
 {

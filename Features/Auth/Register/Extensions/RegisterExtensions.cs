@@ -1,4 +1,4 @@
-using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 
 namespace Dirassati_Backend.Features.Auth.Register.Extensions;

@@ -1,4 +1,5 @@
 using Dirassati_Backend.Data.Enums;
+using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 

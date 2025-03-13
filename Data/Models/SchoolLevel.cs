@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Dirassati_Backend.Data.Models;
 
-namespace Dirassati_Backend.Domain.Models;
+namespace Dirassati_Backend.Data.Models;
 
 public partial class SchoolLevel
 {

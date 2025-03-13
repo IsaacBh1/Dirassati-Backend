@@ -1,3 +1,4 @@
+using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,5 +1,6 @@
 using Dirassati_Backend.Common.Extensions;
 using Dirassati_Backend.Common.Services;
+using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Students.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +33,7 @@ public class ParentServices(AppDbContext dbContext, UserManager<AppUser> userMan
             var result = await userManager.CreateAsync(user);
             if (!result.Succeeded)
                 throw new Exception($"Can not create user \n{result.Errors.ToCustomString()}");
-            parent = new Domain.Models.Parent
+            parent = new Parent
             {
                 NationalIdentityNumber = parentInfosDTO.NationalIdentityNumber,
                 Occupation = parentInfosDTO.Occupation,

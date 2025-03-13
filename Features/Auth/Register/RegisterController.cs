@@ -4,6 +4,7 @@ using Dirassati_Backend.Common.Services;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Services;
 using FluentEmail.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.Auth.SignUp
@@ -14,12 +15,12 @@ namespace Dirassati_Backend.Features.Auth.SignUp
     [Route("api/auth")]
     [ApiController]
     [Produces("application/json")]
-    public class SignUpController(RegisterService service, VerifyEmailService verifyEmailService, SendCridentialsService sendCridentialsService, IFluentEmail fluentEmail) : BaseController
+    public class SignUpController(RegisterService service, VerifyEmailService verifyEmailService, SendCridentialsService sendCridentialsService) : BaseController
     {
         private readonly RegisterService _registerService = service;
         private readonly VerifyEmailService _verifyEmailService = verifyEmailService;
         private readonly SendCridentialsService _sendCridentialsService = sendCridentialsService;
-
+        [AllowAnonymous]
         [HttpPost("register")]
         [ProducesResponseType(typeof(EmployeeDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -32,8 +33,8 @@ namespace Dirassati_Backend.Features.Auth.SignUp
         }
 
 
+        [AllowAnonymous]
         [HttpGet("register/verify-email", Name = "VerifyEmail")]
-
         public async Task<ActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
         {
 
@@ -46,26 +47,6 @@ namespace Dirassati_Backend.Features.Auth.SignUp
         }
 
 
-        [HttpGet("test-email")]
-        public async Task<ActionResult> TestEmail()
-        {
-            try
-            {
-                var result = await fluentEmail.To("moh@moh.com")
-                .Subject("Hoha")
-                .Body("HIIIIIIIIII")
-                .SendAsync();
 
-                return !result.Successful ? BadRequest(result.ErrorMessages)
-                : Ok("Email sent successfully!");
-
-            }
-            catch (System.Exception)
-            {
-                throw;
-
-            }
-
-        }
     }
 }

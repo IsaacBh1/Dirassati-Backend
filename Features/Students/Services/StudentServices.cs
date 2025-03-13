@@ -78,7 +78,7 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
                 studentDTO.parentInfosDTO
             );
 
-            var student = new Student
+            var student = new Data.Models.Student
             {
                 FirstName = studentDTO.studentInfosDTO.FirstName,
                 LastName = studentDTO.studentInfosDTO.LastName,

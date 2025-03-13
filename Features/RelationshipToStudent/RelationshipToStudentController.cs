@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Dirassati_Backend.Domain.Models;
-using Dirassati_Backend.Features.ParentRelationShip.DTOs;
 using Persistence;
+using Dirassati_Backend.Features.RelationshipToStudent.DTOs;
 
 namespace Dirassati_Backend.Features.ParentRelationShip
 {
@@ -13,7 +13,7 @@ namespace Dirassati_Backend.Features.ParentRelationShip
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetRelationshipsDTO>>> GetAll()
         {
-            var relationships = await context.ParentRelationshipToStudentTypes.Select(r => new GetRelationshipsDTO{Id = r.Id, Name = r.Name}).ToListAsync();
+            var relationships = await context.ParentRelationshipToStudentTypes.Select(r => new GetRelationshipsDTO { Id = r.Id, Name = r.Name }).ToListAsync();
             return Ok(relationships);
         }
     }
