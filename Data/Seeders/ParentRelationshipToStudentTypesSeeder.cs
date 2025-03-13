@@ -1,5 +1,4 @@
 using Dirassati_Backend.Data.Models;
-using Dirassati_Backend.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Data.Seeders;

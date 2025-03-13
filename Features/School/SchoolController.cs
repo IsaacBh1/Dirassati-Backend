@@ -1,6 +1,5 @@
 using Dirassati_Backend.Features.School.DTOs;
 using Dirassati_Backend.Features.School.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.School;

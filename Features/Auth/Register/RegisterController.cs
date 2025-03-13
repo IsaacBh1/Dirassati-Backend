@@ -1,9 +1,7 @@
 
 using System.Net;
-using Dirassati_Backend.Common.Services;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Services;
-using FluentEmail.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

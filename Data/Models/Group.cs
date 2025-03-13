@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Dirassati_Backend.Domain.Models;
 
 namespace Dirassati_Backend.Data.Models;
 

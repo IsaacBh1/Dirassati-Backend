@@ -1,4 +1,3 @@
-using System;
 using Dirassati_Backend.Data.Models;
 
 namespace Dirassati_Backend.Features.School.DTOs;

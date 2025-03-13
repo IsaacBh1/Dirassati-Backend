@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Dirassati_Backend.Features.Common
 {
     public class PaginatedResult<T>

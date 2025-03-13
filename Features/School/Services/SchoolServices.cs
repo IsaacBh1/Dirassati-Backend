@@ -1,11 +1,8 @@
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using AutoMapper;
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Enums;
-using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.School.DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 

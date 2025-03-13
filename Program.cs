@@ -1,5 +1,7 @@
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Extensions;
+using Dirassati_Backend.Features.Auth.SignUp;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -39,7 +41,9 @@ var service = scope.ServiceProvider;
 try
 {
     var context = service.GetRequiredService<AppDbContext>();
+    var registerService = service.GetRequiredService<RegisterService>();
     await context.Database.MigrateAsync();
+    await SchoolSeeder.SeedAsync(registerService);
 }
 catch (Exception e)
 {

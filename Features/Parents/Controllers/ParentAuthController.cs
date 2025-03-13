@@ -2,7 +2,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Dirassati_Backend.Features.Parents.Dtos;
-using Dirassati_Backend.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -47,7 +46,7 @@ public class ParentAuthController : ControllerBase
 
 
         var token = GenerateJwtToken(user, parent.ParentId.ToString());
-        return Ok(new { Token = token,parent.User.FirstName, parent.User.LastName });
+        return Ok(new { Token = token, parent.User.FirstName, parent.User.LastName });
     }
 
     private string GenerateJwtToken(AppUser user, string parentId)

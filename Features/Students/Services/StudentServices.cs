@@ -1,6 +1,5 @@
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Enums;
-using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Features.Students.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Persistence;

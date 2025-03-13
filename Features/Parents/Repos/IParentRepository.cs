@@ -1,5 +1,4 @@
 using Dirassati_Backend.Data.Models;
-using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Features.Common;
 using Dirassati_Backend.Features.Parents.Dtos;
 
