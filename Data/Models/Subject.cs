@@ -10,5 +10,5 @@ public partial class Subject
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int SubjectId { get; set; }
     public string Name { get; set; } = null!;
-    public SchoolTypeEnum Level { get; set; }
+    public SchoolTypeEnum SchoolType { get; set; }
 }

@@ -24,7 +24,7 @@ namespace Dirassati_Backend.Controllers
         {
             // Récupérer le SchoolLevelId depuis le token JWT
             var schoolLevelClaim = User.Claims.FirstOrDefault(c => c.Type == "SchoolLevelId");
-            
+
             if (schoolLevelClaim == null || !int.TryParse(schoolLevelClaim.Value, out int schoolLevelId))
             {
                 return BadRequest("SchoolLevelId non trouvé dans le token ou format invalide");
@@ -41,10 +41,10 @@ namespace Dirassati_Backend.Controllers
 
             // Récupérer les matières correspondantes
             var subjects = await _context.Subjects
-                .Where(s => s.Level == schoolLevel)
+                .Where(s => s.SchoolType == schoolLevel)
                 .ToListAsync();
 
-            return Ok(new 
+            return Ok(new
             {
                 SchoolLevelId = schoolLevelId,
                 Subjects = subjects
