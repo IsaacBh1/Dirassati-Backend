@@ -47,8 +47,9 @@ public class EmployeeAuthController : ControllerBase
         }
 
         // Compare by converting userGuid to string
-        var employee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == userGuid.ToString());
-        if (employee == null)
+        var employee = await _context.Employees
+            .Include(e => e.School)
+            .FirstOrDefaultAsync(e => e.UserId == userGuid.ToString()); if (employee == null)
         {
             return Unauthorized("Employee record not found.");
         }
@@ -68,7 +69,8 @@ public class EmployeeAuthController : ControllerBase
         new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
         new Claim("EmployeeId", employee.EmployeeId.ToString()),
         new Claim("Permission", employee.Permissions.ToString()),
-        new Claim("SchoolId", employee.SchoolId.ToString().ToUpper()), 
+        new Claim("SchoolId", employee.SchoolId.ToString().ToUpper()),
+        new Claim("SchoolLevelId" , employee.School.SchoolTypeId.ToString().ToUpper()),
         // new Claim("FirstName", employee.User.FirstName),
         // new Claim("LastName", employee.LastName)
     };

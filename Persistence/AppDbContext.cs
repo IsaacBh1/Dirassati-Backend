@@ -38,6 +38,7 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
         SchoolTypeSeeders.SeedSchoolTypes(builder);
         SchoolLevelSeeder.SeedSchoolLevels(builder);
         ParentRelationshipSeeder.SeedParentRelationships(builder);
+        SubjectSeeder.SeedSubjects(builder);
 
         base.OnModelCreating(builder);
         builder.Entity<School>()

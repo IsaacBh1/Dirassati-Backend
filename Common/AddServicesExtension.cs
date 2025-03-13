@@ -29,15 +29,26 @@ public static class AddServicesExtension
         });
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerWithJwtAuth();
+
+        // Register DbContext
         builder.Services.AddDbContext<AppDbContext>(opt =>
         {
-            opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string not found."));
+            opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string not found."));
         });
 
         builder.Services.AddIdentityCore<AppUser>()
-        .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
-        //cinfigure Authentication
-        string key = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT key not found");
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
+
+        // Register UserManager & SignInManager
+        builder.Services.AddScoped<UserManager<AppUser>>();
+        builder.Services.AddScoped<SignInManager<AppUser>>();
+
+        // Configure Authentication & JWT
+        string key = builder.Configuration["Jwt:Key"]
+            ?? throw new InvalidOperationException("JWT key not found");
+
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(opt =>
         {
@@ -79,5 +90,4 @@ public static class AddServicesExtension
 
         return builder;
     }
-
 }

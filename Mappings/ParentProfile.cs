@@ -1,7 +1,7 @@
 using AutoMapper;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Domain.Models;
-using static Dirassati_Backend.Features.Parents.Dtos.ParentDtos;
+using Dirassati_Backend.Features.Parents.Dtos;
 
 namespace Dirassati_Backend.Mappings
 {

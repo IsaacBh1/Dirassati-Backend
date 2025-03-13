@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Features.ParentRelationShip.DTOs;
 using Persistence;
 using Dirassati_Backend.Features.RelationshipToStudent.DTOs;
 
