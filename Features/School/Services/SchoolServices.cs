@@ -55,11 +55,7 @@ public class SchoolServices(
             if (school == null)
                 return result.Failure("School not found", 404);
 
-            school.Name = schoolInfosDTO.Name;
-            school.Email = schoolInfosDTO.Email;
-            school.Logo = schoolInfosDTO.Logo;
-            school.WebsiteUrl = schoolInfosDTO.WebsiteUrl;
-            school.Address = schoolInfosDTO.Address;
+            _mapper.Map(schoolInfosDTO, school);
 
             if (school.SchoolTypeId == (int)SchoolTypeEnum.Lycee)
             {
@@ -70,7 +66,7 @@ public class SchoolServices(
                 bool isStudentInSpec = await _dbContext.Students.AnyAsync(s =>
                     s.SchoolId.ToString() == schoolId &&
                     s.Specialization != null &&
-                    specializationsToRemove.Any(spec => spec.SpecializationId == s.Specialization.SpecializationId));
+                    specializationsToRemove.Contains(s.Specialization));
 
                 if (isStudentInSpec)
                     return result.Failure("Cannot delete specializations that have enrolled students", 400);

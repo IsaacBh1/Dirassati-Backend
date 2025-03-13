@@ -10,6 +10,11 @@ public class SchoolProfiles : Profile
 {
     public SchoolProfiles()
     {
+        CreateMap<AcademicYear, AcademicYearDTO>();
+        CreateMap<PhoneNumberDTO, PhoneNumber>();
+        CreateMap<UpdateSchoolInfosDTO, Data.Models.School>()
+        .ForMember(s => s.PhoneNumbers, opt => opt.MapFrom(u => u.PhoneNumbers))
+        .ForMember(s => s.Specializations, opt => opt.Ignore());
         CreateMap<Data.Models.School, GetSchoolInfoDTO>()
             .ForMember(dest => dest.AcademicYear,
                   opt => opt.MapFrom(src => src.AcademicYear));
