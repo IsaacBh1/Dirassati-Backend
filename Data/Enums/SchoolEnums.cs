@@ -19,8 +19,6 @@ public enum SpecializationEnum
     TechniqueGenieMecanique,  // تقني رياضي تخصص هندسة ميكانيكية
     LettresPhilosophie,
     LanguesEtrangeres,
-
-
 }
 
 public enum SchoolLevelsEnum
