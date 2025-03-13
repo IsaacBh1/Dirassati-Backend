@@ -38,7 +38,7 @@ public class SendCridentialsService(IEmailService emailService, UserManager<AppU
     private async Task SendEmailAsync(string email, string password)
     {
         var body = $@"
-            <h1>Welcome to Dirassati</h1>
+            <h1style='color:DarkCyan;'>Welcome to Dirassati</h1>
             <p>Your account credentials are:</p>
             <p>Email: {email}</p>
             <p>Password: {System.Web.HttpUtility.HtmlEncode(password)}</p>";

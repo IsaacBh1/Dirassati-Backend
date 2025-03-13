@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using SchoolManagement.Features.Subjects.Dtos;
 
 namespace Dirassati_Backend.Controllers
 {
@@ -18,35 +19,40 @@ namespace Dirassati_Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Subjects/BySchoolLevel
+        ///BySchoolLevel
         [HttpGet("BySchoolLevel")]
         public async Task<IActionResult> GetSubjectsBySchoolLevel()
         {
-            // Récupérer le SchoolLevelId depuis le token JWT
-            var schoolLevelClaim = User.Claims.FirstOrDefault(c => c.Type == "SchoolLevelId");
             
-            if (schoolLevelClaim == null || !int.TryParse(schoolLevelClaim.Value, out int schoolLevelId))
+            var schoolLevelClaim = User.Claims.FirstOrDefault(c => c.Type == "SchoolTypeId");
+            
+            if (schoolLevelClaim == null || !int.TryParse(schoolLevelClaim.Value, out int SchoolTypeId))
             {
-                return BadRequest("SchoolLevelId non trouvé dans le token ou format invalide");
+                return BadRequest("SchoolTypeId not found");
             }
 
-            // Vérifier que le SchoolLevelId est valide
-            if (!Enum.IsDefined(typeof(SchoolTypeEnum), schoolLevelId))
+             
+            if (!Enum.IsDefined(typeof(SchoolTypeEnum), SchoolTypeId))
             {
-                return BadRequest("SchoolLevelId invalide");
+                return BadRequest("SchoolTypeId invalide");
             }
 
-            // Convertir en enum
-            var schoolLevel = (SchoolTypeEnum)schoolLevelId;
+            
+            var schoolLevel = (SchoolTypeEnum)SchoolTypeId;
 
-            // Récupérer les matières correspondantes
+            
             var subjects = await _context.Subjects
-                .Where(s => s.Level == schoolLevel)
+                .Where(s => s.SchoolType == schoolLevel)
+                .Select(s => new GetSubjectsBySchoolLevelDto
+                {
+                    SubjectId = s.SubjectId,
+                    Name = s.Name
+                })
                 .ToListAsync();
 
             return Ok(new 
             {
-                SchoolLevelId = schoolLevelId,
+                SchoolTypeId = SchoolTypeId,
                 Subjects = subjects
             });
         }

@@ -2,13 +2,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Dirassati_Backend.Features.Parents.Dtos;
-using Dirassati_Backend.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using Persistence; // For EF Core extensions
+using Persistence; 
 
+[Tags("Parent")]
 [Route("api/parent/auth")]
 [ApiController]
 public class ParentAuthController : ControllerBase

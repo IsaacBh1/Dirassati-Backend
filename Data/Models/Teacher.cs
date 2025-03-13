@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dirassati_Backend.Domain.Models;
 
 public partial class Teacher
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
     public Guid TeacherId { get; set; } = Guid.NewGuid();
     public string UserId { get; set; } = string.Empty;
     public DateOnly HireDate { get; set; }

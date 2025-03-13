@@ -81,6 +81,10 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
             .HasForeignKey(s => s.SchoolId)
             .OnDelete(DeleteBehavior.ClientSetNull);
 
+        builder.Entity<Teacher>()
+    .HasMany(t => t.Subjects)
+    .WithMany(s => s.Teachers);
+
 
     }
 

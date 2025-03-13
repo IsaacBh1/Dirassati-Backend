@@ -6,9 +6,10 @@ namespace Dirassati_Backend.Domain.Models;
 
 public partial class Subject
 {
-    [Key]   
+    [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int SubjectId { get; set; }
     public string Name { get; set; } = null!;
-    public SchoolTypeEnum Level {get;set;} 
+    public SchoolTypeEnum SchoolType { get; set; }
+    public virtual ICollection<Teacher> Teachers { get; set; } = new List<Teacher>();
 }

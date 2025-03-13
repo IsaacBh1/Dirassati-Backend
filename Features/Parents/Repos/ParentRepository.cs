@@ -107,6 +107,8 @@ namespace Dirassati_Backend.Features.Parents.Repositories
         public async Task<IEnumerable<getStudentDto>> GetStudentsByParentIdAsync(Guid parentId)
         {
             var students = await _context.Students
+                .Include(s => s.SchoolLevel) // Ensure this relationship is loaded
+                .Include(s => s.Specialization) // Ensure this is loaded
                 .Where(s => s.ParentId == parentId)
                 .ToListAsync();
 
@@ -116,7 +118,8 @@ namespace Dirassati_Backend.Features.Parents.Repositories
                 FirstName = s.FirstName,
                 LastName = s.LastName,
                 EnrollmentDate = s.EnrollmentDate,
-                Grade = s.SchoolLevel.LevelYear.ToString() + " " + s.Specialization?.Name ?? string.Empty,
+                Grade = (s.SchoolLevel != null ? s.SchoolLevel.LevelYear.ToString() : "Unknown") +
+                        " " + (s.Specialization?.Name ?? string.Empty),
                 IsActive = s.IsActive
             });
         }

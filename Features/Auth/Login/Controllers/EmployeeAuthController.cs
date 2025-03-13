@@ -69,7 +69,7 @@ public class EmployeeAuthController : ControllerBase
         new Claim("EmployeeId", employee.EmployeeId.ToString()),
         new Claim("Permission", employee.Permissions.ToString()),
         new Claim("SchoolId", employee.SchoolId.ToString().ToUpper()),
-        new Claim("SchoolLevelId" , employee.School.SchoolTypeId.ToString().ToUpper()),
+        new Claim("SchoolTypeId" , employee.School.SchoolTypeId.ToString().ToUpper()),
         // new Claim("FirstName", employee.User.FirstName),
         // new Claim("LastName", employee.LastName)
     };

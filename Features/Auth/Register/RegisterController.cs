@@ -33,18 +33,20 @@ namespace Dirassati_Backend.Features.Auth.SignUp
 
 
         [HttpGet("register/verify-email", Name = "VerifyEmail")]
-
-        public async Task<ActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
+        public async Task<ActionResult> ConfirmEmail(
+        [FromQuery] string email,
+        [FromQuery] string token)
         {
-
             var result = await _verifyEmailService.VerifyEmailAsync(email, token);
+
             if (!result.IsSuccess)
-                return HandleResult(result);
+                return BadRequest(result.Errors);
+
             var credResult = await _sendCridentialsService.SendCridentialsAsync(email);
-            return HandleResult(credResult);
-
+            return credResult.IsSuccess ?
+                Ok("Email verified and credentials sent") :
+                BadRequest(credResult.Errors);
         }
-
 
         [HttpGet("test-email")]
         public async Task<ActionResult> TestEmail()

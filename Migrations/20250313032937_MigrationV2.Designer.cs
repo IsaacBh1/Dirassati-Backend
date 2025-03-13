@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence;
 
@@ -10,9 +11,11 @@ using Persistence;
 namespace Dirassati_Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250313032937_MigrationV2")]
+    partial class MigrationV2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -694,12 +697,12 @@ namespace Dirassati_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Level")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("SchoolType")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("SubjectId");
 
@@ -709,260 +712,260 @@ namespace Dirassati_Backend.Migrations
                         new
                         {
                             SubjectId = 1,
-                            Name = "général",
-                            SchoolType = 1
+                            Level = 1,
+                            Name = "général"
                         },
                         new
                         {
                             SubjectId = 2,
-                            Name = "Langue Française",
-                            SchoolType = 1
+                            Level = 1,
+                            Name = "Langue Française"
                         },
                         new
                         {
                             SubjectId = 3,
-                            Name = "Langue Anglaise",
-                            SchoolType = 1
+                            Level = 1,
+                            Name = "Langue Anglaise"
                         },
                         new
                         {
                             SubjectId = 4,
-                            Name = "Tamazight",
-                            SchoolType = 1
+                            Level = 1,
+                            Name = "Tamazight"
                         },
                         new
                         {
                             SubjectId = 101,
-                            Name = "Histoire",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Histoire"
                         },
                         new
                         {
                             SubjectId = 102,
-                            Name = "Géographie",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Géographie"
                         },
                         new
                         {
                             SubjectId = 103,
-                            Name = "Éducation Islamique",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Éducation Islamique"
                         },
                         new
                         {
                             SubjectId = 104,
-                            Name = "Éducation Civique",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Éducation Civique"
                         },
                         new
                         {
                             SubjectId = 105,
-                            Name = "Mathématiques",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Mathématiques"
                         },
                         new
                         {
                             SubjectId = 106,
-                            Name = "Sciences de la Nature et de la Vie",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Sciences de la Nature et de la Vie"
                         },
                         new
                         {
                             SubjectId = 107,
-                            Name = "Sciences Physiques et Technologiques",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Sciences Physiques et Technologiques"
                         },
                         new
                         {
                             SubjectId = 108,
-                            Name = "Langue Arabe",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Langue Arabe"
                         },
                         new
                         {
                             SubjectId = 109,
-                            Name = "Langue Tamazight",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Langue Tamazight"
                         },
                         new
                         {
                             SubjectId = 110,
-                            Name = "Langue Française",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Langue Française"
                         },
                         new
                         {
                             SubjectId = 111,
-                            Name = "Langue Anglaise",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Langue Anglaise"
                         },
                         new
                         {
                             SubjectId = 112,
-                            Name = "EPS",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "EPS"
                         },
                         new
                         {
                             SubjectId = 113,
-                            Name = "Éducation Artistique",
-                            SchoolType = 2
+                            Level = 2,
+                            Name = "Éducation Artistique"
                         },
                         new
                         {
                             SubjectId = 201,
-                            Name = "Économie et Management",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Économie et Management"
                         },
                         new
                         {
                             SubjectId = 202,
-                            Name = "Histoire",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Histoire"
                         },
                         new
                         {
                             SubjectId = 203,
-                            Name = "Géographie",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Géographie"
                         },
                         new
                         {
                             SubjectId = 204,
-                            Name = "Gestion Comptabilité et Finances",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Gestion Comptabilité et Finances"
                         },
                         new
                         {
                             SubjectId = 205,
-                            Name = "Mathématiques",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Mathématiques"
                         },
                         new
                         {
                             SubjectId = 206,
-                            Name = "Sciences Islamiques",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Sciences Islamiques"
                         },
                         new
                         {
                             SubjectId = 207,
-                            Name = "Sciences de la Nature et de la Vie",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Sciences de la Nature et de la Vie"
                         },
                         new
                         {
                             SubjectId = 208,
-                            Name = "Sciences Physiques",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Sciences Physiques"
                         },
                         new
                         {
                             SubjectId = 209,
-                            Name = "Philosophie",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Philosophie"
                         },
                         new
                         {
                             SubjectId = 210,
-                            Name = "Droit",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Droit"
                         },
                         new
                         {
                             SubjectId = 211,
-                            Name = "Espagnol",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Espagnol"
                         },
                         new
                         {
                             SubjectId = 212,
-                            Name = "Allemand",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Allemand"
                         },
                         new
                         {
                             SubjectId = 213,
-                            Name = "Anglais",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Anglais"
                         },
                         new
                         {
                             SubjectId = 214,
-                            Name = "Italien",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Italien"
                         },
                         new
                         {
                             SubjectId = 215,
-                            Name = "Français",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Français"
                         },
                         new
                         {
                             SubjectId = 216,
-                            Name = "Arabe",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Arabe"
                         },
                         new
                         {
                             SubjectId = 217,
-                            Name = "Tamazight",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Tamazight"
                         },
                         new
                         {
                             SubjectId = 218,
-                            Name = "Informatique",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Informatique"
                         },
                         new
                         {
                             SubjectId = 219,
-                            Name = "Génie des Procédés",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Génie des Procédés"
                         },
                         new
                         {
                             SubjectId = 220,
-                            Name = "Génie Électrique",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Génie Électrique"
                         },
                         new
                         {
                             SubjectId = 221,
-                            Name = "Génie Civil",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Génie Civil"
                         },
                         new
                         {
                             SubjectId = 222,
-                            Name = "Génie Mécanique",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Génie Mécanique"
                         },
                         new
                         {
                             SubjectId = 223,
-                            Name = "Éducation Physique et Sportive",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Éducation Physique et Sportive"
                         },
                         new
                         {
                             SubjectId = 224,
-                            Name = "Éducation Artistique",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Éducation Artistique"
                         },
                         new
                         {
                             SubjectId = 225,
-                            Name = "Technologie",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Technologie"
                         },
                         new
                         {
                             SubjectId = 226,
-                            Name = "Musique",
-                            SchoolType = 3
+                            Level = 3,
+                            Name = "Musique"
                         });
                 });
 
