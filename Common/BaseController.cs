@@ -23,29 +23,27 @@ public class BaseController : ControllerBase
     {
         if (result.IsSuccess)
         {
-            switch (result.StatusCode)
+            return result.StatusCode switch
             {
-                case (int)HttpStatusCode.Created: // 201
-                    return Created(string.Empty, result.Value);
-                case (int)HttpStatusCode.NoContent: // 204
-                    return NoContent();
-                default:
-                    return Ok(result.Value);
-            }
+                // 201
+                (int)HttpStatusCode.Created => Created(string.Empty, result.Value),
+                // 204
+                (int)HttpStatusCode.NoContent => NoContent(),
+                _ => Ok(result.Value),
+            };
         }
 
-        switch (result.StatusCode)
+        return result.StatusCode switch
         {
-            case (int)HttpStatusCode.NotFound: // 404
-                return NotFound(result.Errors);
-            case (int)HttpStatusCode.BadRequest: // 400
-                return BadRequest(result.Errors);
-            case (int)HttpStatusCode.Unauthorized: // 401
-                return Unauthorized(result.Errors);
-            case (int)HttpStatusCode.Forbidden: // 403
-                return Forbid();
-            default:
-                return StatusCode(result.StatusCode != 0 ? result.StatusCode : 500, result.Errors);
-        }
+            // 404
+            (int)HttpStatusCode.NotFound => NotFound(result.Errors),
+            // 400
+            (int)HttpStatusCode.BadRequest => BadRequest(result.Errors),
+            // 401
+            (int)HttpStatusCode.Unauthorized => Unauthorized(result.Errors),
+            // 403
+            (int)HttpStatusCode.Forbidden => Forbid(),
+            _ => StatusCode(result.StatusCode != 0 ? result.StatusCode : 500, result.Errors),
+        };
     }
 }

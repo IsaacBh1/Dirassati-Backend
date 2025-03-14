@@ -76,10 +76,9 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
 
         // Configure one-to-many relationship between School and AcademicYear
         builder.Entity<AcademicYear>()
-            .HasOne(ay => ay.School)
-            .WithMany(s => s.AcademicYear)
-            .HasForeignKey(s => s.SchoolId)
-            .OnDelete(DeleteBehavior.ClientSetNull);
+            .HasOne(ay => ay.School);
+
+
 
         builder.Entity<Teacher>()
     .HasMany(t => t.Subjects)

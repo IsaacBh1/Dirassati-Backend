@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Dirassati_Backend.Features.Parents.Dtos
 {
     public class getStudentDto
@@ -15,5 +10,5 @@ namespace Dirassati_Backend.Features.Parents.Dtos
         public bool IsActive { get; set; }
     }
 
-    
+
 }

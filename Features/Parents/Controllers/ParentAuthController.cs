@@ -47,7 +47,7 @@ public class ParentAuthController : ControllerBase
 
 
         var token = GenerateJwtToken(user, parent.ParentId.ToString());
-        return Ok(new { Token = token,parent.User.FirstName, parent.User.LastName });
+        return Ok(new { Token = token, parent.User.FirstName, parent.User.LastName });
     }
 
     private string GenerateJwtToken(AppUser user, string parentId)

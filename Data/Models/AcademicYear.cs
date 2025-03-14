@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Dirassati_Backend.Domain.Models;
+namespace Dirassati_Backend.Data.Models;
 
 public partial class AcademicYear
 {
@@ -11,7 +11,7 @@ public partial class AcademicYear
     public int AcademicYearId { get; set; }
     public DateOnly EndDate { get; set; }
 
-
+    [ForeignKey(nameof(School))]
     public Guid SchoolId { get; set; }
 
     public virtual ICollection<Group> Groups { get; set; } = new List<Group>();

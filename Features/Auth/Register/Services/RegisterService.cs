@@ -1,9 +1,11 @@
 using Dirassati_Backend.Common;
-using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Extensions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
+using SQLitePCL;
 
 namespace Dirassati_Backend.Features.Auth.SignUp;
 
@@ -40,24 +42,28 @@ public class RegisterService
             {
                 return result.Failure(CreateResult.Errors, 400);
             }
+            var Specializations = new List<Specialization>();
 
-            var address = new Address
+            if (dto.School.SpecializationsId != null)
             {
-                City = dto.School.Address.City,
-                Country = dto.School.Address.Country,
-                State = dto.School.Address.State,
-                Street = dto.School.Address.Street
-            };
-
-            var school = new School
+                Specializations = await _dbContext.Specializations.Where(s => dto.School.SpecializationsId.Contains(s.SpecializationId)).ToListAsync();
+            }
+            var school = new Data.Models.School
             {
                 Name = dto.School.SchoolName,
                 SchoolTypeId = dto.School.SchoolTypeId,
-                Address = address,
+                Address = new Address
+                {
+                    City = dto.School.Address.City,
+                    Country = dto.School.Address.Country,
+                    State = dto.School.Address.State,
+                    Street = dto.School.Address.Street
+                },
                 Email = dto.School.SchoolEmail,
                 Logo = string.Empty,
                 WebsiteUrl = string.Empty,
-                SchoolConfig = string.Empty
+                SchoolConfig = string.Empty,
+                Specializations = Specializations
             };
 
 

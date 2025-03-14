@@ -1,6 +1,5 @@
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Enums;
-using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Features.Students.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -78,7 +77,7 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
                 studentDTO.parentInfosDTO
             );
 
-            var student = new Student
+            var student = new Data.Models.Student
             {
                 FirstName = studentDTO.studentInfosDTO.FirstName,
                 LastName = studentDTO.studentInfosDTO.LastName,

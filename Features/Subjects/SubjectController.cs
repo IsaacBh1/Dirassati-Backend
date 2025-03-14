@@ -23,10 +23,12 @@ namespace Dirassati_Backend.Controllers
         [HttpGet("BySchoolLevel")]
         public async Task<IActionResult> GetSubjectsBySchoolLevel()
         {
+
             
             var schoolLevelClaim = User.Claims.FirstOrDefault(c => c.Type == "SchoolTypeId");
             
             if (schoolLevelClaim == null || !int.TryParse(schoolLevelClaim.Value, out int SchoolTypeId))
+
             {
                 return BadRequest("SchoolTypeId not found");
             }
@@ -43,6 +45,7 @@ namespace Dirassati_Backend.Controllers
             
             var subjects = await _context.Subjects
                 .Where(s => s.SchoolType == schoolLevel)
+                
                 .Select(s => new GetSubjectsBySchoolLevelDto
                 {
                     SubjectId = s.SubjectId,
@@ -50,7 +53,7 @@ namespace Dirassati_Backend.Controllers
                 })
                 .ToListAsync();
 
-            return Ok(new 
+            return Ok(new
             {
                 SchoolTypeId = SchoolTypeId,
                 Subjects = subjects

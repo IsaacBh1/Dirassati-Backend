@@ -1,11 +1,13 @@
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Extensions;
+using Dirassati_Backend.Features.Auth.SignUp;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServices();
-
+builder.AddCustomServices();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -16,8 +18,9 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddRepositories();
+
 var app = builder.Build();
 
 // ✅ Ensure CORS middleware is applied early
@@ -38,7 +41,9 @@ var service = scope.ServiceProvider;
 try
 {
     var context = service.GetRequiredService<AppDbContext>();
+    var registerService = service.GetRequiredService<RegisterService>();
     await context.Database.MigrateAsync();
+    await SchoolSeeder.SeedAsync(registerService);
 }
 catch (Exception e)
 {

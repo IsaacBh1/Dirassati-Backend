@@ -1,5 +1,5 @@
 using AutoMapper;
-using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Parents.Dtos;
 
 namespace Dirassati_Backend.Mappings
@@ -19,7 +19,7 @@ namespace Dirassati_Backend.Mappings
                 .ForMember(dest => dest.EmailConfirmed, opt => opt.MapFrom(src => src.User.EmailConfirmed))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
                 .ForMember(dest => dest.PhoneNumberConfirmed, opt => opt.MapFrom(src => src.User.PhoneNumberConfirmed));
-        
+
             CreateMap<UpdateParentDto, Parent>()
             .ForMember(dest => dest.User, opt => opt.Ignore())
             .AfterMap((src, dest) =>
@@ -32,7 +32,7 @@ namespace Dirassati_Backend.Mappings
                     dest.User.PhoneNumber = src.PhoneNumber;
                 }
             });
-        
+
         }
 
 

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Dirassati_Backend.Domain.Models;
+namespace Dirassati_Backend.Data.Models;
 
 public partial class Classroom
 {
