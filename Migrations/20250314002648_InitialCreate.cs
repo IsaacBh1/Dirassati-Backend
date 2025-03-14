@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -129,7 +130,8 @@ namespace Dirassati_Backend.Migrations
                 {
                     SubjectId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    SchoolType = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -330,7 +332,8 @@ namespace Dirassati_Backend.Migrations
                         name: "FK_AcademicYears_Schools_SchoolId",
                         column: x => x.SchoolId,
                         principalTable: "Schools",
-                        principalColumn: "SchoolId");
+                        principalColumn: "SchoolId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -674,6 +677,56 @@ namespace Dirassati_Backend.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Subjects",
+                columns: new[] { "SubjectId", "Name", "SchoolType" },
+                values: new object[,]
+                {
+                    { 1, "général", 1 },
+                    { 2, "Langue Française", 1 },
+                    { 3, "Langue Anglaise", 1 },
+                    { 4, "Tamazight", 1 },
+                    { 101, "Histoire", 2 },
+                    { 102, "Géographie", 2 },
+                    { 103, "Éducation Islamique", 2 },
+                    { 104, "Éducation Civique", 2 },
+                    { 105, "Mathématiques", 2 },
+                    { 106, "Sciences de la Nature et de la Vie", 2 },
+                    { 107, "Sciences Physiques et Technologiques", 2 },
+                    { 108, "Langue Arabe", 2 },
+                    { 109, "Langue Tamazight", 2 },
+                    { 110, "Langue Française", 2 },
+                    { 111, "Langue Anglaise", 2 },
+                    { 112, "EPS", 2 },
+                    { 113, "Éducation Artistique", 2 },
+                    { 201, "Économie et Management", 3 },
+                    { 202, "Histoire", 3 },
+                    { 203, "Géographie", 3 },
+                    { 204, "Gestion Comptabilité et Finances", 3 },
+                    { 205, "Mathématiques", 3 },
+                    { 206, "Sciences Islamiques", 3 },
+                    { 207, "Sciences de la Nature et de la Vie", 3 },
+                    { 208, "Sciences Physiques", 3 },
+                    { 209, "Philosophie", 3 },
+                    { 210, "Droit", 3 },
+                    { 211, "Espagnol", 3 },
+                    { 212, "Allemand", 3 },
+                    { 213, "Anglais", 3 },
+                    { 214, "Italien", 3 },
+                    { 215, "Français", 3 },
+                    { 216, "Arabe", 3 },
+                    { 217, "Tamazight", 3 },
+                    { 218, "Informatique", 3 },
+                    { 219, "Génie des Procédés", 3 },
+                    { 220, "Génie Électrique", 3 },
+                    { 221, "Génie Civil", 3 },
+                    { 222, "Génie Mécanique", 3 },
+                    { 223, "Éducation Physique et Sportive", 3 },
+                    { 224, "Éducation Artistique", 3 },
+                    { 225, "Technologie", 3 },
+                    { 226, "Musique", 3 }
+                });
+
+            migrationBuilder.InsertData(
                 table: "SchoolLevels",
                 columns: new[] { "LevelId", "LevelYear", "SchoolTypeId" },
                 values: new object[,]
@@ -700,7 +753,8 @@ namespace Dirassati_Backend.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_AcademicYears_SchoolId",
                 table: "AcademicYears",
-                column: "SchoolId");
+                column: "SchoolId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

@@ -33,39 +33,17 @@ namespace Dirassati_Backend.Features.Auth.SignUp
 
         [AllowAnonymous]
         [HttpGet("register/verify-email", Name = "VerifyEmail")]
-
-        public async Task<ActionResult> ConfirmEmail(
-        [FromQuery] string email,
-        [FromQuery] string token)
-
+        public async Task<ActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string token)
         {
+
             var result = await _verifyEmailService.VerifyEmailAsync(email, token);
-
             if (!result.IsSuccess)
-                return BadRequest(result.Errors);
-
+                return HandleResult(result);
             var credResult = await _sendCridentialsService.SendCridentialsAsync(email);
-            return credResult.IsSuccess ?
-                Ok("Email verified and credentials sent") :
-                BadRequest(credResult.Errors);
+            return HandleResult(credResult);
+
         }
 
-        [HttpGet("test-email")]
-        public async Task<ActionResult> TestEmail()
-        {
-            try
-            {
-                var result = await fluentEmail.To("moh@moh.com")
-                .Subject("Hoha")
-                .Body("HIIIIIIIIII")
-                .SendAsync();   
-                return Ok("Email sent");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
 
 
     }

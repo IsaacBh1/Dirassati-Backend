@@ -45,13 +45,13 @@ namespace Dirassati_Backend.Controllers
             
             var subjects = await _context.Subjects
                 .Where(s => s.SchoolType == schoolLevel)
-                
+
                 .Select(s => new GetSubjectsBySchoolLevelDto
                 {
                     SubjectId = s.SubjectId,
                     Name = s.Name
                 })
-                .ToListAsync();
+                .ToListAsync(); 
 
             return Ok(new
             {

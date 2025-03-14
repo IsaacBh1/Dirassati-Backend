@@ -11,8 +11,8 @@ using Persistence;
 namespace Dirassati_Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250313104824_MakeOneAcademicYear")]
-    partial class MakeOneAcademicYear
+    [Migration("20250314002648_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -677,36 +677,6 @@ namespace Dirassati_Backend.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("Dirassati_Backend.Data.Models.Teacher", b =>
-                {
-                    b.Property<Guid>("TeacherId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ContractTypeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateOnly>("HireDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("SchoolId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("TeacherId");
-
-                    b.HasIndex("ContractTypeId");
-
-                    b.HasIndex("SchoolId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Teachers");
-                });
-
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.ContractType", b =>
                 {
                     b.Property<int>("ContractId")
@@ -732,9 +702,272 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SchoolType")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("SubjectId");
 
                     b.ToTable("Subjects");
+
+                    b.HasData(
+                        new
+                        {
+                            SubjectId = 1,
+                            Name = "général",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 2,
+                            Name = "Langue Française",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 3,
+                            Name = "Langue Anglaise",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 4,
+                            Name = "Tamazight",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 101,
+                            Name = "Histoire",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 102,
+                            Name = "Géographie",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 103,
+                            Name = "Éducation Islamique",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 104,
+                            Name = "Éducation Civique",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 105,
+                            Name = "Mathématiques",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 106,
+                            Name = "Sciences de la Nature et de la Vie",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 107,
+                            Name = "Sciences Physiques et Technologiques",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 108,
+                            Name = "Langue Arabe",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 109,
+                            Name = "Langue Tamazight",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 110,
+                            Name = "Langue Française",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 111,
+                            Name = "Langue Anglaise",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 112,
+                            Name = "EPS",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 113,
+                            Name = "Éducation Artistique",
+                            SchoolType = 2
+                        },
+                        new
+                        {
+                            SubjectId = 201,
+                            Name = "Économie et Management",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 202,
+                            Name = "Histoire",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 203,
+                            Name = "Géographie",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 204,
+                            Name = "Gestion Comptabilité et Finances",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 205,
+                            Name = "Mathématiques",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 206,
+                            Name = "Sciences Islamiques",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 207,
+                            Name = "Sciences de la Nature et de la Vie",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 208,
+                            Name = "Sciences Physiques",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 209,
+                            Name = "Philosophie",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 210,
+                            Name = "Droit",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 211,
+                            Name = "Espagnol",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 212,
+                            Name = "Allemand",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 213,
+                            Name = "Anglais",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 214,
+                            Name = "Italien",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 215,
+                            Name = "Français",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 216,
+                            Name = "Arabe",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 217,
+                            Name = "Tamazight",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 218,
+                            Name = "Informatique",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 219,
+                            Name = "Génie des Procédés",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 220,
+                            Name = "Génie Électrique",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 221,
+                            Name = "Génie Civil",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 222,
+                            Name = "Génie Mécanique",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 223,
+                            Name = "Éducation Physique et Sportive",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 224,
+                            Name = "Éducation Artistique",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 225,
+                            Name = "Technologie",
+                            SchoolType = 3
+                        },
+                        new
+                        {
+                            SubjectId = 226,
+                            Name = "Musique",
+                            SchoolType = 3
+                        });
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.Teach", b =>
@@ -921,6 +1154,36 @@ namespace Dirassati_Backend.Migrations
                     b.ToTable("SubjectTeacher");
                 });
 
+            modelBuilder.Entity("Teacher", b =>
+                {
+                    b.Property<Guid>("TeacherId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ContractTypeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateOnly>("HireDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("TeacherId");
+
+                    b.HasIndex("ContractTypeId");
+
+                    b.HasIndex("SchoolId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Teachers");
+                });
+
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Absence", b =>
                 {
                     b.HasOne("Dirassati_Backend.Data.Models.Student", "Student")
@@ -1096,33 +1359,6 @@ namespace Dirassati_Backend.Migrations
                     b.Navigation("Specialization");
                 });
 
-            modelBuilder.Entity("Dirassati_Backend.Data.Models.Teacher", b =>
-                {
-                    b.HasOne("Dirassati_Backend.Domain.Models.ContractType", "ContractType")
-                        .WithMany("Teachers")
-                        .HasForeignKey("ContractTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dirassati_Backend.Data.Models.School", "School")
-                        .WithMany("Teachers")
-                        .HasForeignKey("SchoolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AppUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ContractType");
-
-                    b.Navigation("School");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.Teach", b =>
                 {
                     b.HasOne("Dirassati_Backend.Data.Models.Group", "Group")
@@ -1137,7 +1373,7 @@ namespace Dirassati_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dirassati_Backend.Data.Models.Teacher", "Teacher")
+                    b.HasOne("Teacher", "Teacher")
                         .WithMany()
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1224,11 +1460,38 @@ namespace Dirassati_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dirassati_Backend.Data.Models.Teacher", null)
+                    b.HasOne("Teacher", null)
                         .WithMany()
                         .HasForeignKey("TeachersTeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Teacher", b =>
+                {
+                    b.HasOne("Dirassati_Backend.Domain.Models.ContractType", "ContractType")
+                        .WithMany("Teachers")
+                        .HasForeignKey("ContractTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dirassati_Backend.Data.Models.School", "School")
+                        .WithMany("Teachers")
+                        .HasForeignKey("SchoolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ContractType");
+
+                    b.Navigation("School");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.AcademicYear", b =>
