@@ -22,11 +22,7 @@ public static class AddServicesExtension
     public static WebApplicationBuilder AddServices(this WebApplicationBuilder builder)
     {
 
-        builder.Services.AddControllers(opt =>
-        {
-            var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-            opt.Filters.Add(new AuthorizeFilter(policy));
-        });
+        builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerWithJwtAuth();
 
