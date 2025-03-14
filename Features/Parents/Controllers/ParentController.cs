@@ -8,7 +8,7 @@ namespace Dirassati_Backend.Features.Parents.Controllers
 {
     [Route("api/parents")]
     [ApiController]
-    [AllowAnonymous]
+
     public class ParentController : ControllerBase
     {
         private readonly IParentRepository _parentRepository;
