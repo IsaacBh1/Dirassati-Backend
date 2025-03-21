@@ -9,13 +9,11 @@ public partial class Address
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int AdresseId { get; set; }
 
-    public string City { get; set; } = null!;
+    public string? Street { get; set; } 
+    public string? City { get; set; } 
+    public string? State { get; set; } 
+    public string? PostalCode { get; set; } 
+    public string? Country { get; set; } 
 
-    public string? State { get; set; }
-
-    public string Country { get; set; } = null!;
-    public string Street { get; set; } = null!;
-    public string? PostalCode { get; set; }
-    public virtual School? School { get; set; }
 
 }

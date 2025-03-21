@@ -16,5 +16,6 @@ public partial class Teacher
     public virtual ContractType ContractType { get; set; } = null!;
     public virtual School School { get; set; } = null!;
     public virtual AppUser User { get; set; } = null!;
+    public byte[]? Photo { get; set; }
     public virtual ICollection<Subject> Subjects { get; set; } = new List<Subject>();
 }

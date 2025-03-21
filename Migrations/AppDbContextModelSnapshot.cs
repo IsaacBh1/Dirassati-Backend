@@ -25,6 +25,12 @@ namespace Dirassati_Backend.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("AddressAdresseId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("AdresseId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("TEXT");
 
@@ -81,6 +87,8 @@ namespace Dirassati_Backend.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AddressAdresseId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -179,11 +187,9 @@ namespace Dirassati_Backend.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("City")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Country")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PostalCode")
@@ -193,7 +199,6 @@ namespace Dirassati_Backend.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Street")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("AdresseId");
@@ -449,8 +454,7 @@ namespace Dirassati_Backend.Migrations
 
                     b.HasKey("SchoolId");
 
-                    b.HasIndex("AddressId")
-                        .IsUnique();
+                    b.HasIndex("AddressId");
 
                     b.HasIndex("SchoolTypeId");
 
@@ -1004,6 +1008,9 @@ namespace Dirassati_Backend.Migrations
                     b.Property<DateOnly>("HireDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<byte[]>("Photo")
+                        .HasColumnType("BLOB");
+
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("TEXT");
 
@@ -1180,6 +1187,15 @@ namespace Dirassati_Backend.Migrations
                     b.ToTable("SubjectTeacher");
                 });
 
+            modelBuilder.Entity("AppUser", b =>
+                {
+                    b.HasOne("Dirassati_Backend.Domain.Models.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressAdresseId");
+
+                    b.Navigation("Address");
+                });
+
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.Absence", b =>
                 {
                     b.HasOne("Dirassati_Backend.Domain.Models.Student", "Student")
@@ -1286,8 +1302,8 @@ namespace Dirassati_Backend.Migrations
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.School", b =>
                 {
                     b.HasOne("Dirassati_Backend.Domain.Models.Address", "Address")
-                        .WithOne("School")
-                        .HasForeignKey("Dirassati_Backend.Domain.Models.School", "AddressId")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1492,11 +1508,6 @@ namespace Dirassati_Backend.Migrations
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.AcademicYear", b =>
                 {
                     b.Navigation("Groups");
-                });
-
-            modelBuilder.Entity("Dirassati_Backend.Domain.Models.Address", b =>
-                {
-                    b.Navigation("School");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.ContractType", b =>

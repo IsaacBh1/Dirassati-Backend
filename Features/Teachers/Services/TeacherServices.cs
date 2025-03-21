@@ -1,14 +1,10 @@
 using Dirassati_Backend.Common.Extensions;
 using Dirassati_Backend.Common.Services;
 using Dirassati_Backend.Domain.Models;
-using Dirassati_Backend.Dtos;
 using Dirassati_Backend.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-using System.Net;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
 using Dirassati_Backend.Features.Auth.Register.Services;
 
 namespace Dirassati_Backend.Features.Teachers.Services
@@ -66,13 +62,26 @@ namespace Dirassati_Backend.Features.Teachers.Services
 
         private async Task<(AppUser user, Teacher teacher)> CreateTeacherEntitiesAsync(TeacherInfosDTO teacherDto)
         {
-            // Validation des données
             ValidateSchoolClaims();
             var schoolId = Guid.Parse(_httpContext.HttpContext!.User.FindFirst("SchoolId")!.Value);
             await ValidateContractTypeAsync(teacherDto.ContractTypeId);
             await ValidateSchoolExistsAsync(schoolId);
 
-            // Création de l'utilisateur
+            Address? address = null;
+            if (teacherDto.Address != null)
+            {
+                address = new Address
+                {
+                    Street = teacherDto.Address.Street,
+                    City = teacherDto.Address.City,
+                    State = teacherDto.Address.State,
+                    PostalCode = teacherDto.Address.PostalCode,
+                    Country = teacherDto.Address.Country
+                };
+                _dbContext.Adresses.Add(address);
+                await _dbContext.SaveChangesAsync(); // Generate Address ID
+            }
+
             var user = new AppUser
             {
                 UserName = teacherDto.Email,
@@ -80,27 +89,27 @@ namespace Dirassati_Backend.Features.Teachers.Services
                 FirstName = teacherDto.FirstName,
                 LastName = teacherDto.LastName,
                 PhoneNumber = teacherDto.PhoneNumber,
-                EmailConfirmed = false
+                EmailConfirmed = false,
+                AdresseId = address?.AdresseId
             };
 
             var createResult = await _userManager.CreateAsync(user);
             if (!createResult.Succeeded)
                 throw new Exception($"User creation failed: {createResult.Errors.ToCustomString()}");
 
-            // Création du professeur
             var teacher = new Teacher
             {
                 UserId = user.Id,
                 HireDate = teacherDto.HireDate,
                 ContractTypeId = teacherDto.ContractTypeId,
                 SchoolId = schoolId,
-                User = user
+                User = user,
+                Photo = teacherDto.Photo 
             };
 
             await AssignSubjectsAsync(teacher, teacherDto.SubjectIds);
             return (user, teacher);
         }
-
         private void ValidateSchoolClaims()
         {
             if (_httpContext.HttpContext?.User.FindFirst("SchoolId") == null ||
