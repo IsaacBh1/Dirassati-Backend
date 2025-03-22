@@ -7,4 +7,5 @@ public class SchoolDto
     public string SchoolEmail { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
     public AddressDto Address { get; set; } = null!;
+    public List<int>? SpecializationsId { get; set; }
 }

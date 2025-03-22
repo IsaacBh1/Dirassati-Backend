@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Features.SchoolLevels.DTOs;
 using Dirassati_Backend.Features.SchoolLevels.Services;
 using Microsoft.AspNetCore.Mvc;

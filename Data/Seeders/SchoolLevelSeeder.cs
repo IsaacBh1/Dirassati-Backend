@@ -1,5 +1,5 @@
 using Dirassati_Backend.Data.Enums;
-using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Data.Seeders;

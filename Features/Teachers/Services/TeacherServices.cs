@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Dirassati_Backend.Features.Auth.Register.Services;
+using Dirassati_Backend.Data.Models;
 
 namespace Dirassati_Backend.Features.Teachers.Services
 {

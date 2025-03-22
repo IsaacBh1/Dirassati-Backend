@@ -1,12 +1,14 @@
-using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Parents.Dtos;
 using Dirassati_Backend.Features.Parents.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.Parents.Controllers
 {
     [Route("api/parents")]
     [ApiController]
+
     public class ParentController : ControllerBase
     {
         private readonly IParentRepository _parentRepository;
@@ -80,7 +82,7 @@ namespace Dirassati_Backend.Features.Parents.Controllers
 
             return Ok(students);
         }
-        
+
         [HttpGet("{studentId:guid}/parent")]
         public async Task<IActionResult> GetParentByStudentId(Guid studentId)
         {

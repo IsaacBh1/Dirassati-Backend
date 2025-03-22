@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.StaticAssets;
 
 namespace Dirassati_Backend.Common.Extensions;
 

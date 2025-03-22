@@ -14,7 +14,8 @@ public class Result<TResult, TError>
          new()
          {
              IsSuccess = true,
-             Value = value
+             Value = value,
+             StatusCode = statusCode
          };
 
     }

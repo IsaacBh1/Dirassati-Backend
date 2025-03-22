@@ -1,4 +1,3 @@
-using Dirassati_Backend.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -8,10 +7,13 @@ using System.Text;
 using Persistence;
 using Dirassati_Backend.Dtos;
 using Microsoft.EntityFrameworkCore;
+using Dirassati_Backend.Data.Models;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/auth")]
 [Tags("Employee Authentication")]
+[AllowAnonymous]
 public class EmployeeAuthController : ControllerBase
 {
     private readonly UserManager<AppUser> _userManager;
@@ -24,7 +26,7 @@ public class EmployeeAuthController : ControllerBase
         _context = context;
         _configuration = configuration;
     }
-
+    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] EmployeeLoginDto dto)
     {

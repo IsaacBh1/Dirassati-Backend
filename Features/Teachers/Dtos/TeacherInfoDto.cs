@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Domain.Models;
 
 public class TeacherInfosDTO

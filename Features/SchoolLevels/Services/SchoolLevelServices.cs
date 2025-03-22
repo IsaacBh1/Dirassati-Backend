@@ -1,9 +1,7 @@
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Enums;
-using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Features.SchoolLevels.DTOs;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Persistence;
 using System.Net;
 

@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Dirassati_Backend.Domain.Models;
+using System.ComponentModel.DataAnnotations.Schema;
+using Dirassati_Backend.Data.Models;
+using Dirassati_Backend.Domain.Models;
+
 
 public partial class Teacher
 {
