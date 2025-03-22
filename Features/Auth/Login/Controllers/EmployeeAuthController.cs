@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 [ApiController]
 [Route("api/auth")]
 [Tags("Employee Authentication")]
+[AllowAnonymous]
 public class EmployeeAuthController : ControllerBase
 {
     private readonly UserManager<AppUser> _userManager;

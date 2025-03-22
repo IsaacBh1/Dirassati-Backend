@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using Persistence; 
+using Persistence;
+using Microsoft.AspNetCore.Authorization;
 
 [Tags("Parent")]
 [Route("api/parent/auth")]
 [ApiController]
+[AllowAnonymous]
 public class ParentAuthController : ControllerBase
 {
     private readonly UserManager<AppUser> _userManager;
