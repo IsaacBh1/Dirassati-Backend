@@ -11,7 +11,7 @@ using Persistence;
 namespace Dirassati_Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250314002648_InitialCreate")]
+    [Migration("20250322001202_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
