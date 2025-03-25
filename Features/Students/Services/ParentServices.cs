@@ -32,7 +32,7 @@ public class ParentServices(AppDbContext dbContext, UserManager<AppUser> userMan
             };
             var result = await userManager.CreateAsync(user);
             if (!result.Succeeded)
-                throw new Exception($"Can not create user \n{result.Errors.ToCustomString()}");
+                throw new InvalidOperationException($"Can not create user \n{result.Errors.ToCustomString()}");
             parent = new Parent
             {
                 NationalIdentityNumber = parentInfosDTO.NationalIdentityNumber,
@@ -57,7 +57,7 @@ public class ParentServices(AppDbContext dbContext, UserManager<AppUser> userMan
     }
     private async Task SendConfirmationEmailAsync(string token, string email)
     {
-        var link = linkGenerator.GetUriByName(httpContext.HttpContext!, "VerifyEmail", new { email, token }) ?? throw new Exception("Can't create verification email link");
+        var link = linkGenerator.GetUriByName(httpContext.HttpContext!, "VerifyEmail", new { email, token }) ?? throw new InvalidOperationException("Can't create verification email link");
         var body = $"Please Verify your email by clicking on <a href=\"{link}\">this link</a>";
         await emailService.SendEmailAsync(email, "Confirmation Email", body, null, null, isHTML: true);
     }

@@ -73,11 +73,11 @@ namespace Dirassati_Backend.Features.Teachers.Services
             {
                 address = new Address
                 {
-                    Street = teacherDto.Address.Street,
-                    City = teacherDto.Address.City,
-                    State = teacherDto.Address.State,
-                    PostalCode = teacherDto.Address.PostalCode,
-                    Country = teacherDto.Address.Country
+                    Street = teacherDto.Address.FullAddress,
+                    City = "",
+                    State = "",
+                    PostalCode = "",
+                    Country = "Algerie"
                 };
                 _dbContext.Adresses.Add(address);
                 await _dbContext.SaveChangesAsync(); // Generate Address ID
