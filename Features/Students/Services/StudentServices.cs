@@ -22,14 +22,12 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
     {
         var result = new Result<Guid, string>();
 
-        // Validate school exists
         var school = await dbContext.Schools
             .FirstOrDefaultAsync(s => s.SchoolId.ToString() == schoolId);
 
         if (school == null)
             return result.Failure("School not found", 404);
 
-        // Validate school level exists and belongs to this school type
         var schoolLevel = await dbContext.SchoolLevels
             .FirstOrDefaultAsync(l => l.LevelId == studentDTO.studentInfosDTO.SchoolLevelId);
 
@@ -39,7 +37,6 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
         if (schoolLevel.SchoolTypeId != school.SchoolTypeId)
             return result.Failure("School level does not match school type", 400);
 
-        // Validate specialization if provided
         if (studentDTO.studentInfosDTO.SpecializationId.HasValue)
         {
             var specialization = await dbContext.Specializations
@@ -48,7 +45,6 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
             if (specialization == null)
                 return result.Failure("Invalid specialization", 400);
 
-            // Check if this school offers this specialization
             var hasSpecialization = await dbContext.Schools
                 .Where(s => s.SchoolId.ToString() == schoolId)
                 .SelectMany(s => s.Specializations)

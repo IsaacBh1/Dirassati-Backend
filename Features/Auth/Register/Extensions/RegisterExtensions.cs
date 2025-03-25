@@ -13,5 +13,6 @@ public static class RegisterExtensions
         EmployeeId = source.Entity.EmployeeId,
         PhoneNumber = source.Entity.User.PhoneNumber!,
         Permissions = source.Entity.Permissions,
+        SchoolId = source.Entity.SchoolId.ToString()
     };
 }

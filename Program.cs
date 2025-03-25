@@ -2,6 +2,7 @@ using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Extensions;
 using Dirassati_Backend.Features.Auth.SignUp;
+using Dirassati_Backend.Features.Teachers.Services;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -42,8 +43,11 @@ try
 {
     var context = service.GetRequiredService<AppDbContext>();
     var registerService = service.GetRequiredService<RegisterService>();
+    var teacherServices = service.GetRequiredService<TeacherServices>();
     await context.Database.MigrateAsync();
-    await SchoolSeeder.SeedAsync(registerService);
+    string? schoolId = await SchoolSeeder.SeedAsync(registerService, context) ?? throw new Exception("School Has not been created");
+    if ((await context.Teachers.FirstOrDefaultAsync(t => t.SchoolId == Guid.Parse(schoolId))) == null)
+        await TeacherSeeder.SeedTeachersAsync(Guid.Parse(schoolId), teacherServices);
 }
 catch (Exception e)
 {

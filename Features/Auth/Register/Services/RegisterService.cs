@@ -28,6 +28,7 @@ public class RegisterService
         using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
+
             var user = new AppUser
             {
                 FirstName = dto.Employee.FirstName,

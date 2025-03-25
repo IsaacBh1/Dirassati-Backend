@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Data.Models
 {
@@ -17,6 +18,7 @@ namespace Dirassati_Backend.Data.Models
 
         [Required]
         [EmailAddress]
+
         public string Email { get; set; } = null!;
 
         [Required]

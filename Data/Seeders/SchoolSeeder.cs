@@ -2,6 +2,8 @@ using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.SignUp;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Dirassati_Backend.Data.Seeders
@@ -10,7 +12,7 @@ namespace Dirassati_Backend.Data.Seeders
     {
 
 
-        public static async Task SeedAsync(RegisterService registerService)
+        public static async Task<string?> SeedAsync(RegisterService registerService, AppDbContext dbContext)
         {
             var registerDto = new RegisterDto
             {
@@ -39,40 +41,39 @@ namespace Dirassati_Backend.Data.Seeders
                     Email = "test123@test.com",
                     PhoneNumber = "+1987654321",
                     Password = "P@ssword123",
-                    Permission = 2
+                    Permission = 1
                 },
-
-
             };
 
-            try
+            var school = await dbContext.Schools.FirstOrDefaultAsync(s => s.Email == registerDto.School.SchoolEmail);
+            if (school != null)
+                return school.SchoolId.ToString();
+            var result = await registerService.Register(registerDto);
+            if (result.IsSuccess && result.Value != null)
             {
-                var result = await registerService.Register(registerDto);
-
-                if (result.IsSuccess)
+                Console.WriteLine("Successfully seeded Greenwood High School and employee.");
+                return result.Value.SchoolId;
+            }
+            else
+            {
+                Console.WriteLine("Failed to seed Greenwood High School and employee.");
+                if (result.Errors != null)
                 {
-                    Console.WriteLine("Successfully seeded Greenwood High School and employee.");
+                    foreach (var error in result.Errors)
+                    {
+                        Console.WriteLine($"Error: {error.Description}");
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Failed to seed Greenwood High School and employee.");
-                    if (result.Errors != null)
-                    {
-                        foreach (var error in result.Errors)
-                        {
-                            Console.WriteLine($"Error: {error.Description}");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Error: {result.Errors}");
-                    }
+                    Console.WriteLine($"Error: {result.Errors}");
                 }
+                return null;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An exception occurred during seeding: {ex.Message}");
-            }
+
         }
+
+
     }
+
 }

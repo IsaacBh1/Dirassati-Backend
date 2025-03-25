@@ -3,24 +3,25 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Domain.Models;
 
-public class TeacherInfosDTO
+public class GetTeacherInfosDTO
 {
-    [Required]
+
+    public string TeacherId { get; set; } = null!;
     public string Email { get; set; } = string.Empty;
 
-    [Required]
+
     public string FirstName { get; set; } = string.Empty;
 
-    [Required]
+
     public string LastName { get; set; } = string.Empty;
 
-    [Required]
+
     public string PhoneNumber { get; set; } = string.Empty;
 
-    [Required]
+
     public DateOnly HireDate { get; set; }
 
-    [Required]
+
     public int ContractTypeId { get; set; }
     public string ContractType { get; set; } = "";
 

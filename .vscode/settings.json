@@ -1,0 +1,10 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "database": "${workspaceFolder:Dirassati-Backend}/dirasatiDb.db",
+      "name": "Dirasati Db"
+    }
+  ]
+}

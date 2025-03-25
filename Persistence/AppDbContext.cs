@@ -39,7 +39,7 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
         SchoolLevelSeeder.SeedSchoolLevels(builder);
         ParentRelationshipSeeder.SeedParentRelationships(builder);
         SubjectSeeder.SeedSubjects(builder);
-
+        TeacherSeeder.SeedContractType(builder);
         base.OnModelCreating(builder);
         builder.Entity<School>()
         .HasMany(sch => sch.Specializations)
