@@ -66,7 +66,9 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
             }
 
         }
-
+        var relationshipExists = await dbContext.ParentRelationshipToStudentTypes.AnyAsync(r => r.Id == studentDTO.parentInfosDTO.RelationshipToStudentId);
+        if (!relationshipExists)
+            return result.Failure("Invalid parent relationship type", 400);
 
         using var transaction = await dbContext.Database.BeginTransactionAsync();
         try

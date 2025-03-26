@@ -51,16 +51,17 @@ namespace Dirassati_Backend.Features.Absences.Services
             foreach (var absence in absences)
             {
                 var student = group.Students.First(s => s.StudentId == absence.StudentId);
-                var parentUserId = student.Parent.UserId;
+                var parentId = student.Parent.ParentId.ToString();
 
-                if (_connectionTracker.IsUserOnline(parentUserId))
-                {
-                    await _hubContext.Clients.User(parentUserId)
-                        .SendAsync("ReceiveAbsenceNotification",
-                            $"Your child {student.FirstName} {student.LastName} is absent.");
-                    absence.IsNotified = true;
-                    await _absenceRepository.UpdateAbsenceAsync(absence);
-                }
+                await _hubContext.Clients.Group($"parent-{parentId}")
+                    .SendAsync("ReceiveAbsenceNotification", new
+                    {
+                        StudentName = $"{student.FirstName} {student.LastName}",
+                        Date = DateTime.Now
+                    });
+
+                absence.IsNotified = true;
+                await _absenceRepository.UpdateAbsenceAsync(absence);
             }
 
             await _absenceRepository.SaveChangesAsync();

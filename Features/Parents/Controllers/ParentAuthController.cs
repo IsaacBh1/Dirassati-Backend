@@ -59,7 +59,7 @@ public class ParentAuthController : ControllerBase
             new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("parentId", parentId) // Adding parentId claim
+            new Claim("parentId", parentId)
         };
 
         var jwtKey = _configuration["Jwt:Key"]

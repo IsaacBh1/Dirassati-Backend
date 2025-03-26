@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
-using Dirassati_Backend.Features.Absences.Repos;
 using DirassatiBackend.Common.Services.ConnectionTracker;
 
 namespace Dirassati_Backend.Common;

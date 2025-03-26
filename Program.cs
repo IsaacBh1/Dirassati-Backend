@@ -36,7 +36,8 @@ var app = builder.Build();
 app.UseHttpsRedirection(); 
 
 app.UseCors("AllowAll");
-
+//app.UseAuthentication();
+app.UseAuthorization(); 
 // Configure Swagger UI only in development mode
 if (app.Environment.IsDevelopment())
 {

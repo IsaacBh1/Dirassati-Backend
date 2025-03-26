@@ -638,7 +638,7 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("GroupId")
+                    b.Property<int?>("GroupId")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsActive")
@@ -1343,9 +1343,7 @@ namespace Dirassati_Backend.Migrations
                 {
                     b.HasOne("Dirassati_Backend.Data.Models.Group", "Group")
                         .WithMany("Students")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GroupId");
 
                     b.HasOne("Dirassati_Backend.Data.Models.Parent", "Parent")
                         .WithMany()

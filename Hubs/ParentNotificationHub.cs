@@ -1,15 +1,20 @@
-using System.Security.Claims;
 using Dirassati_Backend.Features.Absences.Repos;
 using Dirassati_Backend.Features.Parents.Repositories;
 using DirassatiBackend.Common.Services.ConnectionTracker;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
+[Authorize]
 public class ParentNotificationHub : Hub
 {
     private readonly IConnectionTracker _connectionTracker;
     private readonly IAbsenceRepository _absenceRepository;
     private readonly IParentRepository _parentRepository;
-    public ParentNotificationHub(IConnectionTracker connectionTracker, IAbsenceRepository absenceRepository, IParentRepository parentRepository)
+
+    public ParentNotificationHub(
+        IConnectionTracker connectionTracker,
+        IAbsenceRepository absenceRepository,
+        IParentRepository parentRepository)
     {
         _connectionTracker = connectionTracker;
         _absenceRepository = absenceRepository;
@@ -18,39 +23,37 @@ public class ParentNotificationHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userId != null)
+        var parentId = Context.User?.FindFirst("parentId")?.Value;
+        if (!string.IsNullOrEmpty(parentId))
         {
-            _connectionTracker.AddConnection(userId, Context.ConnectionId);
+            // Track by parentId instead of user ID
+            _connectionTracker.AddConnection(parentId, Context.ConnectionId);
+
+            // Add connection to parent-specific group
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"parent-{parentId}");
+
+            if (Guid.TryParse(parentId, out var parentGuid))
+            {
+                await SendPendingNotifications(parentGuid);
+            }
         }
         await base.OnConnectedAsync();
-        if (Guid.TryParse(userId, out var userGuid))
-        {
-            await SendPendingNotifications(userGuid);
-        }
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userId != null)
+        var parentId = Context.User?.FindFirst("parentId")?.Value;
+        if (!string.IsNullOrEmpty(parentId))
         {
-            _connectionTracker.RemoveConnection(userId, Context.ConnectionId);
+            _connectionTracker.RemoveConnection(parentId, Context.ConnectionId);
         }
         await base.OnDisconnectedAsync(exception);
     }
 
-    private async Task SendPendingNotifications(Guid userId)
+    private async Task SendPendingNotifications(Guid parentId)
     {
-        var parent = await _parentRepository.GetParentByStudentIdAsync(userId);
-        if (parent == null)
-        {
-            throw new InvalidOperationException("Parent not found.");
-        }
-
-        var students = await _parentRepository.GetStudentsByParentIdAsync(parent.ParentId);
+        var students = await _parentRepository.GetStudentsByParentIdAsync(parentId);
         var studentIds = students.Select(s => s.StudentId).ToList();
-
         var pendingAbsences = await _absenceRepository.GetAbsencesByStudentIdsAsync(studentIds, false);
 
         foreach (var absence in pendingAbsences)
@@ -74,5 +77,4 @@ public class ParentNotificationHub : Hub
     {
         await Clients.All.SendAsync("ReceiveBroadcastNotification", message);
     }
-
 }

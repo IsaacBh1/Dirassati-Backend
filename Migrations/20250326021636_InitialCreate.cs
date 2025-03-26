@@ -554,7 +554,7 @@ namespace Dirassati_Backend.Migrations
                     EnrollmentDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
                     ParentId = table.Column<Guid>(type: "TEXT", nullable: false),
                     IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
-                    GroupId = table.Column<int>(type: "INTEGER", nullable: false)
+                    GroupId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -563,8 +563,7 @@ namespace Dirassati_Backend.Migrations
                         name: "FK_Students_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
-                        principalColumn: "GroupId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "GroupId");
                     table.ForeignKey(
                         name: "FK_Students_ParentRelationshipToStudentTypes_ParentRelationshipToStudentTypeId",
                         column: x => x.ParentRelationshipToStudentTypeId,
