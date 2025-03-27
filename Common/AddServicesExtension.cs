@@ -2,6 +2,7 @@ using System.Net.Mail;
 using System.Text;
 using Dirasati_Backend.Configurations;
 using Dirassati_Backend.Common.Services;
+using Dirassati_Backend.Features.Auth.Accounts.Services;
 using Dirassati_Backend.Features.Auth.Register.Services;
 using Dirassati_Backend.Features.Auth.SignUp;
 using Dirassati_Backend.Features.School.Services;
@@ -83,6 +84,7 @@ public static class AddServicesExtension
         builder.Services.AddScoped<VerifyEmailService>();
         builder.Services.AddScoped<SendCridentialsService>();
         builder.Services.AddScoped<ISchoolService, SchoolServices>();
+        builder.Services.AddScoped<AccountServices>();
 
         return builder;
     }

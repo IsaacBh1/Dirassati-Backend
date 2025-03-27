@@ -1,17 +1,17 @@
 using Dirassati_Backend.Features.School.DTOs;
 using Dirassati_Backend.Features.School.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.School;
 
 [Route("api/[controller]")]
-
+[Authorize]
 public class SchoolController(ISchoolService schoolService) : BaseController
 {
     private readonly ISchoolService _schoolService = schoolService;
 
     [HttpGet]
-    [ProducesResponseType(typeof(GetSchoolInfoDTO), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<GetSchoolInfoDTO>> GetSchoolInfo()
     {

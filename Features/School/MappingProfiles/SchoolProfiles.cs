@@ -1,4 +1,5 @@
 using AutoMapper;
+using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.School.DTOs;
 
@@ -9,8 +10,10 @@ public class SchoolProfiles : Profile
 {
     public SchoolProfiles()
     {
-        CreateMap<AcademicYear, AcademicYearDTO>();
-        CreateMap<PhoneNumberDTO, PhoneNumber>();
+
+        CreateMap<Address, AdressDto>();
+        CreateMap<AcademicYear, AcademicYearDto>();
+
         CreateMap<UpdateSchoolInfosDTO, Data.Models.School>()
         .ForMember(s => s.PhoneNumbers, opt => opt.MapFrom(u => u.PhoneNumbers))
         .ForMember(s => s.Specializations, opt => opt.Ignore());
