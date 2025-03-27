@@ -30,4 +30,9 @@ public class Result<TResult, TError>
             StatusCode = statusCode
         };
     }
+
+    internal void Success()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -9,12 +9,11 @@ using Dirassati_Backend.Features.School.Services;
 using Dirassati_Backend.Features.SchoolLevels.Services;
 using Dirassati_Backend.Features.Students.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
+using DirassatiBackend.Common.Services.ConnectionTracker;
 
 namespace Dirassati_Backend.Common;
 
@@ -26,7 +25,7 @@ public static class AddServicesExtension
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerWithJwtAuth();
-
+        builder.Services.AddSingleton<IConnectionTracker, ConnectionTracker>();
         // Register DbContext
         builder.Services.AddDbContext<AppDbContext>(opt =>
         {

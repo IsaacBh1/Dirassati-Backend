@@ -68,6 +68,7 @@ public class TeacherServices
         }
     }
 
+
     private async Task<(AppUser user, Teacher teacher)> CreateTeacherEntitiesAsync(TeacherInfosDTO teacherDto, string SchoolId)
     {
         await ValidateSchoolClaims(SchoolId);
@@ -75,20 +76,22 @@ public class TeacherServices
         await ValidateContractTypeAsync(teacherDto.ContractTypeId);
         await ValidateSchoolExistsAsync(schoolId);
 
-        Address? address = null;
-        if (teacherDto.Address != null)
-        {
-            address = new Address
+            Address? address = null;
+            if (teacherDto.Address != null)
             {
-                Street = teacherDto.Address.Street,
-                City = teacherDto.Address.City,
-                State = teacherDto.Address.State,
-                PostalCode = teacherDto.Address.PostalCode,
-                Country = teacherDto.Address.Country
-            };
-            _dbContext.Adresses.Add(address);
-            await _dbContext.SaveChangesAsync(); // Generate Address ID
-        }
+                address = new Address
+                {
+                    Street = teacherDto.Address.FullAddress,
+                    City = "",
+                    State = "",
+                    PostalCode = "",
+                    Country = "Algerie"
+                };
+                _dbContext.Adresses.Add(address);
+                await _dbContext.SaveChangesAsync(); // Generate Address ID
+            }
+
+        
 
         var user = new AppUser
         {

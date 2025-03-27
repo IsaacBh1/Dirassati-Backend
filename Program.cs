@@ -1,33 +1,45 @@
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Extensions;
+using Dirassati_Backend.Features.Absences.Services;
 using Dirassati_Backend.Features.Auth.SignUp;
 using Dirassati_Backend.Features.Teachers.Services;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.AddServices();
 builder.AddCustomServices();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowCredentials()
+              .SetIsOriginAllowed(_ => true);
     });
 });
-
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true; // Helps in debugging
+});
 
 builder.Services.AddRepositories();
+builder.Services.AddScoped<AbsenceService>();
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// ✅ Ensure CORS middleware is applied early
-app.UseCors("AllowAll");
+app.UseHttpsRedirection(); 
 
-// Configure the HTTP request pipeline.
+app.UseCors("AllowAll");
+//app.UseAuthentication();
+app.UseAuthorization(); 
+// Configure Swagger UI only in development mode
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -36,7 +48,7 @@ if (app.Environment.IsDevelopment())
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dirasati API v1");
     });
 }
-
+//note for front-end : Include the trailing record separator (U+001E) to make the handshake works
 using var scope = app.Services.CreateScope();
 var service = scope.ServiceProvider;
 try
@@ -56,6 +68,8 @@ catch (Exception e)
     throw;
 }
 
+app.MapHub<ParentNotificationHub>("/parentNotificationHub").RequireCors("AllowAll");
+
 app.MapControllers();
-app.UseHttpsRedirection();
+
 app.Run();
