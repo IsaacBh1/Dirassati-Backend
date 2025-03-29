@@ -36,3 +36,11 @@ public enum SchoolLevelsEnum
     Lycee2eme,
     Lycee3eme
 }
+
+
+public enum ReportStatusEnum
+{
+    Pending = 1,
+    Sent,
+    Viewed,
+}

@@ -1,5 +1,3 @@
-using System;
-
 namespace Dirassati_Backend.Common.Dtos;
 
 public class AcademicYearDto

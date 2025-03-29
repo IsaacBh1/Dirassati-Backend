@@ -1,7 +1,7 @@
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Absences.Repos;
 using Dirassati_Backend.Features.Groups.Repos;
-using DirassatiBackend.Common.Services.ConnectionTracker;
+using Dirassati_Backend.Common.Services.ConnectionTracker;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Dirassati_Backend.Features.Absences.Services
@@ -35,7 +35,7 @@ namespace Dirassati_Backend.Features.Absences.Services
                 .Select(s => new Absence
                 {
                     StudentId = s.StudentId,
-                    DateTIme = DateTime.Now,
+                    DateTime = DateTime.Now,
                     IsJustified = false,
                     Remark = "Absent",
                     IsNotified = false

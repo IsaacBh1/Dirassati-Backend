@@ -1,6 +1,6 @@
 using System.Net.Mail;
 using System.Text;
-using Dirasati_Backend.Configurations;
+using Dirassati_Backend.Configurations;
 using Dirassati_Backend.Common.Services;
 using Dirassati_Backend.Features.Auth.Accounts.Services;
 using Dirassati_Backend.Features.Auth.Register.Services;
@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
-using DirassatiBackend.Common.Services.ConnectionTracker;
+using Dirassati_Backend.Common.Services.ConnectionTracker;
 
 namespace Dirassati_Backend.Common;
 
@@ -68,7 +68,13 @@ public static class AddServicesExtension
         EnableSsl = false,
         DeliveryMethod = SmtpDeliveryMethod.Network
     });
-
+        // Add logging
+        builder.Services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.AddConsole(); // Add console logger
+            loggingBuilder.AddDebug();   // Add debug logger
+            // Add other log providers as needed (e.g., ApplicationInsights, Seq)
+        });
         return builder;
     }
 

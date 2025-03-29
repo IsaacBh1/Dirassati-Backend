@@ -1,6 +1,3 @@
-using Dirassati_Backend.Domain.Models;
-using System.Threading.Tasks;
-
 namespace Dirassati_Backend.Repositories
 {
     public interface ITeacherRepository

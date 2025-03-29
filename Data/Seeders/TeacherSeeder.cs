@@ -1,9 +1,6 @@
-using System;
-using System.ComponentModel;
 using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Features.Teachers.Services;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Dirassati_Backend.Data.Seeders;
 

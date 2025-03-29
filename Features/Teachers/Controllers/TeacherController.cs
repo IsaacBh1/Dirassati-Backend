@@ -1,11 +1,11 @@
 // TeacherController.cs
 using System.Security.Claims;
-using Dirassati_Backend.Dtos;
 using Dirassati_Backend.Features.Teachers.Dtos;
 using Dirassati_Backend.Features.Teachers.Services;
-using Microsoft.AspNetCore.Authentication;
+using Dirassati_Backend.Hubs.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Dirassati_Backend.Features.Teachers.Controllers;
 
@@ -15,10 +15,11 @@ namespace Dirassati_Backend.Features.Teachers.Controllers;
 public class TeacherController : BaseController
 {
     private readonly TeacherServices _teacherServices;
-
-    public TeacherController(TeacherServices teacherServices)
+    private readonly IHubContext<ParentNotificationHub, IParentClient> _hubContext;
+    public TeacherController(TeacherServices teacherServices, IHubContext<ParentNotificationHub, IParentClient> hubContext)
     {
         _teacherServices = teacherServices;
+        _hubContext = hubContext;
     }
 
     [HttpPost("create")]
@@ -64,5 +65,30 @@ public class TeacherController : BaseController
     public async Task<ActionResult<List<ContractTypeDTO>>> GetContractTypes()
     {
         return HandleResult(await _teacherServices.GetContractTypes());
+    }
+
+
+    [HttpPost("/reports/add")]
+    public async Task<ActionResult<GetStudentReportDto>> AddTeacherReport([FromBody] AddStudentReportDto reportDto)
+    {
+
+        try
+        {
+            var teacherId = User.FindFirstValue("TeacherId");
+            var result = await _teacherServices.AddTeacherReportAsync(teacherId, reportDto);
+            if (result.IsSuccess && result.Value != null)
+            {
+
+                await _teacherServices.TriggerSendReportNotification(result.Value);
+            }
+            return HandleResult(result);
+        }
+        catch (System.Exception e)
+        {
+            Console.WriteLine(e);
+            return Problem(e.Message, statusCode: 500);
+
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-namespace DirassatiBackend.Common.Services.ConnectionTracker
+namespace Dirassati_Backend.Common.Services.ConnectionTracker
 {
     public interface IConnectionTracker
     {

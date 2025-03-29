@@ -10,6 +10,9 @@ namespace Dirassati_Backend.Features.Students.Services;
 
 public class ParentServices(AppDbContext dbContext, UserManager<AppUser> userManager, LinkGenerator linkGenerator, IHttpContextAccessor httpContext, IEmailService emailService)
 {
+    public string VerificationToken { get; private set; } = "";
+    public string Email { get; private set; } = "";
+
     public async Task<Guid> RegisterParent(string NationalIdentityNumber, ParentInfosDTO parentInfosDTO)
     {
         var parent = await dbContext.Parents
@@ -46,7 +49,8 @@ public class ParentServices(AppDbContext dbContext, UserManager<AppUser> userMan
             await dbContext.SaveChangesAsync();
 
             var verificationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
-            await SendConfirmationEmailAsync(verificationToken, parentInfosDTO.Email);
+            VerificationToken = verificationToken;
+            Email = user.Email;
             return parent.ParentId;
         }
         catch (Exception)
@@ -55,10 +59,10 @@ public class ParentServices(AppDbContext dbContext, UserManager<AppUser> userMan
             throw;
         }
     }
-    private async Task SendConfirmationEmailAsync(string token, string email)
+    public async Task SendConfirmationEmailAsync()
     {
-        var link = linkGenerator.GetUriByName(httpContext.HttpContext!, "VerifyEmail", new { email, token }) ?? throw new InvalidOperationException("Can't create verification email link");
+        var link = linkGenerator.GetUriByName(httpContext.HttpContext!, "VerifyEmail", new { Email, VerificationToken }) ?? throw new InvalidOperationException("Can't create verification email link");
         var body = $"Please Verify your email by clicking on <a href=\"{link}\">this link</a>";
-        await emailService.SendEmailAsync(email, "Confirmation Email", body, null, null, isHTML: true);
+        await emailService.SendEmailAsync(Email, "Confirmation Email", body, null, null, isHTML: true);
     }
 }

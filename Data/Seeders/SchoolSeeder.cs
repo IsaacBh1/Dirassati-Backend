@@ -1,7 +1,5 @@
-using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.SignUp;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Persistence;

@@ -1,6 +1,4 @@
-using Dirassati_Backend.Domain.Models;
 using Persistence;
-using System.Threading.Tasks;
 
 namespace Dirassati_Backend.Repositories
 {
@@ -11,12 +9,12 @@ namespace Dirassati_Backend.Repositories
         {
             _context = context;
         }
-        
+
         public async Task AddTeacherAsync(Teacher teacher)
         {
             await _context.Teachers.AddAsync(teacher);
         }
-        
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
