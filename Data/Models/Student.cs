@@ -42,3 +42,19 @@ public partial class Student
 
 
 }
+
+
+
+/*
+    {
+        StudentId
+        First Name
+        Last Name 
+        StudentIdNumber 
+        Parent Name 
+        parent contact , Email or phone number
+
+    }
+
+
+ */

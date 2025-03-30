@@ -1,4 +1,3 @@
-// TeacherController.cs
 using System.Security.Claims;
 using Dirassati_Backend.Features.Teachers.Dtos;
 using Dirassati_Backend.Features.Teachers.Services;
