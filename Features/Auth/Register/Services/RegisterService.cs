@@ -5,7 +5,6 @@ using Dirassati_Backend.Features.Auth.Register.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-using SQLitePCL;
 
 namespace Dirassati_Backend.Features.Auth.SignUp;
 

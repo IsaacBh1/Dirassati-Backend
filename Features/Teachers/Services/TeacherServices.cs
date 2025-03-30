@@ -1,6 +1,5 @@
 using Dirassati_Backend.Common.Extensions;
 using Dirassati_Backend.Common.Services;
-using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,8 +9,10 @@ using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Features.Teachers.Dtos;
 using AutoMapper;
-using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.SignalR;
+using Dirassati_Backend.Hubs.Interfaces;
+using Dirassati_Backend.Data.Enums;
+using Dirassati_Backend.Common.Dtos;
 namespace Dirassati_Backend.Features.Teachers.Services;
 
 public class TeacherServices
@@ -24,6 +25,7 @@ public class TeacherServices
     private readonly IEmailService _emailService;
     private readonly SendCridentialsService _sendCridentialsService;
     private readonly IMapper _mapper;
+    private readonly IHubContext<ParentNotificationHub, IParentClient> _hubContext;
 
     public TeacherServices(
         ITeacherRepository teacherRepository,
@@ -33,7 +35,8 @@ public class TeacherServices
         IHttpContextAccessor httpContext,
         IEmailService emailService,
         SendCridentialsService sendCridentialsService,
-        IMapper mapper)
+        IMapper mapper,
+         IHubContext<ParentNotificationHub, IParentClient> hubContext)
     {
         _teacherRepository = teacherRepository;
         _dbContext = dbContext;
@@ -43,6 +46,7 @@ public class TeacherServices
         _emailService = emailService;
         _sendCridentialsService = sendCridentialsService;
         _mapper = mapper;
+        _hubContext = hubContext;
     }
 
     public async Task<Guid> RegisterTeacherAsync(TeacherInfosDTO teacherDto, string schoolId, bool isSeed = false)
@@ -76,22 +80,22 @@ public class TeacherServices
         await ValidateContractTypeAsync(teacherDto.ContractTypeId);
         await ValidateSchoolExistsAsync(schoolId);
 
-            Address? address = null;
-            if (teacherDto.Address != null)
+        Address? address = null;
+        if (teacherDto.Address != null)
+        {
+            address = new Address
             {
-                address = new Address
-                {
-                    Street = teacherDto.Address.FullAddress,
-                    City = "",
-                    State = "",
-                    PostalCode = "",
-                    Country = "Algerie"
-                };
-                _dbContext.Adresses.Add(address);
-                await _dbContext.SaveChangesAsync(); // Generate Address ID
-            }
+                Street = teacherDto.Address.FullAddress,
+                City = "",
+                State = "",
+                PostalCode = "",
+                Country = "Algerie"
+            };
+            _dbContext.Adresses.Add(address);
+            await _dbContext.SaveChangesAsync(); // Generate Address ID
+        }
 
-        
+
 
         var user = new AppUser
         {
@@ -252,4 +256,82 @@ public class TeacherServices
         }
     }
 
+    internal async Task<Result<GetStudentReportDto, string>> AddTeacherReportAsync(string? TeacherId, AddStudentReportDto reportDto)
+    {
+        var result = new Result<GetStudentReportDto, string>();
+
+        try
+        {
+            if (string.IsNullOrEmpty(TeacherId) || !Guid.TryParse(TeacherId, out Guid teacherId))
+            {
+                return result.Failure("Invalid teacher ID", 400);
+            }
+
+            var report = new StudentReport
+            {
+                TeacherId = teacherId,
+                StudentId = reportDto.StudentId,
+                Title = reportDto.Title,
+                Description = reportDto.Description,
+                ReportDate = reportDto.ReportDate
+            };
+
+            _dbContext.StudentReports.Add(report);
+            await _dbContext.SaveChangesAsync();
+
+            // Load the student data for the response
+            var reportWithStudent = await _dbContext.StudentReports
+            .Include(r => r.Student)
+            .FirstAsync(r => r.StudentReportId == report.StudentReportId);
+
+            var responseDto = _mapper.Map<GetStudentReportDto>(reportWithStudent);
+            return result.Success(responseDto);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error Happened ==> \n{ex}");
+            return result.Failure($"Failed to add teacher report: {ex.Message}", 500);
+        }
+    }
+
+    internal async Task UpdateStudentReportStatus(GetStudentReportDto report)
+    {
+        var existingReport = await _dbContext.StudentReports.FirstOrDefaultAsync(rep => rep.StudentReportId == report.Id);
+        if (existingReport != null)
+        {
+
+            existingReport.StudentReportStatusId = (int)ReportStatusEnum.Sent;
+            await _dbContext.SaveChangesAsync();
+        }
+    }
+
+    public async Task TriggerSendReportNotification(GetStudentReportDto reportDto)
+    {
+        var student = await _dbContext.Students.FirstOrDefaultAsync(s => s.StudentId == reportDto.StudentId);
+        var teacher = await _dbContext.Teachers
+                        .Include(t => t.User) // Eager load the User
+                        .FirstOrDefaultAsync(t => t.TeacherId == reportDto.TeacherId);
+        if (teacher is null)
+            return;
+        if (student == null)
+            return;
+        // Construct the group name for the parent
+        string groupName = $"parent-{student.ParentId}";
+        reportDto.Teacher = new SimpleTeacherDto
+        {
+            FirstName = teacher.User.FirstName,
+            LastName = teacher.User.FirstName,
+        };
+        // Send the report to the parent(s) in the group
+        await _hubContext.Clients.Group(groupName).ReceiveNewReport(reportDto);
+
+        await UpdateStudentReportStatus(reportDto);
+
+    }
 }
+
+/*
+
+{"type":1,"target":"ReceiveNewReport","arguments":[{"id":"95e60f54-4788-42ae-b8fc-e932b41ff6eb","teacherId":"3ae8af26-9421-48a7-ba12-f1914072f3e0","studentId":"deba38c6-8746-4709-a340-d56946b56a69","title":"He is a hola boy ","description":"NO WAAAY!!!","reportDate":"2025-03-29T15:17:05.778Z","createdAt":"2025-03-29T17:27:58.4982727Z","updatedAt":"2025-03-29T17:27:58.4982727Z","subject":null,"teacher":null,"student":{"firstName":"Mohamed","lastName":"Mohamed"}}]}
+
+*/

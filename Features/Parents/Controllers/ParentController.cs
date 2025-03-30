@@ -1,7 +1,6 @@
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Parents.Dtos;
 using Dirassati_Backend.Features.Parents.Repositories;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.Parents.Controllers

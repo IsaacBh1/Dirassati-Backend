@@ -29,16 +29,13 @@ builder.Services.AddSignalR(options =>
 
 builder.Services.AddRepositories();
 builder.Services.AddScoped<AbsenceService>();
-
-builder.Services.AddSignalR();
-
 var app = builder.Build();
 
-app.UseHttpsRedirection(); 
+app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 //app.UseAuthentication();
-app.UseAuthorization(); 
+app.UseAuthorization();
 // Configure Swagger UI only in development mode
 if (app.Environment.IsDevelopment())
 {

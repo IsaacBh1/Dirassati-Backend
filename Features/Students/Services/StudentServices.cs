@@ -97,13 +97,15 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
 
             await dbContext.SaveChangesAsync();
 
+            if (parentServices.VerificationToken != "")
+                await parentServices.SendConfirmationEmailAsync();
             await transaction.CommitAsync();
-
             return result.Success(student.StudentId);
         }
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
+            Console.WriteLine(ex);
             return result.Failure($"Failed to add student: {ex.Message}", 500);
         }
     }

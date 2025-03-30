@@ -16,6 +16,7 @@ services:
       - Email__SenderName=Dirasati
       - Email__Host=smtp4dev_mail
       - Email__Port=25
+      - FrontendUrl=http://localhost:5173
     networks:
       - app-network
     restart: always

@@ -1,8 +1,6 @@
-using System.Security.Claims;
 using Dirassati_Backend.Features.Auth.Accounts.DTOs;
 using Dirassati_Backend.Features.Auth.Accounts.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,38 +13,18 @@ public class AccountsController(AccountServices accountServices, UserManager<App
     private readonly AccountServices _accountServices = accountServices;
     private readonly UserManager<AppUser> _userManager = userManager;
 
-    // [HttpPost("request-password-reset")]
-    // public async Task<ActionResult> ReqeuestPasswordReset(RequestPasswordResetDTO requestPasswordResetDTO)
-    // {
-    //     var userType = User.FindFirstValue("UserType");
-    //     if (userType is null)
-    //         return Unauthorized();
-    //     if (userType.Equals("employee", StringComparison.CurrentCultureIgnoreCase) || userType.Equals("teacher", StringComparison.CurrentCultureIgnoreCase))
-    //     {
-    //         var result = await _accountServices.UpdateUserPassword(userType);
+    [HttpPost("request-password-reset")]
+    public async Task<ActionResult> ReqeuestPasswordReset(RequestPasswordResetDTO requestPasswordResetDTO)
+    {
 
-    //     }
-    //     else
-    //         return Unauthorized();
-    //     return Ok();
+        return HandleResult(await _accountServices.SendResetPasswordTokenAsync(requestPasswordResetDTO));
+    }
 
-    // }
-
-    // [HttpPut("update-password")]
-    // public async Task<ActionResult> ResetPassword(ResetPasswordDTO passwordDTO)
-    // {
-    //     var userType = User.FindFirstValue("UserType");
-    //     if (userType is null)
-    //         return Unauthorized();
-    //     if (userType.Equals("employee", StringComparison.CurrentCultureIgnoreCase) || userType.Equals("teacher", StringComparison.CurrentCultureIgnoreCase))
-    //     {
-    //         var result = await _accountServices.UpdateUserPassword(userType);
-    //     }
-    //     else
-    //         return Unauthorized();
-
-
-    // }
+    [HttpPut("reset-password", Name = "ResetPassword"),]
+    public async Task<ActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+    {
+        return HandleResult(await _accountServices.ResetPasswordAsync(resetPasswordDto));
+    }
 
 
     [Authorize]

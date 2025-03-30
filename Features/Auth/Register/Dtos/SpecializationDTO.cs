@@ -1,5 +1,3 @@
-using System;
-
 namespace Dirassati_Backend.Features.Auth.Register.Dtos;
 
 public class SpecializationDTO

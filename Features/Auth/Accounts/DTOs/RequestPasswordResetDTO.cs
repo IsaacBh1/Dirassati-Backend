@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Dirassati_Backend.Features.Auth.Accounts.DTOs;

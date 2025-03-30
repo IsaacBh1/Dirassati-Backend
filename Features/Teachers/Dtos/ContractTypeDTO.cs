@@ -1,5 +1,3 @@
-using System;
-
 namespace Dirassati_Backend.Features.Teachers.Dtos;
 
 public class ContractTypeDTO

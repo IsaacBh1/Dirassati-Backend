@@ -1,6 +1,6 @@
 using Microsoft.OpenApi.Models;
 
-namespace Dirasati_Backend.Configurations
+namespace Dirassati_Backend.Configurations
 {
     public static class SwaggerConfig
     {
