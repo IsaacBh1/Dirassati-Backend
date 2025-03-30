@@ -74,7 +74,6 @@ public static class AddServicesExtension
 
     public static WebApplicationBuilder AddCustomServices(this WebApplicationBuilder builder)
     {
-
         builder.Services.AddScoped<RegisterService>();
         builder.Services.AddScoped<SchoolLevelServices>();
         builder.Services.AddScoped<IEmailService, EmailServices>();

@@ -18,7 +18,7 @@ public class ParentAuthController : ControllerBase
     private readonly UserManager<AppUser> _userManager;
     private readonly SignInManager<AppUser> _signInManager;
     private readonly IConfiguration _configuration;
-    private readonly AppDbContext _context; // i addede this to query for the parent 
+    private readonly AppDbContext _context; // i added this to query for the parent 
 
     public ParentAuthController(UserManager<AppUser> userManager,
                                 SignInManager<AppUser> signInManager,

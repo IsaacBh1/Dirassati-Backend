@@ -123,7 +123,7 @@ public class TeacherServices
     }
     private async Task ValidateSchoolClaims(string SchoolId)
     {
-        if ((await _dbContext.Schools.FirstOrDefaultAsync(s => s.SchoolId.ToString() == SchoolId)) != null)
+        if ((await _dbContext.Schools.FirstOrDefaultAsync(s => s.SchoolId.ToString() == SchoolId)) == null)
         {
             throw new Exception("School is not found");
         }

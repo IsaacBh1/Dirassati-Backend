@@ -40,3 +40,19 @@ public partial class Student
     public virtual ICollection<Absence> Absences { get; set; } = new List<Absence>();
 
 }
+
+
+
+/*
+    {
+        StudentId
+        First Name
+        Last Name 
+        StudentIdNumber 
+        Parent Name 
+        parent contact , Email or phone number
+
+    }
+
+
+ */

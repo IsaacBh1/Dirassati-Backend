@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Dirassati_Backend.Domain.Models;
 using Dirassati_Backend.Data.Models;
 public class AppUser : IdentityUser
 {

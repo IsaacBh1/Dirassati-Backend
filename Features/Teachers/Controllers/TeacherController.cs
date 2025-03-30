@@ -1,9 +1,6 @@
-// TeacherController.cs
 using System.Security.Claims;
-using Dirassati_Backend.Dtos;
 using Dirassati_Backend.Features.Teachers.Dtos;
 using Dirassati_Backend.Features.Teachers.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
