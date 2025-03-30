@@ -73,12 +73,12 @@ public class TeacherServices
     }
 
 
-    private async Task<(AppUser user, Teacher teacher)> CreateTeacherEntitiesAsync(TeacherInfosDTO teacherDto, string SchoolId)
+    public async Task<(AppUser user, Teacher teacher)> CreateTeacherEntitiesAsync(TeacherInfosDTO teacherDto, string SchoolId)
     {
         await ValidateSchoolClaims(SchoolId);
-        var schoolId = Guid.Parse(SchoolId);
+        var schoolIdGuid = Guid.Parse(SchoolId);
         await ValidateContractTypeAsync(teacherDto.ContractTypeId);
-        await ValidateSchoolExistsAsync(schoolId);
+        await ValidateSchoolExistsAsync(schoolIdGuid);
 
         Address? address = null;
         if (teacherDto.Address != null)
@@ -117,7 +117,7 @@ public class TeacherServices
             UserId = user.Id,
             HireDate = teacherDto.HireDate,
             ContractTypeId = teacherDto.ContractTypeId,
-            SchoolId = schoolId,
+            SchoolId = schoolIdGuid,
             User = user,
             Photo = teacherDto.Photo
         };
@@ -127,9 +127,16 @@ public class TeacherServices
     }
     private async Task ValidateSchoolClaims(string SchoolId)
     {
-        if ((await _dbContext.Schools.FirstOrDefaultAsync(s => s.SchoolId.ToString() == SchoolId)) == null)
+        if (Guid.TryParse(SchoolId, out Guid schoolIdGuid))
         {
-            throw new Exception("School is not found");
+            if ((await _dbContext.Schools.FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid)) == null)
+            {
+                throw new Exception("School is not found");
+            }
+        }
+        else
+        {
+            throw new Exception("Invalid School Id");
         }
     }
 
