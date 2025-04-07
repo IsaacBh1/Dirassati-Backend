@@ -18,7 +18,7 @@ namespace Dirassati_Backend.Data.Seeders
                 {
                     SchoolName = "Greenwood High School",
                     SchoolTypeId = 3,
-                    SchoolEmail = "yoursa1@gmail.com",
+                    SchoolEmail = "info@greenwoodhigh.edu",
                     PhoneNumber = "+1234567890",
                     Address = new AddressDto
                     {
