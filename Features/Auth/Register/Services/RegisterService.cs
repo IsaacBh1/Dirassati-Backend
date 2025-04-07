@@ -64,8 +64,9 @@ public class RegisterService
                 WebsiteUrl = string.Empty,
                 SchoolConfig = string.Empty,
                 Specializations = Specializations
-            };
 
+            };
+            school.PhoneNumbers.Add(new PhoneNumber { Number = dto.School.PhoneNumber });
 
             var employee = new Employee
             {

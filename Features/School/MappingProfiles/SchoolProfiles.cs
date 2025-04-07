@@ -11,15 +11,20 @@ public class SchoolProfiles : Profile
     public SchoolProfiles()
     {
 
-        CreateMap<Address, AdressDto>();
-        CreateMap<AcademicYear, AcademicYearDto>();
+        CreateMap<PhoneNumber, PhoneNumberDTO>().ReverseMap();
+        CreateMap<Address, AddressDto>().ReverseMap()
+        .ForMember(dst => dst.AdresseId, opt => opt.Ignore());
 
+
+        CreateMap<AcademicYear, AcademicYearDto>();
         CreateMap<UpdateSchoolInfosDTO, Data.Models.School>()
-        .ForMember(s => s.PhoneNumbers, opt => opt.MapFrom(u => u.PhoneNumbers))
-        .ForMember(s => s.Specializations, opt => opt.Ignore());
+        .ForMember(s => s.PhoneNumbers, opt => opt.Ignore())
+        .ForMember(s => s.Specializations, opt => opt.Ignore())
+        .ForMember(s => s.Address, opt => opt.Ignore());
         CreateMap<Data.Models.School, GetSchoolInfoDTO>()
             .ForMember(dest => dest.AcademicYear,
                   opt => opt.MapFrom(src => src.AcademicYear));
+        CreateMap<Data.Models.School, GetSchoolInfoDTO>();
     }
 
 
