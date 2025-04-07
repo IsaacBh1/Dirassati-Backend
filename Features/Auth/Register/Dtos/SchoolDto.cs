@@ -6,6 +6,6 @@ public class SchoolDto
     public int SchoolTypeId { get; set; }
     public string SchoolEmail { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
-    public AddressDto Address { get; set; } = null!;
+    public RegisterAddressDto Address { get; set; } = null!;
     public List<int>? SpecializationsId { get; set; }
 }

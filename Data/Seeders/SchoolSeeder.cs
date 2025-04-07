@@ -20,7 +20,7 @@ namespace Dirassati_Backend.Data.Seeders
                     SchoolTypeId = 3,
                     SchoolEmail = "info@greenwoodhigh.edu",
                     PhoneNumber = "+1234567890",
-                    Address = new AddressDto
+                    Address = new RegisterAddressDto
                     {
                         Street = "123 Elm Street",
                         City = "Springfield",

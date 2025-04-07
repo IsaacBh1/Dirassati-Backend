@@ -5,7 +5,7 @@ namespace Dirassati_Backend.Features.Auth.Register.Dtos;
 /// <summary>
 /// Data transfer object for address information
 /// </summary>
-public class AddressDto
+public class RegisterAddressDto
 {
     /// <summary>
     /// Street address including house/building number
