@@ -25,13 +25,15 @@ public class UpdateSchoolInfosDTO
     public AcademicYearDTO CurrentAcademicYear { get; set; } = null!;
     [Required]
 
-    public virtual ICollection<PhoneNumberDTO> PhoneNumbers { get; set; } = null!;
+    public List<PhoneNumberDTO> PhoneNumbers { get; set; } = null!;
     [Required]
 
     public AddressDto Address { get; set; } = null!;
     [Required]
 
-    public virtual ICollection<int> Specializations { get; set; } = null!;
+    public List<int> Specializations { get; set; } = null!;
 
+    [Required]
+    public AcademicYearDto AcademicYear { get; set; } = null!;
 }
 

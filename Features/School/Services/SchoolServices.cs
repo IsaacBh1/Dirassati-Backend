@@ -56,11 +56,7 @@ public class SchoolServices(
             if (school == null)
                 return result.Failure("School not found", 404);
             _mapper.Map(schoolInfosDTO, school);
-            school.Address.City = schoolInfosDTO.Address.City;
-            school.Address.Street = schoolInfosDTO.Address.Street;
-            school.Address.Country = schoolInfosDTO.Address.Country;
-            school.Address.PostalCode = schoolInfosDTO.Address.PostalCode;
-            school.Address.State = schoolInfosDTO.Address.State;
+            _mapper.Map(schoolInfosDTO.Address, school.Address);
 
             if (school.SchoolTypeId == (int)SchoolTypeEnum.Lycee)
             {

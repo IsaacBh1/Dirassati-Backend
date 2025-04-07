@@ -17,14 +17,18 @@ public class SchoolProfiles : Profile
 
 
         CreateMap<AcademicYear, AcademicYearDto>();
+        CreateMap<AcademicYear, AcademicYearDto>().ReverseMap();
+
         CreateMap<UpdateSchoolInfosDTO, Data.Models.School>()
         .ForMember(s => s.PhoneNumbers, opt => opt.Ignore())
         .ForMember(s => s.Specializations, opt => opt.Ignore())
         .ForMember(s => s.Address, opt => opt.Ignore());
+
         CreateMap<Data.Models.School, GetSchoolInfoDTO>()
             .ForMember(dest => dest.AcademicYear,
                   opt => opt.MapFrom(src => src.AcademicYear));
         CreateMap<Data.Models.School, GetSchoolInfoDTO>();
+
     }
 
 
