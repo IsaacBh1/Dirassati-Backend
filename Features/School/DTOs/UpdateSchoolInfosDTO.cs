@@ -22,7 +22,7 @@ public class UpdateSchoolInfosDTO
     public string WebsiteUrl { get; set; } = null!;
 
     [Required]
-    public AcademicYearDTO CurrentAcademicYear { get; set; } = null!;
+    public AcademicYearDto AcademicYear { get; set; } = null!;
     [Required]
 
     public List<PhoneNumberDTO> PhoneNumbers { get; set; } = null!;
@@ -33,7 +33,6 @@ public class UpdateSchoolInfosDTO
 
     public List<int> Specializations { get; set; } = null!;
 
-    [Required]
-    public AcademicYearDto AcademicYear { get; set; } = null!;
+
 }
 

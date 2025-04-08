@@ -19,6 +19,7 @@ public class GetSchoolInfoDTO
 
     public string SchoolConfig { get; set; } = null!;
     public virtual List<PhoneNumberDTO> PhoneNumbers { get; set; } = [];
+    public virtual List<SpecializationDto> Specializations { get; set; } = [];
 
     public SchoolType SchoolType { get; set; } = null!;
 

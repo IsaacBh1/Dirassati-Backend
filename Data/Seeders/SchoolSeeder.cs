@@ -49,7 +49,7 @@ namespace Dirassati_Backend.Data.Seeders
                 },
             };
 
-            var school = await dbContext.Schools.FirstOrDefaultAsync(s => s.Email == registerDto.School.Email);
+            var school = await dbContext.Schools.FirstOrDefaultAsync();
             if (school != null)
                 return school.SchoolId.ToString();
             var result = await registerService.Register(registerDto);
