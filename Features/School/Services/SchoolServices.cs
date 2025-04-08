@@ -58,6 +58,8 @@ public class SchoolServices(
             _mapper.Map(schoolInfosDTO, school);
             _mapper.Map(schoolInfosDTO.Address, school.Address);
 
+
+
             if (school.SchoolTypeId == (int)SchoolTypeEnum.Lycee)
             {
                 var specializationsToRemove = school.Specializations
