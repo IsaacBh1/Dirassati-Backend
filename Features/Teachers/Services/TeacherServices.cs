@@ -188,7 +188,7 @@ public class TeacherServices
         );
     }
 
-    private string GenerateConfirmationLink(string email, string token)
+    private string GenerateConfirmationLink(string email, string VerificationToken)
     {
         var httpContext = _httpContext.HttpContext ?? throw new Exception("HttpContext is null");
 
@@ -196,7 +196,7 @@ public class TeacherServices
         var link = _linkGenerator.GetUriByName(
             httpContext,
             "VerifyEmail",
-            new { email, token } // Pass raw token
+            new { email, VerificationToken } // Pass raw token
         );
 
         return link ?? throw new Exception("Confirmation link generation failed. Verify route configuration.");
