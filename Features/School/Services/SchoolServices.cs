@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Features.School.DTOs;
@@ -24,7 +25,7 @@ public class SchoolServices(
         if (schoolId == null)
             return result.Failure("Unauthorized access", 401);
 
-        var school = await _dbContext.Schools.Include(s => s.SchoolType).Include(s => s.AcademicYear).Include(s => s.PhoneNumbers)
+        var school = await _dbContext.Schools.ProjectTo<GetSchoolInfoDTO>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(s => s.SchoolId.ToString() == schoolId);
 
         if (school == null)
@@ -47,12 +48,17 @@ public class SchoolServices(
 
             var school = await _dbContext.Schools
                 .Include(s => s.Specializations)
+                .Include(s => s.Address)
+                .Include(s => s.AcademicYear)
+                .Include(s => s.PhoneNumbers)
                 .FirstOrDefaultAsync(s => s.SchoolId.ToString() == schoolId);
 
             if (school == null)
                 return result.Failure("School not found", 404);
-
             _mapper.Map(schoolInfosDTO, school);
+            _mapper.Map(schoolInfosDTO.Address, school.Address);
+            _mapper.Map(schoolInfosDTO.AcademicYear, school.AcademicYear);
+
 
             if (school.SchoolTypeId == (int)SchoolTypeEnum.Lycee)
             {

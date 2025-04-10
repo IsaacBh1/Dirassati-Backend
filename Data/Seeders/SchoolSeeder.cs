@@ -1,3 +1,4 @@
+using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.SignUp;
 using Microsoft.CodeAnalysis;
@@ -16,9 +17,9 @@ namespace Dirassati_Backend.Data.Seeders
             {
                 School = new SchoolDto
                 {
-                    SchoolName = "Greenwood High School",
+                    Name = "Greenwood High School",
                     SchoolTypeId = 3,
-                    SchoolEmail = "info@greenwoodhigh.edu",
+                    Email = "info@greenwoodhigh.edu",
                     PhoneNumber = "+1234567890",
                     Address = new AddressDto
                     {
@@ -26,11 +27,16 @@ namespace Dirassati_Backend.Data.Seeders
                         City = "Springfield",
                         State = "Illinois",
                         PostalCode = "62704",
-                        Country = "USA"
+                        Country = "USA",
                     },
-                    SpecializationsId = [
-                        1,2,3,4,5
-                    ]
+                    SpecializationsId = new List<int> { 1, 2, 3, 4, 5 },
+                    Logo = "www.verygoodlogo.com",
+                    WebsiteUrl = "www.lesCours.com",
+                    AcademicYear = new AcademicYearDto
+                    {
+                        StartDate = DateOnly.Parse("2023-11-1"),
+                        EndDate = DateOnly.Parse("2024-06-30")
+                    }
                 },
                 Employee = new EmployeeDto
                 {
@@ -43,7 +49,7 @@ namespace Dirassati_Backend.Data.Seeders
                 },
             };
 
-            var school = await dbContext.Schools.FirstOrDefaultAsync(s => s.Email == registerDto.School.SchoolEmail);
+            var school = await dbContext.Schools.FirstOrDefaultAsync();
             if (school != null)
                 return school.SchoolId.ToString();
             var result = await registerService.Register(registerDto);

@@ -12,7 +12,7 @@ public class SchoolController(ISchoolService schoolService) : BaseController
     private readonly ISchoolService _schoolService = schoolService;
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+
     public async Task<ActionResult<GetSchoolInfoDTO>> GetSchoolInfo()
     {
         var result = await _schoolService.GetSchoolInfosAsync();

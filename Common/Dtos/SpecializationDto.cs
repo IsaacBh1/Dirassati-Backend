@@ -1,6 +1,8 @@
-namespace Dirassati_Backend.Features.Auth.Register.Dtos;
+using System;
 
-public class SpecializationDTO
+namespace Dirassati_Backend.Common.Dtos;
+
+public class SpecializationDto
 {
     public int SpecializationId { get; set; }
 

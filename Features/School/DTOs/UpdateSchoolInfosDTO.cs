@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using Dirassati_Backend.Data.Models;
+using Dirassati_Backend.Common.Dtos;
+
+
 
 
 namespace Dirassati_Backend.Features.School.DTOs;
@@ -20,16 +22,17 @@ public class UpdateSchoolInfosDTO
     public string WebsiteUrl { get; set; } = null!;
 
     [Required]
-    public AcademicYearDTO CurrentAcademicYear { get; set; } = null!;
+    public AcademicYearDto AcademicYear { get; set; } = null!;
     [Required]
 
-    public virtual ICollection<PhoneNumberDTO> PhoneNumbers { get; set; } = null!;
+    public List<PhoneNumberDTO> PhoneNumbers { get; set; } = null!;
     [Required]
 
-    public Address Address { get; set; } = null!;
+    public AddressDto Address { get; set; } = null!;
     [Required]
 
-    public virtual ICollection<int> Specializations { get; set; } = null!;
+    public List<int> Specializations { get; set; } = null!;
+
 
 }
 

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Features.SchoolLevels.DTOs;
 using Dirassati_Backend.Features.SchoolLevels.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseCon
 
 
     [HttpGet("specializations")]
-    public async Task<ActionResult<List<SpecializationDTO>>> GetAllSpecializations()
+    public async Task<ActionResult<List<SpecializationDto>>> GetAllSpecializations()
     {
         return await schoolLevelServices.GetAllSpecializationsAsync();
     }
@@ -23,7 +24,7 @@ public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseCon
 
     [HttpGet("specializations/school")]
 
-    public async Task<ActionResult<List<SpecializationDTO>>> GetSchoolSpecializations()
+    public async Task<ActionResult<List<SpecializationDto>>> GetSchoolSpecializations()
     {
         var schoolId = User.FindFirstValue("SchoolId");
         if (schoolId is null)

@@ -1,3 +1,4 @@
+using AutoMapper;
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
@@ -15,11 +16,13 @@ public class RegisterService
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly AppDbContext _dbContext;
+    private readonly IMapper _mapper;
 
-    public RegisterService(UserManager<AppUser> userManager, AppDbContext dbContext)
+    public RegisterService(UserManager<AppUser> userManager, AppDbContext dbContext, IMapper mapper)
     {
         _userManager = userManager;
         _dbContext = dbContext;
+        _mapper = mapper;
     }
     public async Task<Result<CreatedEmployeeDto, IEnumerable<IdentityError>>> Register(RegisterDto dto)
     {
@@ -48,24 +51,9 @@ public class RegisterService
             {
                 Specializations = await _dbContext.Specializations.Where(s => dto.School.SpecializationsId.Contains(s.SpecializationId)).ToListAsync();
             }
-            var school = new Data.Models.School
-            {
-                Name = dto.School.SchoolName,
-                SchoolTypeId = dto.School.SchoolTypeId,
-                Address = new Address
-                {
-                    City = dto.School.Address.City,
-                    Country = dto.School.Address.Country,
-                    State = dto.School.Address.State,
-                    Street = dto.School.Address.Street
-                },
-                Email = dto.School.SchoolEmail,
-                Logo = string.Empty,
-                WebsiteUrl = string.Empty,
-                SchoolConfig = string.Empty,
-                Specializations = Specializations
-            };
-
+            var school = _mapper.Map<Data.Models.School>(dto.School);
+            school.Specializations = Specializations;
+            school.PhoneNumbers.Add(new PhoneNumber { Number = dto.School.PhoneNumber });
 
             var employee = new Employee
             {

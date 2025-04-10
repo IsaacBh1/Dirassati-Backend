@@ -17,7 +17,7 @@ public class TeacherInfosDTO
     public string ContractType { get; set; } = "";
 
     public List<int> SubjectIds { get; set; } = new List<int>();
-    public Guid SchoolId { get; set; }
+    public Guid? SchoolId { get; set; }
     public byte[]? Photo { get; set; }
     public TeacherAddressDto? Address { get; set; }
 }
