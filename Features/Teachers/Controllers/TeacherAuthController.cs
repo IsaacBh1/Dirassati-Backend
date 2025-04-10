@@ -87,6 +87,7 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
                 signingCredentials: creds
             );
 
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }

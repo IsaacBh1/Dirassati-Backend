@@ -41,7 +41,6 @@ public class TeacherController : BaseController
         }
     }
 
-
     [HttpGet("{id}", Name = "GetTeacherInfo")]
     public async Task<ActionResult<GetTeacherInfosDTO>> GetTeacherInfo(string id)
     {
@@ -82,7 +81,7 @@ public class TeacherController : BaseController
             }
             return HandleResult(result);
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Console.WriteLine(e);
             return Problem(e.Message, statusCode: 500);
