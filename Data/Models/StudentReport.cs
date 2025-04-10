@@ -13,7 +13,6 @@ public class StudentReport
     public DateTime ReportDate { get; set; } = DateTime.UtcNow;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
     public int StudentReportStatusId { get; set; } = (int)Enums.ReportStatusEnum.Pending;
     public virtual Teacher Teacher { get; set; } = null!;
     public virtual Student Student { get; set; } = null!;
