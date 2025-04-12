@@ -10,8 +10,8 @@ public class SchoolDto
     public string PhoneNumber { get; set; } = string.Empty;
     public AddressDto Address { get; set; } = null!;
     public List<int>? SpecializationsId { get; set; }
-    public string Logo { get; set; } = null!;
-    public string WebsiteUrl { get; set; } = null!;
+    public string? Logo { get; set; }
+    public string? WebsiteUrl { get; set; }
     public AcademicYearDto AcademicYear { get; set; } = null!;
 
 
