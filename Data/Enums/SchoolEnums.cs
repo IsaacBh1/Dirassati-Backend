@@ -44,3 +44,13 @@ public enum ReportStatusEnum
     Sent,
     Viewed,
 }
+
+
+
+
+public enum PaymentStatus
+{
+    Pending,
+    Paid,
+    Failed
+}

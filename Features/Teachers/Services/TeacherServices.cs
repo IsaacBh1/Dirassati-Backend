@@ -256,7 +256,7 @@ public class TeacherServices
             var ContractTypes = await _dbContext.ContractTypes.Select(c => new ContractTypeDTO { ContractTypeId = c.ContractId, Name = c.Name }).ToListAsync();
             return new Result<List<ContractTypeDTO>, string>().Success(ContractTypes);
         }
-        catch (System.Exception)
+        catch (Exception)
         {
 
             return new Result<List<ContractTypeDTO>, string>().Failure("Failed to retrieve contract types", 500);
@@ -316,7 +316,8 @@ public class TeacherServices
     {
         var student = await _dbContext.Students.FirstOrDefaultAsync(s => s.StudentId == reportDto.StudentId);
         var teacher = await _dbContext.Teachers
-                        .Include(t => t.User) // Eager load the User
+                        .Include(t => t.User)
+
                         .FirstOrDefaultAsync(t => t.TeacherId == reportDto.TeacherId);
         if (teacher is null)
             return;
@@ -327,7 +328,7 @@ public class TeacherServices
         reportDto.Teacher = new SimpleTeacherDto
         {
             FirstName = teacher.User.FirstName,
-            LastName = teacher.User.FirstName,
+            LastName = teacher.User.LastName,
         };
         // Send the report to the parent(s) in the group
         await _hubContext.Clients.Group(groupName).ReceiveNewReport(reportDto);
@@ -337,8 +338,3 @@ public class TeacherServices
     }
 }
 
-/*
-
-{"type":1,"target":"ReceiveNewReport","arguments":[{"id":"95e60f54-4788-42ae-b8fc-e932b41ff6eb","teacherId":"3ae8af26-9421-48a7-ba12-f1914072f3e0","studentId":"deba38c6-8746-4709-a340-d56946b56a69","title":"He is a hola boy ","description":"NO WAAAY!!!","reportDate":"2025-03-29T15:17:05.778Z","createdAt":"2025-03-29T17:27:58.4982727Z","updatedAt":"2025-03-29T17:27:58.4982727Z","subject":null,"teacher":null,"student":{"firstName":"Mohamed","lastName":"Mohamed"}}]}
-
-*/

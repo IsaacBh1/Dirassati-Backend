@@ -29,6 +29,8 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
     public virtual DbSet<SchoolType> SchoolTypes { get; set; }
     public virtual DbSet<StudentReport> StudentReports { get; set; }
     public virtual DbSet<StudentReportStatus> StudentReportStatuses { get; set; }
+    public virtual DbSet<StudentPayment> StudentPayments { get; set; }
+    public virtual DbSet<Bill> Bills { get; set; }
 
 
 
@@ -80,7 +82,20 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
         builder.Entity<AcademicYear>()
             .HasOne(ay => ay.School);
 
+        builder.Entity<StudentPayment>()
+       .HasKey(sp => new { sp.BillId, sp.StudentId }); // Composite primary key
 
+        builder.Entity<StudentPayment>()
+            .HasOne(sp => sp.Bill)
+            .WithMany(b => b.StudentPayments)
+            .HasForeignKey(sp => sp.BillId)
+            .OnDelete(DeleteBehavior.Cascade); // Cascade delete when a Bill is deleted
+
+        builder.Entity<StudentPayment>()
+            .HasOne(sp => sp.Student)
+            .WithMany(s => s.StudentPayments)
+            .HasForeignKey(sp => sp.StudentId)
+            .OnDelete(DeleteBehavior.Cascade); // Cascade delete when a Student is deleted
 
         builder.Entity<Teacher>()
     .HasMany(t => t.Subjects)

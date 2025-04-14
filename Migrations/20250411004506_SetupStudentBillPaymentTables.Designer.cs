@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence;
 
@@ -10,9 +11,11 @@ using Persistence;
 namespace Dirassati_Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250411004506_SetupStudentBillPaymentTables")]
+    partial class SetupStudentBillPaymentTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -195,6 +198,9 @@ namespace Dirassati_Backend.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateOnly>("IssueDate")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("TEXT");
@@ -419,9 +425,6 @@ namespace Dirassati_Backend.Migrations
 
                     b.Property<int>("AddressId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("BillAmount")
-                        .HasColumnType("TEXT");
 
                     b.Property<int>("BillingCycleDays")
                         .HasColumnType("INTEGER");
@@ -741,9 +744,6 @@ namespace Dirassati_Backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("ParentId")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("PaymentGatewayCheckoutId")
                         .HasColumnType("TEXT");
 
@@ -757,8 +757,6 @@ namespace Dirassati_Backend.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("BillId", "StudentId");
-
-                    b.HasIndex("ParentId");
 
                     b.HasIndex("StudentId");
 
@@ -1591,12 +1589,6 @@ namespace Dirassati_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dirassati_Backend.Data.Models.Parent", "Parent")
-                        .WithMany("StudentPayments")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Dirassati_Backend.Data.Models.Student", "Student")
                         .WithMany("StudentPayments")
                         .HasForeignKey("StudentId")
@@ -1604,8 +1596,6 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Bill");
-
-                    b.Navigation("Parent");
 
                     b.Navigation("Student");
                 });
@@ -1791,11 +1781,6 @@ namespace Dirassati_Backend.Migrations
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Group", b =>
                 {
                     b.Navigation("Students");
-                });
-
-            modelBuilder.Entity("Dirassati_Backend.Data.Models.Parent", b =>
-                {
-                    b.Navigation("StudentPayments");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.ParentRelationshipToStudentType", b =>

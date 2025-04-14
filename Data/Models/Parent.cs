@@ -10,4 +10,5 @@ public partial class Parent
     public string Occupation { get; set; } = null!;
     public string NationalIdentityNumber { get; set; } = null!;
     public virtual AppUser User { get; set; } = null!;
+    public ICollection<StudentPayment> StudentPayments { get; set; } = [];
 }

@@ -36,7 +36,8 @@ namespace Dirassati_Backend.Data.Seeders
                     {
                         StartDate = DateOnly.Parse("2023-11-1"),
                         EndDate = DateOnly.Parse("2024-06-30")
-                    }
+                    },
+                    BillAmount = 2500
                 },
                 Employee = new EmployeeDto
                 {
