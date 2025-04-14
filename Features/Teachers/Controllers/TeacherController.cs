@@ -66,7 +66,13 @@ public class TeacherController : BaseController
     }
 
 
-    [HttpPost("/reports/add")]
+    /// <summary>
+    /// Add teacher report
+    /// </summary>
+    /// <param name="reportDto"></param>
+    /// <returns></returns>
+
+    [HttpPost("reports/add")]
     public async Task<ActionResult<GetStudentReportDto>> AddTeacherReport([FromBody] AddStudentReportDto reportDto)
     {
 

@@ -1,4 +1,5 @@
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Configurations;
 using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Extensions;
 using Dirassati_Backend.Features.Absences.Services;
@@ -29,6 +30,8 @@ builder.Services.AddSignalR(options =>
 
 builder.Services.AddRepositories();
 builder.Services.AddScoped<AbsenceService>();
+builder.Services.Configure<CloudinaryConfig>(builder.Configuration.GetSection("CloudinaryConfig"));
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();

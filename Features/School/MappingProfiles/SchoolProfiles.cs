@@ -2,7 +2,6 @@ using AutoMapper;
 using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.School.DTOs;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 
 namespace Dirassati_Backend.Features.School.MappingProfiles;

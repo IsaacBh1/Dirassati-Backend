@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dirassati_Backend.Data.Models
 {
@@ -23,8 +22,11 @@ namespace Dirassati_Backend.Data.Models
 
         public int SchoolTypeId { get; set; }
 
-
         public int AcademicYearId { get; set; }
+
+
+        public int BillingCycleDays { get; set; } = 30;
+        public decimal BillAmount { get; set; } = 2500;
 
         // Navigation properties
         public virtual Address Address { get; set; } = new();

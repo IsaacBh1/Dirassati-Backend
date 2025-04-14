@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using Dirassati_Backend.Common.Services.ConnectionTracker;
+using Dirassati_Backend.Features.Payments.Services;
+using Dirassati_Backend.Hubs.Services;
 
 namespace Dirassati_Backend.Common;
 
@@ -89,7 +91,10 @@ public static class AddServicesExtension
         builder.Services.AddScoped<SendCridentialsService>();
         builder.Services.AddScoped<ISchoolService, SchoolServices>();
         builder.Services.AddScoped<AccountServices>();
-
+        builder.Services.AddHttpClient<IChargilyClient, ChargilyClient>();
+        builder.Services.AddScoped<IPaymentService, PaymentService>();
+        builder.Services.AddScoped<BillServices>();
+        builder.Services.AddScoped<IParentNotificationServices, ParentNotificationServices>();
         return builder;
     }
 }
