@@ -1,3 +1,4 @@
+using Dirassati_Backend.Data;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Domain.Models;
@@ -44,10 +45,15 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
         ParentRelationshipSeeder.SeedParentRelationships(builder);
         SubjectSeeder.SeedSubjects(builder);
         TeacherSeeder.SeedContractType(builder);
-        base.OnModelCreating(builder);
+
         builder.Entity<School>()
         .HasMany(sch => sch.Specializations)
         .WithMany(sp => sp.Schools);
+
+        builder.Entity<SchoolType>()
+        .HasMany(st => st.Schools)
+        .WithOne(s => s.SchoolType)
+         .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<Student>()
         .HasOne(s => s.ParentRelationshipToStudentType)
@@ -125,6 +131,8 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
             new { StudentReportStatusId = 2, Name = "Sent" },
             new { StudentReportStatusId = 3, Name = "Viewed" }
         );
+
+        base.OnModelCreating(builder);
     }
 
 

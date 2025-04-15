@@ -8,7 +8,9 @@ public class AddBillDto
     [Required]
     public string Title { get; set; } = null!;
     public string? Description { get; set; }
-    public decimal? Amount { get; set; }
+    public decimal Amount { get; set; }
+    [Required]
+    public int SchoolLevelId { get; set; }
 
 }
 

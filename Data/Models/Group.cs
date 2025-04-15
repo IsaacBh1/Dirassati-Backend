@@ -18,6 +18,6 @@ public partial class Group
     public virtual SchoolLevel Level { get; set; } = null!;
     public virtual School School { get; set; } = null!;
     public virtual Specialization? Stream { get; set; }
-    public virtual ICollection<Student> Students { get; set; } = new List<Student>();
-    
+    public virtual ICollection<Student> Students { get; set; } = [];
+
 }

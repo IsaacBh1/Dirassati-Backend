@@ -1,5 +1,6 @@
 using AutoMapper;
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Data;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Extensions;

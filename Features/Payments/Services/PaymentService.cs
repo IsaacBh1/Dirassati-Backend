@@ -6,12 +6,11 @@ using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Payments.DTOs;
-using Dirassati_Backend.Features.Payments.Services;
 using Dirassati_Backend.Hubs.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-
+namespace Dirassati_Backend.Features.Payments.Services;
 public class PaymentService(
     AppDbContext context,
     IChargilyClient chargilyClient,
@@ -29,6 +28,7 @@ public class PaymentService(
         var result = new Result<InitiatePaymentResponseDto, string>();
         bool isFailed = false;
         //checking if there is a previous failed payment
+        var studentLevelId = (await _context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId))?.SchoolLevelId;
         var bill = await _context.StudentPayments
             .Where(p => p.Status == PaymentStatus.Failed && p.StudentId == studentId)
             .Select(p => p.Bill)
@@ -39,7 +39,7 @@ public class PaymentService(
                .Where(b => !_context.StudentPayments
                    .Where(sp => sp.StudentId == studentId)
                    .Select(sp => sp.BillId)
-                   .Contains(b.BillId))
+                   .Contains(b.BillId) && b.SchoolLevelId == studentLevelId)
                .FirstOrDefaultAsync();
         if (bill == null) return result.Failure($"No bill active for student {studentId} was found.", (int)HttpStatusCode.NotFound);
         var billId = bill.BillId;
@@ -196,7 +196,7 @@ public class PaymentService(
                 await SendPaymentUpdateNotification(paymentStatus, billId, existingPayment);
                 _logger.LogInformation("Webhook {EventId}: Successfully processed 'checkout.paid' for Bill {BillId}, Student {StudentId}.", payload.Id, billId, studentId);
 
-                //TODO: Notify Frontend
+
                 return result.Success(Unit.Value);
 
             case "checkout.failed":
@@ -278,7 +278,7 @@ public class PaymentService(
         var bill = await _context.Bills.Select(b => new { b.BillId, b.Title, b.Description, b.Amount }).FirstOrDefaultAsync(b => b.BillId == billId);
         if (bill == null)
         {
-            _logger.LogWarning("Can't get the bill entitiy for {billId}", billId);
+            _logger.LogWarning("Can't get the bill entitiy for {BillId}", billId);
             return false;
         }
         else if (status == null)
@@ -297,7 +297,7 @@ public class PaymentService(
             PaymentStatus = status,
         };
         await _hubContext.Clients.Group($"parent-{studentPayment.ParentId}").ReceivePaymentBillUpdate(paymentNotification);
-        _logger.LogInformation($"Sending update notification to {"parent-" + studentPayment.ParentId}");
+        _logger.LogInformation("Sending update notification to {Group}", "parent-" + studentPayment.ParentId);
         return true;
     }
 }

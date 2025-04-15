@@ -12,5 +12,5 @@ public partial class ContractType
 
     public string Name { get; set; } = null!;
 
-    public virtual ICollection<Teacher> Teachers { get; set; } = new List<Teacher>();
+    public virtual ICollection<Teacher> Teachers { get; set; } = [];
 }

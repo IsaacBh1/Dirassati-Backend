@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Microsoft.AspNetCore.Authorization;
+using Dirassati_Backend.Data;
 namespace Dirassati_Backend.Features.Teachers.Controllers
 {
 

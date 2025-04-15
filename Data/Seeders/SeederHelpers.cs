@@ -1,15 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
-public class SeederHelpers(
-    AppDbContext dbContext
-)
+namespace Dirassati_Backend.Data.Seeders
 {
-    private readonly AppDbContext _dbContext = dbContext;
-
-    public async Task<string?> GetSchoolById(string schoolId)
+    public class SeederHelpers(
+        AppDbContext dbContext
+    )
     {
-        var result = await _dbContext.Schools.FirstOrDefaultAsync(s => s.SchoolId == Guid.Parse(schoolId));
-        return result?.SchoolId.ToString();
+        private readonly AppDbContext _dbContext = dbContext;
+
+        public async Task<string?> GetSchoolById(string schoolId)
+        {
+            var result = await _dbContext.Schools.FirstOrDefaultAsync(s => s.SchoolId == Guid.Parse(schoolId));
+            return result?.SchoolId.ToString();
+        }
     }
 }

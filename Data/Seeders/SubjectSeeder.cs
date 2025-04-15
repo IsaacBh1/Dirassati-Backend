@@ -1,5 +1,5 @@
 using Dirassati_Backend.Data.Enums;
-using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Data.Seeders
@@ -9,7 +9,7 @@ namespace Dirassati_Backend.Data.Seeders
         public static void SeedSubjects(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Subject>()
-                .HasData(   
+                .HasData(
                     // Primaire (SchoolTypeEnum.Primaire)
                     new Subject { SubjectId = 1, Name = "général", SchoolType = SchoolTypeEnum.Primaire },
                     new Subject { SubjectId = 2, Name = "Langue Française", SchoolType = SchoolTypeEnum.Primaire },

@@ -25,7 +25,7 @@ public class BillServices(AppDbContext context, IMapper mapper, IHubContext<Pare
         if (!Guid.TryParse(schoolId, out Guid schoolIdGuid))
             return result.Failure("School Id Not Valid", 400);
 
-        var school = await _context.Schools.Select(s => new { s.SchoolId, s.BillAmount }).FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
+        var school = await _context.Schools.Select(s => new { s.SchoolId }).FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
         if (school == null)
         {
             return result.Failure($"School with ID {schoolId} does not exist.", 404);
@@ -35,10 +35,10 @@ public class BillServices(AppDbContext context, IMapper mapper, IHubContext<Pare
         var newBill = new Bill
         {
             SchoolId = schoolIdGuid,
-            Amount = billDto.Amount ?? school.BillAmount,
+            Amount = billDto.Amount,
             Title = billDto.Title,
             Description = billDto.Title,
-
+            SchoolLevelId = billDto.SchoolLevelId
         };
 
         // Add the bill to the database
@@ -134,7 +134,7 @@ public class BillServices(AppDbContext context, IMapper mapper, IHubContext<Pare
         if (schoolId == null)
             return false;
         await _hubContext.Clients.Group($"parents-school-{schoolId}").ReceiveNewStudentBill(billDto);
-        _logger.LogInformation("New bill notification sent for group {group} : , Title: {Title}, Amount: {Amount}",
+        _logger.LogInformation("New bill notification sent for group {Group} : , Title: {Title}, Amount: {Amount}",
         "parents-school-" + schoolId,
              billDto.Title, billDto.Amount);
         return true;

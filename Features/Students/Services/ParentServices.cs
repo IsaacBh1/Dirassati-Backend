@@ -1,5 +1,6 @@
 using Dirassati_Backend.Common.Extensions;
 using Dirassati_Backend.Common.Services;
+using Dirassati_Backend.Data;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Students.DTOs;
 using Microsoft.AspNetCore.Identity;
@@ -22,42 +23,35 @@ public class ParentServices(AppDbContext dbContext, UserManager<AppUser> userMan
             return parent.ParentId;
 
 
-        try
+        var user = new AppUser
         {
-            var user = new AppUser
-            {
-                UserName = parentInfosDTO.Email,
-                FirstName = parentInfosDTO.FirstName,
-                LastName = parentInfosDTO.LastName,
-                Email = parentInfosDTO.Email,
-                PhoneNumber = parentInfosDTO.PhoneNumber,
-                EmailConfirmed = false
-            };
-            var result = await userManager.CreateAsync(user);
-            if (!result.Succeeded)
-                throw new InvalidOperationException($"Can not create user \n{result.Errors.ToCustomString()}");
-            parent = new Parent
-            {
-                NationalIdentityNumber = parentInfosDTO.NationalIdentityNumber,
-                Occupation = parentInfosDTO.Occupation,
-                UserId = user.Id,
-                User = user,
-            };
-
-            await dbContext.Parents.AddAsync(parent);
-
-            await dbContext.SaveChangesAsync();
-
-            var verificationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
-            VerificationToken = verificationToken;
-            Email = user.Email;
-            return parent.ParentId;
-        }
-        catch (Exception)
+            UserName = parentInfosDTO.Email,
+            FirstName = parentInfosDTO.FirstName,
+            LastName = parentInfosDTO.LastName,
+            Email = parentInfosDTO.Email,
+            PhoneNumber = parentInfosDTO.PhoneNumber,
+            EmailConfirmed = false
+        };
+        var result = await userManager.CreateAsync(user);
+        if (!result.Succeeded)
+            throw new InvalidOperationException($"Can not create user \n{result.Errors.ToCustomString()}");
+        parent = new Parent
         {
+            NationalIdentityNumber = parentInfosDTO.NationalIdentityNumber,
+            Occupation = parentInfosDTO.Occupation,
+            UserId = user.Id,
+            User = user,
+        };
 
-            throw;
-        }
+        await dbContext.Parents.AddAsync(parent);
+
+        await dbContext.SaveChangesAsync();
+
+        var verificationToken = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        VerificationToken = verificationToken;
+        Email = user.Email;
+        return parent.ParentId;
+
     }
     public async Task SendConfirmationEmailAsync()
     {

@@ -9,6 +9,7 @@ using Dirassati_Backend.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Dirassati_Backend.Data.Models;
 using Microsoft.AspNetCore.Authorization;
+using Dirassati_Backend.Data;
 
 [ApiController]
 [Route("api/auth")]

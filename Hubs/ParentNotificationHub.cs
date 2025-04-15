@@ -107,7 +107,7 @@ public class ParentNotificationHub(
                 }
                 _dbContext.Entry(teacher).Reference(t => t.User).Load();
                 var notification = _mapper.Map<GetStudentReportDto>(report);
-                notification.Teacher = new SimpleTeacherDto
+                notification.Teacher = new BasePersonDto
                 {
                     FirstName = teacher.User.FirstName,
                     LastName = teacher.User.FirstName,

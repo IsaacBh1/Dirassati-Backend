@@ -14,7 +14,7 @@ public partial class AcademicYear
     [ForeignKey(nameof(School))]
     public Guid SchoolId { get; set; }
 
-    public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
+    public virtual ICollection<Group> Groups { get; set; } = [];
 
     public virtual School School { get; set; } = null!;
 }
