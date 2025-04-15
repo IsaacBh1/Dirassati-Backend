@@ -1,3 +1,4 @@
+using System.Net;
 using System.Security.Claims;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -24,9 +25,10 @@ public class SchoolServices(
         var schoolId = _httpContextAccessor.HttpContext?.User.FindFirstValue("SchoolId");
         if (schoolId == null)
             return result.Failure("Unauthorized access", 401);
-
+        if (!Guid.TryParse(schoolId, out var schoolIdGuid))
+            return result.Failure($"Invalid SchoolId Format {schoolIdGuid}", (int)HttpStatusCode.BadRequest);
         var school = await _dbContext.Schools.ProjectTo<GetSchoolInfoDTO>(_mapper.ConfigurationProvider)
-            .FirstOrDefaultAsync(s => s.SchoolId.ToString() == schoolId);
+            .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
 
         if (school == null)
             return result.Failure("School not found", 404);
