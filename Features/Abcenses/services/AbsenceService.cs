@@ -10,7 +10,7 @@ namespace Dirassati_Backend.Features.Absences.Services
     {
         private readonly IAbsenceRepository _absenceRepository;
         private readonly IGroupRepository _groupRepository;
-        private readonly IConnectionTracker _connectionTracker;
+
         private readonly IHubContext<ParentNotificationHub> _hubContext;
 
         public AbsenceService(
@@ -21,11 +21,11 @@ namespace Dirassati_Backend.Features.Absences.Services
         {
             _absenceRepository = absenceRepository;
             _groupRepository = groupRepository;
-            _connectionTracker = connectionTracker;
+
             _hubContext = hubContext;
         }
 
-        public async Task MarkAbsencesAsync(int groupId, List<Guid> absentStudentIds)
+        public async Task MarkAbsencesAsync(Guid groupId, List<Guid> absentStudentIds)
         {
             var group = await _groupRepository.GetGroupWithStudentsAsync(groupId);
             if (group == null) throw new ArgumentException("Group not found");

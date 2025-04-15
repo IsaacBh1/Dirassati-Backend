@@ -1,7 +1,7 @@
 using System.Security.Claims;
+using Dirassati_Backend.Persistence;
 using FluentEmail.Core;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Dirassati_Backend.Common.Services;
 
@@ -17,11 +17,11 @@ public class EmailServices(IFluentEmail fluentEmail, IHttpContextAccessor httpCo
         if (_schoolEmail != null) return false;
 
         var schoolId = _httpContextAccessor.HttpContext?.User.FindFirstValue("SchoolId");
-        if (schoolId == null) return true;
+        if (schoolId == null || !Guid.TryParse(schoolId, out var schoolIdGuid)) return true;
 
         var school = await _dbContext.Schools
-            .FirstOrDefaultAsync(s => s.SchoolId.ToString() == schoolId)
-            ?? throw new Exception("School not found");
+            .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid)
+            ?? throw new InvalidOperationException("School not found");
 
         _schoolEmail = school.Email;
         _schoolName = school.Name;
@@ -50,7 +50,7 @@ public class EmailServices(IFluentEmail fluentEmail, IHttpContextAccessor httpCo
                 .Body(body, isHTML)
                 .SendAsync();
             if (!response.Successful)
-                throw new Exception($"Failed to send email: {string.Join(", ", response.ErrorMessages)}");
+                throw new InvalidOperationException($"Failed to send email: {string.Join(", ", response.ErrorMessages)}");
         }
         catch (Exception e)
         {

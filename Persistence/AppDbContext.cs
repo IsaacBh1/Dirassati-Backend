@@ -4,12 +4,9 @@ using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Domain.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-namespace Persistence;
-public partial class AppDbContext : IdentityDbContext<AppUser>
+namespace Dirassati_Backend.Persistence;
+public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>(options)
 {
-    public AppDbContext(DbContextOptions options) : base(options)
-    {
-    }
     public virtual DbSet<Absence> Absences { get; set; }
     public virtual DbSet<AcademicYear> AcademicYears { get; set; }
     public virtual DbSet<Address> Adresses { get; set; }
@@ -25,7 +22,6 @@ public partial class AppDbContext : IdentityDbContext<AppUser>
     public virtual DbSet<Specialization> Specializations { get; set; }
     public virtual DbSet<Student> Students { get; set; }
     public virtual DbSet<Subject> Subjects { get; set; }
-    public virtual DbSet<Teach> Teaches { get; set; }
     public virtual DbSet<Teacher> Teachers { get; set; }
     public virtual DbSet<SchoolType> SchoolTypes { get; set; }
     public virtual DbSet<StudentReport> StudentReports { get; set; }

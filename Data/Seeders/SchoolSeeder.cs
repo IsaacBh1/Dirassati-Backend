@@ -2,9 +2,9 @@ using System.Globalization;
 using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.SignUp;
+using Dirassati_Backend.Persistence;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Dirassati_Backend.Data.Seeders
 {

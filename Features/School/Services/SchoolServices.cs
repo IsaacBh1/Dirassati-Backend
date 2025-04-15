@@ -5,8 +5,9 @@ using AutoMapper.QueryableExtensions;
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Features.School.DTOs;
+using Dirassati_Backend.Persistence;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Dirassati_Backend.Features.School.Services;
 
@@ -47,13 +48,14 @@ public class SchoolServices(
             var schoolId = _httpContextAccessor.HttpContext?.User.FindFirstValue("SchoolId");
             if (schoolId == null)
                 return result.Failure("Unauthorized access", 401);
-
+            if (!Guid.TryParse(schoolId, out var schoolIdGuid))
+                return result.Failure("Invalid School Id", (int)HttpStatusCode.BadRequest);
             var school = await _dbContext.Schools
                 .Include(s => s.Specializations)
                 .Include(s => s.Address)
                 .Include(s => s.AcademicYear)
                 .Include(s => s.PhoneNumbers)
-                .FirstOrDefaultAsync(s => s.SchoolId.ToString() == schoolId);
+                .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
 
             if (school == null)
                 return result.Failure("School not found", 404);
@@ -69,7 +71,7 @@ public class SchoolServices(
                     .ToList();
 
                 bool isStudentInSpec = await _dbContext.Students.AnyAsync(s =>
-                    s.SchoolId.ToString() == schoolId &&
+                    s.SchoolId == schoolIdGuid &&
                     s.Specialization != null &&
                     specializationsToRemove.Contains(s.Specialization));
 

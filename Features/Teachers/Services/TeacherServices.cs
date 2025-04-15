@@ -3,7 +3,6 @@ using Dirassati_Backend.Common.Services;
 using Dirassati_Backend.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Dirassati_Backend.Features.Auth.Register.Services;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Common;
@@ -14,6 +13,7 @@ using Dirassati_Backend.Hubs.Interfaces;
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Data;
+using Dirassati_Backend.Persistence;
 namespace Dirassati_Backend.Features.Teachers.Services;
 
 public class TeacherServices

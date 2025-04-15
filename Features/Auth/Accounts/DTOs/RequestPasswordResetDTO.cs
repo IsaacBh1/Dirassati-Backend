@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dirassati_Backend.Features.Auth.Accounts.DTOs;
 
-public class RequestPasswordResetDTO
+public class RequestPasswordResetDto
 {
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress(ErrorMessage = "Invalid email address")]

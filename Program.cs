@@ -5,8 +5,8 @@ using Dirassati_Backend.Extensions;
 using Dirassati_Backend.Features.Absences.Services;
 using Dirassati_Backend.Features.Auth.SignUp;
 using Dirassati_Backend.Features.Teachers.Services;
+using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

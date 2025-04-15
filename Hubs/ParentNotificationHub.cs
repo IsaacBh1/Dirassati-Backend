@@ -8,12 +8,12 @@ using Dirassati_Backend.Hubs.HelperClasses;
 using AutoMapper;
 using Dirassati_Backend.Features.Teachers.Dtos;
 using Dirassati_Backend.Features.Parents.Dtos;
-using Persistence;
 using Microsoft.EntityFrameworkCore;
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Hubs.Services;
-using Dirassati_Backend.Features.Payments.DTOs; // Add this
+using Dirassati_Backend.Features.Payments.DTOs;
+using Dirassati_Backend.Persistence; // Add this
 
 [Authorize]
 public class ParentNotificationHub(

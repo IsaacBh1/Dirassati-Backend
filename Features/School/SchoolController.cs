@@ -1,3 +1,4 @@
+using Dirassati_Backend.Common;
 using Dirassati_Backend.Features.School.DTOs;
 using Dirassati_Backend.Features.School.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -29,5 +30,7 @@ public class SchoolController(ISchoolService schoolService) : BaseController
         var result = await _schoolService.UpdateSchoolInfos(schoolInfosDTO);
         return HandleResult(result);
     }
+
+
 
 }

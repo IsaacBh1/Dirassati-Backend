@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Dirassati_Backend.Data;
+using Dirassati_Backend.Persistence;
 namespace Dirassati_Backend.Features.Teachers.Controllers
 {
 
@@ -75,7 +75,7 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
             };
 
             var jwtKey = _configuration["Jwt:Key"]
-                ?? throw new ArgumentNullException("Jwt:Key configuration is missing");
+                ?? throw new InvalidOperationException("Jwt:Key configuration is missing");
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

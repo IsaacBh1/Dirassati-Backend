@@ -1,7 +1,7 @@
 using Dirassati_Backend.Features.Students.DTOs;
 using Dirassati_Backend.Features.Common;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
+using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Features.Students.Repositories
 {

@@ -1,3 +1,5 @@
+using Dirassati_Backend.Data.Models;
+
 namespace Dirassati_Backend.Repositories
 {
     public interface ITeacherRepository

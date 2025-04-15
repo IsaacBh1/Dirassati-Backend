@@ -2,8 +2,8 @@ using AutoMapper;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Common; // Contains PaginatedResult<T>
 using Dirassati_Backend.Features.Parents.Dtos;
+using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Dirassati_Backend.Features.Parents.Repositories
 {

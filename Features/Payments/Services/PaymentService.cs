@@ -7,9 +7,9 @@ using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Payments.DTOs;
 using Dirassati_Backend.Hubs.Interfaces;
+using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 namespace Dirassati_Backend.Features.Payments.Services;
 public class PaymentService(
     AppDbContext context,
@@ -168,7 +168,7 @@ public class PaymentService(
                     .FirstOrDefaultAsync(sp => sp.BillId == billId && sp.StudentId == studentId);
                 if (existingPayment == null)
                 {
-                    _logger.LogError("Webhook {EventId}: No existing payment record found for Bill {BillId}, Student {StudentId}.", payload.Id, billId, studentId);
+                    _logger.LogError("Webhook {EventId}: No existing payment record found for Bill {BillId}, Student {StudentId} , Parent {Parent}.", payload.Id, billId, studentId, parentId);
                     return result.Failure("No existing payment record found.", (int)HttpStatusCode.NotFound);
                 }
                 if (existingPayment.Status == PaymentStatus.Paid)

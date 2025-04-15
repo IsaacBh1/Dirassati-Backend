@@ -1,8 +1,9 @@
+using System.Net;
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Features.Students.DTOs;
+using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Dirassati_Backend.Features.Students.Services;
 
@@ -21,9 +22,10 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
     public async Task<Result<Guid, string>> AddStudentAsync(string schoolId, AddStudentDTO studentDTO)
     {
         var result = new Result<Guid, string>();
-
+        if (!Guid.TryParse(schoolId, out var schoolIdGuid))
+            return result.Failure("Invalid School Id", (int)HttpStatusCode.BadRequest);
         var school = await dbContext.Schools
-            .FirstOrDefaultAsync(s => s.SchoolId.ToString() == schoolId);
+            .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
 
         if (school == null)
             return result.Failure("School not found", 404);
@@ -46,7 +48,7 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
                 return result.Failure("Invalid specialization", 400);
 
             var hasSpecialization = await dbContext.Schools
-                .Where(s => s.SchoolId.ToString() == schoolId)
+                .Where(s => s.SchoolId == schoolIdGuid)
                 .SelectMany(s => s.Specializations)
                 .AnyAsync(s => s.SpecializationId == studentDTO.studentInfosDTO.SpecializationId.Value);
 

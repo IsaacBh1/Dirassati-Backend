@@ -5,9 +5,9 @@ using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Payments.DTOs;
 using Dirassati_Backend.Hubs.Interfaces;
+using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Dirassati_Backend.Features.Payments.Services;
 

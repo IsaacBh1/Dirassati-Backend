@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Dirassati_Backend.Features.RelationshipToStudent.DTOs;
+using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Features.ParentRelationShip
 {

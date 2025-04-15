@@ -12,11 +12,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Persistence;
 using Dirassati_Backend.Common.Services.ConnectionTracker;
 using Dirassati_Backend.Features.Payments.Services;
 using Dirassati_Backend.Hubs.Services;
 using Dirassati_Backend.Data;
+using Dirassati_Backend.Features.Groups.Services;
+using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Common;
 
@@ -96,6 +97,7 @@ public static class AddServicesExtension
         builder.Services.AddScoped<IPaymentService, PaymentService>();
         builder.Services.AddScoped<BillServices>();
         builder.Services.AddScoped<IParentNotificationServices, ParentNotificationServices>();
+        builder.Services.AddScoped<IGroupServices, GroupServices>();
         return builder;
     }
 }

@@ -1,6 +1,6 @@
 using Dirassati_Backend.Data.Models;
+using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 namespace Dirassati_Backend.Features.Groups.Repos
 {
 
@@ -14,7 +14,7 @@ namespace Dirassati_Backend.Features.Groups.Repos
             _context = context;
         }
 
-        public async Task<Group> GetGroupWithStudentsAsync(int groupId)
+        public async Task<Group> GetGroupWithStudentsAsync(Guid groupId)
         {
             var group = await _context.Groups
                 .Include(g => g.Students)
