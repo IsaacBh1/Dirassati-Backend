@@ -37,7 +37,7 @@ public partial class Student
     public virtual SchoolLevel SchoolLevel { get; set; } = null!;
     public virtual Specialization? Specialization { get; set; }
     public virtual Parent Parent { get; set; } = null!;
-    public virtual ICollection<Absence> Absences { get; set; } = new List<Absence>();
+    public virtual ICollection<Absence> Absences { get; set; } = [];
     public virtual ICollection<StudentReport> StudentReports { get; set; } = [];
     public virtual ICollection<StudentPayment> StudentPayments { get; set; } = [];
 

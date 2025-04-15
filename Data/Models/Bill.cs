@@ -13,13 +13,14 @@ public class Bill
 
     public string? Description { get; set; }
 
-
+    public int SchoolLevelId { get; set; }
     public bool IsActive { get; set; } = true; // To allow disabling old bills maybe
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public virtual School School { get; set; } = null!;
+    public virtual SchoolLevel SchoolLevel { get; set; } = null!;
 
     // Navigation property for the join table
     public virtual ICollection<StudentPayment> StudentPayments { get; set; } = [];

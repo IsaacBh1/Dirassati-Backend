@@ -1,3 +1,4 @@
+using System.Globalization;
 using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.SignUp;
@@ -29,13 +30,13 @@ namespace Dirassati_Backend.Data.Seeders
                         PostalCode = "62704",
                         Country = "USA",
                     },
-                    SpecializationsId = new List<int> { 1, 2, 3, 4, 5 },
+                    SpecializationsId = [1, 2, 3, 4, 5],
                     Logo = "www.verygoodlogo.com",
                     WebsiteUrl = "www.lesCours.com",
                     AcademicYear = new AcademicYearDto
                     {
-                        StartDate = DateOnly.Parse("2023-11-1"),
-                        EndDate = DateOnly.Parse("2024-06-30")
+                        StartDate = DateOnly.Parse("2023-11-1", CultureInfo.InvariantCulture),
+                        EndDate = DateOnly.Parse("2024-06-30", CultureInfo.InvariantCulture)
                     },
                     BillAmount = 2500
                 },

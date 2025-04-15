@@ -15,6 +15,6 @@ public class GetStudentReportDto
     public DateTime UpdatedAt { get; set; }
 
     public string Subject { get; set; } = null!;
-    public SimpleTeacherDto Teacher { get; set; } = null!;
-    public SimpleStudentDto Student { get; set; } = null!;
+    public BasePersonDto Teacher { get; set; } = null!;
+    public BasePersonDto Student { get; set; } = null!;
 }

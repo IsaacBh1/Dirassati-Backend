@@ -62,7 +62,7 @@ public class PaymentsController(IPaymentService paymentService, ILogger<Payments
 
             rawRequestBody = Encoding.UTF8.GetString(buffer.ToArray());
             reader.AdvanceTo(buffer.End); // Mark the buffer as consumed
-            _logger.LogInformation("Recieved payload from webhook \n: {rawRequestBody}", rawRequestBody);
+            _logger.LogInformation("Recieved payload from webhook \n: {RawRequestBody}", rawRequestBody);
         }
         catch (Exception ex)
         {
@@ -77,7 +77,7 @@ public class PaymentsController(IPaymentService paymentService, ILogger<Payments
             _logger.LogWarning("Received webhook request without signature header");
             return BadRequest("Missing signature header.");
         }
-        _logger.LogInformation("Recieved signature from webhook \n: {signatureHeader}", signatureHeader);
+        _logger.LogInformation("Recieved signature from webhook \n: {SignatureHeader}", signatureHeader);
 
         // Manually Deserialize
         ChargilyWebhookPayload? payload;
@@ -110,7 +110,7 @@ public class PaymentsController(IPaymentService paymentService, ILogger<Payments
     }
     [HttpPost("add-bill")]
     [Authorize(Roles = "Employee")]
-    public async Task<ActionResult<GetBillDto>> AddBill([FromBody] AddBillDto request)
+    public async Task<ActionResult<GetBillDto>> AddBill(AddBillDto request)
     {
         var schoolId = User.FindFirstValue("SchoolId");
         if (schoolId == null)

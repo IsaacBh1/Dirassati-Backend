@@ -16,6 +16,7 @@ using Persistence;
 using Dirassati_Backend.Common.Services.ConnectionTracker;
 using Dirassati_Backend.Features.Payments.Services;
 using Dirassati_Backend.Hubs.Services;
+using Dirassati_Backend.Data;
 
 namespace Dirassati_Backend.Common;
 

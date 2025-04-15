@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Dirassati_Backend.Data;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Domain.Models;
 
@@ -15,7 +16,7 @@ public partial class Teacher
     public virtual School School { get; set; } = null!;
     public virtual AppUser User { get; set; } = null!;
     public byte[]? Photo { get; set; }
-    public virtual ICollection<Subject> Subjects { get; set; } = new List<Subject>();
+    public virtual ICollection<Subject> Subjects { get; set; } = [];
     public virtual ICollection<StudentReport> StudentReports { get; set; } = [];
 
 }
