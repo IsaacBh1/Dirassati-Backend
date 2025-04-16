@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Dirassati_Backend.Data.Models
 {
@@ -24,13 +25,13 @@ namespace Dirassati_Backend.Data.Models
         [ForeignKey(nameof(School))]
         public Guid SchoolId { get; set; } = Guid.Empty; // Foreign Key referencing the School
 
-
+        public Guid ClassroomId { get; set; }
         // Navigation properties
 
         public virtual SchoolLevel Level { get; set; } = null!;
         public virtual School School { get; set; } = null!;
         public virtual ICollection<Student> Students { get; set; } = [];
         public Specialization? Specialization { get; set; }
-
+        public Classroom? Classroom { get; set; } 
     }
 }
