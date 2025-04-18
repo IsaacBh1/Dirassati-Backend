@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Persistence;
 
@@ -10,9 +11,11 @@ using Persistence;
 namespace Dirassati_Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250415170548_FixAvailabilities")]
+    partial class FixAvailabilities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -237,43 +240,6 @@ namespace Dirassati_Backend.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("Dirassati_Backend.Data.Models.ExamType", b =>
-                {
-                    b.Property<int>("ExamTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ExamTypeId");
-
-                    b.ToTable("ExamTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            ExamTypeId = 1,
-                            Name = "Devoire1"
-                        },
-                        new
-                        {
-                            ExamTypeId = 2,
-                            Name = "Devoire2"
-                        },
-                        new
-                        {
-                            ExamTypeId = 3,
-                            Name = "Examen"
-                        },
-                        new
-                        {
-                            ExamTypeId = 4,
-                            Name = "Controle Continue"
-                        });
-                });
-
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Group", b =>
                 {
                     b.Property<int>("GroupId")
@@ -380,65 +346,6 @@ namespace Dirassati_Backend.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("LevelSubjectHours");
-                });
-
-            modelBuilder.Entity("Dirassati_Backend.Data.Models.Note", b =>
-                {
-                    b.Property<int>("NoteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("AcademicYearId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ExamTypeId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("GroupId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("SchoolId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("SubjectId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("TeacherId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Tremester")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<double>("Value")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5, 2)");
-
-                    b.HasKey("NoteId");
-
-                    b.HasIndex("AcademicYearId");
-
-                    b.HasIndex("ExamTypeId");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("SchoolId");
-
-                    b.HasIndex("StudentId");
-
-                    b.HasIndex("SubjectId");
-
-                    b.HasIndex("TeacherId");
-
-                    b.ToTable("Notes");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Parent", b =>
@@ -1729,65 +1636,6 @@ namespace Dirassati_Backend.Migrations
                     b.Navigation("SchoolLevel");
 
                     b.Navigation("Subject");
-                });
-
-            modelBuilder.Entity("Dirassati_Backend.Data.Models.Note", b =>
-                {
-                    b.HasOne("Dirassati_Backend.Data.Models.AcademicYear", "AcademicYear")
-                        .WithMany()
-                        .HasForeignKey("AcademicYearId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dirassati_Backend.Data.Models.ExamType", "ExamType")
-                        .WithMany()
-                        .HasForeignKey("ExamTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dirassati_Backend.Data.Models.Group", "Group")
-                        .WithMany()
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dirassati_Backend.Data.Models.School", "School")
-                        .WithMany()
-                        .HasForeignKey("SchoolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dirassati_Backend.Data.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Dirassati_Backend.Domain.Models.Subject", "Subject")
-                        .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Teacher", "Teacher")
-                        .WithMany()
-                        .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AcademicYear");
-
-                    b.Navigation("ExamType");
-
-                    b.Navigation("Group");
-
-                    b.Navigation("School");
-
-                    b.Navigation("Student");
-
-                    b.Navigation("Subject");
-
-                    b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Parent", b =>

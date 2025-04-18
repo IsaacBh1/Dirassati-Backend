@@ -5,6 +5,7 @@ namespace Dirassati_Backend.Data.Models;
 
 public partial class Group
 {
+
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int GroupId { get; set; }

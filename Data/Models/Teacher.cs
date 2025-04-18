@@ -17,5 +17,6 @@ public partial class Teacher
     public byte[]? Photo { get; set; }
     public virtual ICollection<Subject> Subjects { get; set; } = new List<Subject>();
     public virtual ICollection<StudentReport> StudentReports { get; set; } = [];
+    public virtual ICollection<TeacherAvailability?>? Availabilities { get; set; } = new List<TeacherAvailability?>();
 
 }

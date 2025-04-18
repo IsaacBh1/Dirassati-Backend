@@ -127,10 +127,15 @@ public class TeacherServices
     }
     private async Task ValidateSchoolClaims(string SchoolId)
     {
-        if ((await _dbContext.Schools.FirstOrDefaultAsync(s => s.SchoolId.ToString() == SchoolId)) == null)
+        if (!Guid.TryParse(SchoolId, out Guid parsedId))
+        {
+            throw new Exception("Invalid School Id format");
+        }
+        if (!await _dbContext.Schools.AnyAsync(s => s.SchoolId == parsedId))
         {
             throw new Exception("School is not found");
         }
+
     }
 
     private async Task ValidateContractTypeAsync(int contractTypeId)
@@ -181,15 +186,15 @@ public class TeacherServices
         );
     }
 
-    private string GenerateConfirmationLink(string email, string token)
+    private string GenerateConfirmationLink(string email, string VerificationToken)
     {
         var httpContext = _httpContext.HttpContext ?? throw new Exception("HttpContext is null");
-
+        var encodedToken = Uri.EscapeDataString(VerificationToken);
         // Remove URL encoding for the token
         var link = _linkGenerator.GetUriByName(
             httpContext,
             "VerifyEmail",
-            new { email, token } // Pass raw token
+            new { email, VerificationToken = encodedToken }
         );
 
         return link ?? throw new Exception("Confirmation link generation failed. Verify route configuration.");

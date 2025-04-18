@@ -31,9 +31,9 @@ namespace Dirassati_Backend.Data.Models
         [Required]
         [ForeignKey(nameof(SchoolType))]
         public int SchoolTypeId { get; set; }
-
-
         public int AcademicYearId { get; set; }
+
+        public SchoolScheduleConfig? ScheduleConfig { get; set; }
 
         // Navigation properties
         public virtual Address Address { get; set; } = new();
@@ -49,6 +49,7 @@ namespace Dirassati_Backend.Data.Models
         public virtual ICollection<PhoneNumber> PhoneNumbers { get; set; } = new List<PhoneNumber>();
         public virtual ICollection<Teacher> Teachers { get; set; } = new List<Teacher>();
         public virtual ICollection<Specialization> Specializations { get; set; } = new List<Specialization>();
+        public virtual ICollection<Timeslot> Timeslots { get; set; } = new List<Timeslot>();
 
     }
 }
