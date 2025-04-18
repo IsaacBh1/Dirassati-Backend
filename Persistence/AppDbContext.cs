@@ -29,6 +29,12 @@ public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<
     public virtual DbSet<StudentPayment> StudentPayments { get; set; }
     public virtual DbSet<Bill> Bills { get; set; }
 
+    public virtual DbSet<LevelSubjectHours> LevelSubjectHours { get; set; }
+    public virtual DbSet<Timeslot> Timeslots { get; set; }
+    public virtual DbSet<Lesson> Lessons { get; set; }
+    public virtual DbSet<TeacherAvailability> TeacherAvailabilities { get; set; }
+    public virtual DbSet<ExamType> ExamTypes { get; set; }
+    public virtual DbSet<Note> Notes { get; set; }
 
 
 
@@ -41,6 +47,12 @@ public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<
         ParentRelationshipSeeder.SeedParentRelationships(builder);
         SubjectSeeder.SeedSubjects(builder);
         TeacherSeeder.SeedContractType(builder);
+        ExamTypeSeeder.SeedExamTypes(builder);
+        base.OnModelCreating(builder);
+
+        builder.Entity<LevelSubjectHours>()
+        .HasKey(lsh => new { lsh.LevelId, lsh.SubjectId });
+
 
         builder.Entity<School>()
         .HasMany(sch => sch.Specializations)

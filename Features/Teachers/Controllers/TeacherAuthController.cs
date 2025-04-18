@@ -53,7 +53,7 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
             if (teacher == null)
                 return Unauthorized("Teacher not found");
 
-            var token = GenerateJwtToken(user, teacher.SchoolId.ToString());
+            var token = GenerateJwtToken(user, teacher.SchoolId.ToString() , teacher.TeacherId.ToString());
             return Ok(new
             {
                 Token = token,
@@ -63,13 +63,14 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
             });
         }
 
-        private string GenerateJwtToken(AppUser user, string schoolId)
+        private string GenerateJwtToken(AppUser user, string schoolId , string teacherId)
         {
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("TeacherId", teacherId),
                 new Claim("SchoolId", schoolId),
                 new Claim(ClaimTypes.Role, "Teacher")
             };
@@ -79,7 +80,6 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],

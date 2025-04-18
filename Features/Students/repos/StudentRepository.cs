@@ -1,7 +1,10 @@
 using Dirassati_Backend.Features.Students.DTOs;
 using Dirassati_Backend.Features.Common;
 using Microsoft.EntityFrameworkCore;
+
 using Dirassati_Backend.Persistence;
+using Dirassati_Backend.Data.Models;
+
 
 namespace Dirassati_Backend.Features.Students.Repositories
 {
@@ -43,6 +46,19 @@ namespace Dirassati_Backend.Features.Students.Repositories
                 student.GroupId
             );
         }
+
+        public async Task<List<Student>> GetStudentsByGroupAsync(Guid groupId)
+
+        {
+            var students = await _context.Students
+            .Where(s => s.GroupId == groupId)
+            .OrderBy(s => s.LastName)
+            .AsNoTracking()
+            .ToListAsync();
+            return students;
+        }
+
+
 
         public async Task<PaginatedResult<StudentDto>> GetStudentsBySchoolIdAsync(Guid schoolId, int page, int pageSize)
         {

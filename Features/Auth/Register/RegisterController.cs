@@ -32,6 +32,7 @@ namespace Dirassati_Backend.Features.Auth.SignUp
         }
 
 
+
         [AllowAnonymous]
         [HttpGet("register/verify-email", Name = "VerifyEmail")]
         public async Task<ActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string VerificationToken)

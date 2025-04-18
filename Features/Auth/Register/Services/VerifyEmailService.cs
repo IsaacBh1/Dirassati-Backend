@@ -14,10 +14,13 @@ public class VerifyEmailService(UserManager<AppUser> _userManager)
         var user = await _userManager.FindByEmailAsync(email);
         if (user is null)
             return result.Failure("User does not exist", 404);
-        var isVerified = await _userManager.ConfirmEmailAsync(user, token);
+
+        var decodedToken = Uri.UnescapeDataString(token);
+
+        var isVerified = await _userManager.ConfirmEmailAsync(user, decodedToken);
 
         return isVerified.Succeeded ?
-        result.Success("Your email is verified") :
-        result.Failure($"Cannot Verify Email\n {isVerified.Errors.ToCustomString()} ", 500);
+            result.Success("Your email is verified") :
+            result.Failure($"Cannot Verify Email\n {isVerified.Errors.ToCustomString()} ", 500);
     }
 }

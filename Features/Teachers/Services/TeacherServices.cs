@@ -133,9 +133,13 @@ public class TeacherServices
     }
     private async Task ValidateSchoolClaims(string SchoolId)
     {
-        if (Guid.TryParse(SchoolId, out Guid schoolIdGuid))
+        if (!Guid.TryParse(SchoolId, out Guid parsedId))
         {
-            if ((await _dbContext.Schools.FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid)) == null)
+            throw new ArgumentException("Invalid School Id format");
+        }
+        if (!await _dbContext.Schools.AnyAsync(s => s.SchoolId == parsedId))
+        {
+            if ((await _dbContext.Schools.FirstOrDefaultAsync(s => s.SchoolId == parsedId)) == null)
             {
                 throw new InvalidOperationException("School is not found");
             }
@@ -144,6 +148,7 @@ public class TeacherServices
         {
             throw new InvalidOperationException("Invalid School Id");
         }
+
     }
 
     private async Task ValidateContractTypeAsync(int contractTypeId)
@@ -197,12 +202,12 @@ public class TeacherServices
     private string GenerateConfirmationLink(string email, string VerificationToken)
     {
         var httpContext = _httpContext.HttpContext ?? throw new InvalidOperationException("HttpContext is null");
-
+        var encodedToken = Uri.EscapeDataString(VerificationToken);
         // Remove URL encoding for the token
         var link = _linkGenerator.GetUriByName(
             httpContext,
             "VerifyEmail",
-            new { email, VerificationToken } // Pass raw token
+            new { email, VerificationToken = encodedToken }
         );
 
         return link ?? throw new InvalidOperationException("Confirmation link generation failed. Verify route configuration.");
@@ -236,7 +241,7 @@ public class TeacherServices
     public async Task<Result<List<GetTeacherInfosDto>, string>> GetTeachers(string SchoolId)
     {
         var result = new Result<List<GetTeacherInfosDto>, string>();
-        if (!Guid.TryParse(SchoolId, out Guid schoolGuid))
+        if (!Guid.TryParse(SchoolId, out _))
         {
             return result.Failure("Invalid teacher ID or school ID format", 400);
         }
