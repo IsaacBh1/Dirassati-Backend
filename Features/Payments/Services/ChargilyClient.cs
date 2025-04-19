@@ -8,22 +8,21 @@ public class ChargilyClient : IChargilyClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<ChargilyClient> _logger;
-    private readonly string? _apiBaseUrl;
 
     public ChargilyClient(HttpClient httpClient, IConfiguration configuration, ILogger<ChargilyClient> logger)
     {
         _httpClient = httpClient;
         _logger = logger;
-        _apiBaseUrl = configuration["ChargilyConfigs:ApiBaseUrl"]?.TrimEnd('/');
+        var apiBaseUrl = configuration["ChargilyConfigs:ApiBaseUrl"]?.TrimEnd('/');
         var apiKey = configuration["ChargilyConfigs:ApiKey"];
 
-        if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(_apiBaseUrl))
+        if (string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiBaseUrl))
         {
             _logger.LogCritical("Chargily API Key or Base URL is not configured!");
             throw new InvalidOperationException("Chargily client configuration is missing.");
         }
 
-        _httpClient.BaseAddress = new Uri(_apiBaseUrl + "/");
+        _httpClient.BaseAddress = new Uri(apiBaseUrl + "/");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
@@ -61,13 +60,14 @@ public class ChargilyClient : IChargilyClient
         }
         catch (HttpRequestException httpEx)
         {
-            _logger.LogError(httpEx, "HTTP request error while creating Chargily checkout session.");
-            throw; // Re-throw network-related errors
+            _logger.LogError(httpEx, "HTTP request error while creating Chargily checkout session. {Error}", httpEx);
+            throw ; // Re-throw network-related errors
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error in ChargilyClient CreateCheckoutSessionAsync.");
-            throw;
+            throw; // Re-throw network-related errors
+
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Dirassati_Backend.Features.Auth.Register.Services
 {
-    public class PasswordGeneratorService
+    public static class PasswordGeneratorService
     {
         private const string Lowercase = "abcdefghijklmnopqrstuvwxyz";
         private const string Uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

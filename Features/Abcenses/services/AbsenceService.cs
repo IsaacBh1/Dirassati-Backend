@@ -1,10 +1,11 @@
+using Dirassati_Backend.Common.Services.ConnectionTracker;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Absences.Repos;
 using Dirassati_Backend.Features.Groups.Repos;
-using Dirassati_Backend.Common.Services.ConnectionTracker;
+using Dirassati_Backend.Hubs;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Dirassati_Backend.Features.Absences.Services
+namespace Dirassati_Backend.Features.Abcenses.services
 {
     public class AbsenceService
     {

@@ -1,5 +1,3 @@
-using System;
-
 namespace Dirassati_Backend.Configurations;
 
 public class CloudinaryConfig

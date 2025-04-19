@@ -10,10 +10,10 @@ namespace Dirassati_Backend.Features.SchoolLevels.Services;
 
 public class SchoolLevelServices(AppDbContext dbContext)
 {
-    public async Task<List<GetSchoolLevelDTO>> GetAllLevelsAsync()
+    public async Task<List<GetSchoolLevelDto>> GetAllLevelsAsync()
     {
         var levels = await dbContext.SchoolLevels.Include(sl => sl.SchoolType).ToListAsync();
-        return levels.Select(lev => new GetSchoolLevelDTO { LevelId = lev.LevelId, SchoolTypeId = lev.SchoolTypeId, LevelYear = lev.LevelYear, SchoolTypeName = lev.SchoolType.Name }).ToList();
+        return levels.Select(lev => new GetSchoolLevelDto { LevelId = lev.LevelId, SchoolTypeId = lev.SchoolTypeId, LevelYear = lev.LevelYear, SchoolTypeName = lev.SchoolType.Name }).ToList();
 
     }
 

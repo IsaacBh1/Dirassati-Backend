@@ -2,9 +2,10 @@ using Dirassati_Backend.Common;
 using Dirassati_Backend.Configurations;
 using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Extensions;
-using Dirassati_Backend.Features.Absences.Services;
+using Dirassati_Backend.Features.Abcenses.services;
 using Dirassati_Backend.Features.Auth.SignUp;
 using Dirassati_Backend.Features.Teachers.Services;
+using Dirassati_Backend.Hubs;
 using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,7 +38,6 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
-//app.UseAuthentication();
 app.UseAuthorization();
 // Configure Swagger UI only in development mode
 if (app.Environment.IsDevelopment())
@@ -57,19 +57,19 @@ try
     var registerService = service.GetRequiredService<RegisterService>();
     var teacherServices = service.GetRequiredService<TeacherServices>();
     await context.Database.MigrateAsync();
-    string? schoolId = await SchoolSeeder.SeedAsync(registerService, context) ?? throw new Exception("School Has not been created");
+    string? schoolId = await SchoolSeeder.SeedAsync(registerService, context) ?? throw new InvalidOperationException("School Has not been created");
     if ((await context.Teachers.FirstOrDefaultAsync(t => t.SchoolId == Guid.Parse(schoolId))) == null)
         await TeacherSeeder.SeedTeachersAsync(Guid.Parse(schoolId), teacherServices);
 }
 catch (Exception e)
 {
     var logger = service.GetRequiredService<ILogger<Program>>();
-    logger.LogError(e, "A problem occurred when migrating database");
-    throw;
+    logger.LogError(e, "A problem occurred when migrating database {Error}", e.Message);
+    throw new InvalidOperationException("An error occurred during database migration. See inner exception for details.", e);
 }
 
 app.MapHub<ParentNotificationHub>("/parentNotificationHub").RequireCors("AllowAll");
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

@@ -6,7 +6,7 @@ using Dirassati_Backend.Common.Dtos;
 
 namespace Dirassati_Backend.Features.School.DTOs;
 
-public class UpdateSchoolInfosDTO
+public class UpdateSchoolInfosDto
 {
     [Required]
 
@@ -22,10 +22,10 @@ public class UpdateSchoolInfosDTO
     public string WebsiteUrl { get; set; } = null!;
 
     [Required]
-    public AcademicYearDto AcademicYear { get; set; } = null!;
+    public Dirassati_Backend.Common.Dtos.AcademicYearDto AcademicYear { get; set; } = null!;
     [Required]
 
-    public List<PhoneNumberDTO> PhoneNumbers { get; set; } = null!;
+    public List<PhoneNumberDto> PhoneNumbers { get; set; } = null!;
     [Required]
 
     public AddressDto Address { get; set; } = null!;

@@ -14,7 +14,7 @@ public class SchoolController(ISchoolService schoolService) : BaseController
 
     [HttpGet]
 
-    public async Task<ActionResult<GetSchoolInfoDTO>> GetSchoolInfo()
+    public async Task<ActionResult<GetSchoolInfoDto>> GetSchoolInfo()
     {
         var result = await _schoolService.GetSchoolInfosAsync();
         return HandleResult(result);
@@ -25,7 +25,7 @@ public class SchoolController(ISchoolService schoolService) : BaseController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-    public async Task<IActionResult> UpdateSchoolInfos(UpdateSchoolInfosDTO schoolInfosDTO)
+    public async Task<IActionResult> UpdateSchoolInfos(UpdateSchoolInfosDto schoolInfosDTO)
     {
         var result = await _schoolService.UpdateSchoolInfos(schoolInfosDTO);
         return HandleResult(result);

@@ -1,19 +1,23 @@
-using Dirassati_Backend.Features.Absences.Repos;
-using Dirassati_Backend.Features.Parents.Repositories;
+using AutoMapper;
+using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Common.Services.ConnectionTracker;
+using Dirassati_Backend.Data.Enums;
+using Dirassati_Backend.Features.Absences.Repos;
+using Dirassati_Backend.Features.Parents.Dtos;
+using Dirassati_Backend.Features.Parents.Repositories;
+using Dirassati_Backend.Features.Payments.DTOs;
+using Dirassati_Backend.Features.Teachers.Dtos;
+using Dirassati_Backend.Hubs.HelperClasses;
+using Dirassati_Backend.Hubs.Interfaces;
+using Dirassati_Backend.Hubs.Services;
+using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using Dirassati_Backend.Hubs.Interfaces;
-using Dirassati_Backend.Hubs.HelperClasses;
-using AutoMapper;
-using Dirassati_Backend.Features.Teachers.Dtos;
-using Dirassati_Backend.Features.Parents.Dtos;
 using Microsoft.EntityFrameworkCore;
-using Dirassati_Backend.Data.Enums;
-using Dirassati_Backend.Common.Dtos;
-using Dirassati_Backend.Hubs.Services;
-using Dirassati_Backend.Features.Payments.DTOs;
-using Dirassati_Backend.Persistence; // Add this
+
+// Add this
+
+namespace Dirassati_Backend.Hubs;
 
 [Authorize]
 public class ParentNotificationHub(
@@ -34,14 +38,14 @@ public class ParentNotificationHub(
         var parentId = Context.User?.FindFirst("parentId")?.Value;
         if (!string.IsNullOrEmpty(parentId) && Guid.TryParse(parentId, out var parentGuid))
         {
-            _logger.LogInformation("Parent {parentId} connected with connection ID {connectionId}", parentId, Context.ConnectionId);
+            _logger.LogInformation("Parent {ParentId} connected with connection ID {ConnectionId}", parentId, Context.ConnectionId);
 
             // Track by parentId instead of user ID
             _connectionTracker.AddConnection(parentId, Context.ConnectionId);
 
             // Add connection to parent-specific group
             await Groups.AddToGroupAsync(Context.ConnectionId, $"parent-{parentId}");
-            _logger.LogInformation("Parent {parentId} added to group parent-{parentId}", parentId, parentId);
+            _logger.LogInformation("Parent {ParentIdFirst} added to group parent-{ParentId}", parentId, parentId);
 
             // Get all school IDs related to the parent
             var schoolIds = await _parentNotificationServices.GetSchoolIdsByParentIdAsync(parentGuid);
@@ -50,16 +54,16 @@ public class ParentNotificationHub(
             {
                 // Add the parent to the group for each school
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"parents-school-{schoolId}");
-                _logger.LogInformation("Parent {parentId} added to group parents-school-{schoolId}", parentId, schoolId);
+                _logger.LogInformation("Parent {ParentId} added to group parents-school-{SchoolId}", parentId, schoolId);
             }
 
             // Send pending notifications
-            _logger.LogInformation("Sending pending notifications to parent {parentId}", parentId);
+            _logger.LogInformation("Sending pending notifications to parent {ParentId}", parentId);
             await SendPendingNotifications(parentGuid);
         }
         else
         {
-            _logger.LogWarning("Failed to retrieve or parse parent ID from context for connection ID {connectionId}", Context.ConnectionId);
+            _logger.LogWarning("Failed to retrieve or parse parent ID from context for connection ID {ConnectionId}", Context.ConnectionId);
         }
 
         await base.OnConnectedAsync();
@@ -82,11 +86,11 @@ public class ParentNotificationHub(
         var studentIds = students.Select(s => s.StudentId).ToList();
         var schoolIdsForParent = await _parentNotificationServices.GetSchoolIdsByParentIdAsync(parentId);
         await SendAbsenceNotifications(students, studentIds);
-        await SendStudentReportNotifications(studentIds, students);
+        await SendStudentReportNotifications(studentIds);
         await SendPendingBillAddedNotifications(schoolIdsForParent, parentId);
     }
 
-    private async Task SendStudentReportNotifications(List<Guid> studentIds, IEnumerable<getStudentDto> students)
+    private async Task SendStudentReportNotifications(List<Guid> studentIds)
     {
         try
         {
@@ -101,7 +105,7 @@ public class ParentNotificationHub(
                 var teacher = await _dbContext.Teachers.FirstOrDefaultAsync(t => t.TeacherId == report.TeacherId);
                 if (teacher == null)
                 {
-                    _logger.LogWarning($"Cannot find teacher : {report.TeacherId}");
+                    _logger.LogWarning("Cannot find teacher : {Id}", report.TeacherId);
                     return;
 
                 }
@@ -139,7 +143,7 @@ public class ParentNotificationHub(
 
             if (pendingBills.Count == 0)
             {
-                _logger.LogInformation("No pending admin bills to notify for parent {parentId}", parentId);
+                _logger.LogInformation("No pending admin bills to notify for parent {ParentId}", parentId);
                 return;
             }
 
@@ -156,15 +160,15 @@ public class ParentNotificationHub(
 
 
 
-            _logger.LogInformation("Pending admin bill notifications sent for parent {parentId}", parentId);
+            _logger.LogInformation("Pending admin bill notifications sent for parent {ParentId}", parentId);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error sending pending admin bill notifications for school {parentId}", parentId);
+            _logger.LogError(ex, "Error sending pending admin bill notifications for school {ParentId}", parentId);
         }
     }
 
-    private async Task SendAbsenceNotifications(IEnumerable<getStudentDto> students, List<Guid> studentIds)
+    private async Task SendAbsenceNotifications(IEnumerable<GetStudentDto> students, List<Guid> studentIds)
     {
         try
         {
@@ -175,7 +179,7 @@ public class ParentNotificationHub(
                 var student = students.FirstOrDefault(s => s.StudentId == absence.StudentId);
                 if (student == null)
                 {
-                    _logger.LogWarning($"Student with ID {absence.StudentId} not found");
+                    _logger.LogWarning("Student with ID {Id} not found", absence.StudentId);
                     continue;
                 }
 

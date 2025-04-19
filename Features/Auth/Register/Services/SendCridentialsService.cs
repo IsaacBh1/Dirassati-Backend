@@ -30,12 +30,11 @@ public class SendCridentialsService(IEmailService emailService, UserManager<AppU
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             return result.Failure(ex.Message, 500);
         }
     }
-
-
-
+    
     private async Task SendEmailAsync(string email, string password)
     {
         var body = $@"

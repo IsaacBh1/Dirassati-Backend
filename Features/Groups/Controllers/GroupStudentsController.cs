@@ -10,7 +10,8 @@ namespace Dirassati_Backend.Features.Groups.Controllers;
 [Tags("Group")]
 [Route("api/group/students")]
 [ApiController]
-public class GroupStudentsController(AppDbContext context, IGroupServices groupServices) : BaseController
+public class 
+    GroupStudentsController(AppDbContext context, IGroupServices groupServices) : BaseController
 {
     private readonly AppDbContext _context = context;
     private readonly IGroupServices _groupServices = groupServices;
@@ -43,41 +44,42 @@ public class GroupStudentsController(AppDbContext context, IGroupServices groupS
 
         return Ok(students);
     }
+   
     /// <summary>
-    /// Creates a new group and assigns students to it
+    /// Creates a new group with optional student assignments
     /// </summary>
-    /// <param name="groupDto">The group data with student IDs</param>
-    /// <returns>The newly created group with its details</returns>
+    /// <param name="addGroupDto">Group information and optional student IDs</param>
+    /// <returns>The created group with details</returns>
     [HttpPost]
-    public async Task<IActionResult> AddGroup(AddGroupDto groupDto)
+    public async Task<IActionResult> AddGroup(AddGroupDto addGroupDto)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
+            
         var schoolId = User.FindFirstValue("SchoolId");
-        if (schoolId == null)
-            return Unauthorized();
-        var result = await _groupServices.AddGroupAsync(groupDto, schoolId);
+        if (string.IsNullOrEmpty(schoolId))
+            return Unauthorized("School ID is missing from user claims");
+                
+        var result = await _groupServices.AddGroupAsync(addGroupDto, schoolId);
         return HandleResult(result);
-
     }
 
-    // Add this method to the existing GroupStudentsController class
-
     /// <summary>
-    /// Gets all groups by school level ID
+    /// Gets all groups for a specific school level
     /// </summary>
     /// <param name="levelId">The school level ID</param>
     /// <returns>List of groups for the specified level</returns>
-    [HttpGet("groups-by-level/{levelId}")]
-    public async Task<IActionResult> GetGroupsByLevelId(int levelId)
+    [HttpGet("by-level/{levelId:int}")]
+    public async Task<IActionResult> GetGroupsByLevel(int levelId)
     {
         var schoolId = User.FindFirstValue("SchoolId");
-        if (schoolId == null)
-            return Unauthorized();
-
+        if (string.IsNullOrEmpty(schoolId))
+            return Unauthorized("School ID is missing from user claims");
+                
         var result = await _groupServices.GetGroupsByLevelIdAsync(levelId, schoolId);
         return HandleResult(result);
     }
+
 }

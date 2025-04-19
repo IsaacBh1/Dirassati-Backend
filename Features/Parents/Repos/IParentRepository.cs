@@ -12,7 +12,7 @@ namespace Dirassati_Backend.Features.Parents.Repositories
         Task<Parent> CreateAsync(Parent parent);//Note : this is just for testing purpos es
         Task<GetParentDto?> UpdateAsync(UpdateParentDto updateDto);
         Task<bool> DeleteAsync(Guid id);
-        Task<IEnumerable<getStudentDto>> GetStudentsByParentIdAsync(Guid parentId);
-        Task<getStudentParentDto?> GetParentByStudentIdAsync(Guid studentId);
+        Task<IEnumerable<GetStudentDto>> GetStudentsByParentIdAsync(Guid parentId);
+        Task<GetStudentParentDto?> GetParentByStudentIdAsync(Guid studentId);
     }
 }

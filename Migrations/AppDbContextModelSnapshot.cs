@@ -220,9 +220,9 @@ namespace Dirassati_Backend.Migrations
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Classroom", b =>
                 {
-                    b.Property<int>("ClassroomId")
+                    b.Property<Guid>("ClassroomId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ClassName")
                         .IsRequired()
@@ -231,9 +231,19 @@ namespace Dirassati_Backend.Migrations
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SchoolLevelId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("SpecializationId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("ClassroomId");
 
                     b.HasIndex("SchoolId");
+
+                    b.HasIndex("SchoolLevelId");
+
+                    b.HasIndex("SpecializationId");
 
                     b.ToTable("Classrooms");
                 });
@@ -323,6 +333,9 @@ namespace Dirassati_Backend.Migrations
                     b.Property<int?>("AcademicYearId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid>("ClassroomId")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("GroupCapacity")
                         .HasColumnType("INTEGER");
 
@@ -330,11 +343,11 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("LevelId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("SchoolLevelLevelId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("SpecializationId")
                         .HasColumnType("INTEGER");
@@ -343,9 +356,12 @@ namespace Dirassati_Backend.Migrations
 
                     b.HasIndex("AcademicYearId");
 
-                    b.HasIndex("LevelId");
+                    b.HasIndex("ClassroomId")
+                        .IsUnique();
 
                     b.HasIndex("SchoolId");
+
+                    b.HasIndex("SchoolLevelLevelId");
 
                     b.HasIndex("SpecializationId");
 
@@ -1665,7 +1681,21 @@ namespace Dirassati_Backend.Migrations
                         .HasForeignKey("SchoolId")
                         .IsRequired();
 
+                    b.HasOne("Dirassati_Backend.Data.Models.SchoolLevel", "SchoolLevel")
+                        .WithMany()
+                        .HasForeignKey("SchoolLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Dirassati_Backend.Data.Models.Specialization", "Specialization")
+                        .WithMany()
+                        .HasForeignKey("SpecializationId");
+
                     b.Navigation("School");
+
+                    b.Navigation("SchoolLevel");
+
+                    b.Navigation("Specialization");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Employee", b =>
@@ -1693,9 +1723,9 @@ namespace Dirassati_Backend.Migrations
                         .WithMany("Groups")
                         .HasForeignKey("AcademicYearId");
 
-                    b.HasOne("Dirassati_Backend.Data.Models.SchoolLevel", "Level")
-                        .WithMany("Groups")
-                        .HasForeignKey("LevelId")
+                    b.HasOne("Dirassati_Backend.Data.Models.Classroom", "Classroom")
+                        .WithOne("Group")
+                        .HasForeignKey("Dirassati_Backend.Data.Models.Group", "ClassroomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1705,15 +1735,17 @@ namespace Dirassati_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dirassati_Backend.Data.Models.Specialization", "Specialization")
+                    b.HasOne("Dirassati_Backend.Data.Models.SchoolLevel", null)
+                        .WithMany("Groups")
+                        .HasForeignKey("SchoolLevelLevelId");
+
+                    b.HasOne("Dirassati_Backend.Data.Models.Specialization", null)
                         .WithMany("Groups")
                         .HasForeignKey("SpecializationId");
 
-                    b.Navigation("Level");
+                    b.Navigation("Classroom");
 
                     b.Navigation("School");
-
-                    b.Navigation("Specialization");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Lesson", b =>
@@ -2139,6 +2171,11 @@ namespace Dirassati_Backend.Migrations
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Bill", b =>
                 {
                     b.Navigation("StudentPayments");
+                });
+
+            modelBuilder.Entity("Dirassati_Backend.Data.Models.Classroom", b =>
+                {
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Group", b =>

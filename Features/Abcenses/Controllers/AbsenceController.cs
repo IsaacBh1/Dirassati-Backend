@@ -1,4 +1,4 @@
-using Dirassati_Backend.Features.Absences.Services;
+using Dirassati_Backend.Features.Abcenses.services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.Abcenses.Controllers

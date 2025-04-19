@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using System.Text;
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Features.Common;
 using Dirassati_Backend.Features.Students.DTOs;
+using Dirassati_Backend.Features.Students.Models;
 using Dirassati_Backend.Features.Students.Repositories;
 using Dirassati_Backend.Features.Students.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -33,7 +35,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
 
 
     [HttpPost("add")]
-    public async Task<ActionResult> AddStudent(AddStudentDTO studentDTO)
+    public async Task<ActionResult> AddStudent(AddStudentDto studentDTO)
     {
         var schoolId = User.FindFirstValue("SchoolId")!;
         var result = await _studentServices.AddStudentAsync(schoolId, studentDTO);
@@ -64,7 +66,81 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
         return Ok(result);
 
     }
-
+    [HttpPost("import-csv")]
+    [ProducesResponseType(typeof(StudentImportResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ImportStudentsFromCsv([FromForm] StudentCsvUploadModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+    
+        // Validate file
+        if ( model.CsvFile.Length == 0)
+        {
+            return BadRequest("File is empty");
+        }
+    
+        // Check file extension
+        var extension = Path.GetExtension(model.CsvFile.FileName).ToLowerInvariant();
+        if (extension != ".csv")
+        {
+            return BadRequest("Only CSV files are allowed");
+        }
+    
+        // Verify file content type
+        if (!model.CsvFile.ContentType.Equals("text/csv") && 
+            !model.CsvFile.ContentType.Equals("application/csv") &&
+            !model.CsvFile.ContentType.Equals("application/vnd.ms-excel"))
+        {
+            return BadRequest("File content type is not valid. Please upload a valid CSV file.");
+        }
+    
+        var schoolId = User.FindFirstValue("SchoolId");
+        if (string.IsNullOrEmpty(schoolId))
+        {
+            return Unauthorized("Invalid or missing School ID claim.");
+        }
+    
+        var result = await _studentServices.ImportStudentsFromCsvAsync(schoolId, model.CsvFile, model.HasHeaders);
+        return HandleResult(result);
+    }
+    
+    [HttpGet("import-template")]
+    [ProducesResponseType(typeof(FileContentResult), 200)]
+    public IActionResult GetImportTemplate()
+    {
+        try
+        {
+            // Create a memory stream to write the CSV to
+            using var memoryStream = new MemoryStream();
+            using var writer = new StreamWriter(memoryStream, new UTF8Encoding(true));
+            using var csv = new CsvHelper.CsvWriter(writer, new CsvHelper.Configuration.CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture));
+    
+            // Register class map to use column names
+            csv.Context.RegisterClassMap<StudentCsvRecordMap>();
+    
+            // Write header row only
+            csv.WriteHeader<StudentCsvRecord>();
+            csv.NextRecord();
+        
+            // No records to write, just the header
+        
+            // Make sure everything is written
+            writer.Flush();
+        
+            // Get the bytes from the memory stream
+            var bytes = memoryStream.ToArray();
+        
+            // Return as a file
+            return File(bytes, "text/csv", "student-import-template.csv");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error generating template: {ex.Message}");
+        }
+    }
 
 }
 

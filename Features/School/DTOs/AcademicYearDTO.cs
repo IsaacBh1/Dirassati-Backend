@@ -1,6 +1,6 @@
 namespace Dirassati_Backend.Features.School.DTOs;
 
-public class AcademicYearDTO
+public class AcademicYearDto
 
 {
     public DateOnly StartDate { get; set; }

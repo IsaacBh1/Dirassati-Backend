@@ -13,9 +13,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Dirassati_Backend.Common.Services.ConnectionTracker;
+using Dirassati_Backend.Common.Services.EmailService;
 using Dirassati_Backend.Features.Payments.Services;
 using Dirassati_Backend.Hubs.Services;
 using Dirassati_Backend.Data;
+using Dirassati_Backend.Features.Classrooms.Services;
 using Dirassati_Backend.Features.Groups.Services;
 using Dirassati_Backend.Persistence;
 
@@ -63,7 +65,10 @@ public static class AddServicesExtension
         builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
         builder.Services.AddHttpContextAccessor();
-        builder.Services
+        var provider = builder.Configuration["Email:Provider"];
+        if (provider == "smtp") 
+        {
+            builder.Services
     .AddFluentEmail(builder.Configuration["Email:SenderEmail"], builder.Configuration["Email:SenderName"])
     .AddSmtpSender(new SmtpClient
     {
@@ -72,6 +77,17 @@ public static class AddServicesExtension
         EnableSsl = false,
         DeliveryMethod = SmtpDeliveryMethod.Network
     });
+        }
+        else if (provider == "postmark")
+        {
+            var API_KEY = builder.Configuration["Email:PostMartAPI_KEY"];
+            builder.Services
+       .AddFluentEmail(builder.Configuration["Email:SenderEmail"], builder.Configuration["Email:SenderName"])
+       .AddPostmarkSender(API_KEY);
+        }
+        else
+            throw new InvalidOperationException("Invalid  Email provider configuration , please choose between smtp or postmark");
+
         // Add logging
         builder.Services.AddLogging(loggingBuilder =>
         {
@@ -98,6 +114,7 @@ public static class AddServicesExtension
         builder.Services.AddScoped<BillServices>();
         builder.Services.AddScoped<IParentNotificationServices, ParentNotificationServices>();
         builder.Services.AddScoped<IGroupServices, GroupServices>();
+        builder.Services.AddScoped<IClassroomServices, ClassroomServices>();
         return builder;
     }
 }

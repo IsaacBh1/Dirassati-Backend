@@ -1,4 +1,3 @@
-using System;
 using Dirassati_Backend.Common.Dtos;
 
 namespace Dirassati_Backend.Features.Groups.Dtos;
@@ -23,9 +22,10 @@ public class GroupDto
 
     public virtual LevelDto Level { get; set; } = null!;
 
-    public virtual ICollection<StudentGroupDto> Students { get; set; } = [];
+    public virtual ICollection<GetGroupStudetDto> Students { get; set; } = [];
 
 }
+
 
 public class GroupListingDto
 {
