@@ -13,6 +13,7 @@ using Dirassati_Backend.Hubs.Interfaces;
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Data;
+using Dirassati_Backend.Hubs;
 using Dirassati_Backend.Persistence;
 namespace Dirassati_Backend.Features.Teachers.Services;
 
@@ -238,7 +239,7 @@ public class TeacherServices
         var result = new Result<List<GetTeacherInfosDto>, string>();
         if (!Guid.TryParse(SchoolId, out Guid schoolGuid))
         {
-            return result.Failure("Invalid teacher ID or school ID format", 400);
+            return result.Failure($"Invalid teacher ID or school ID format {schoolGuid}", 400);
         }
 
         var rerult = _dbContext.Teachers.Include(t => t.ContractType).Include(t => t.User);
@@ -255,17 +256,17 @@ public class TeacherServices
 
     }
 
-    public async Task<Result<List<ContractTypeDTO>, string>> GetContractTypes()
+    public async Task<Result<List<ContractTypeDto>, string>> GetContractTypes()
     {
         try
         {
-            var ContractTypes = await _dbContext.ContractTypes.Select(c => new ContractTypeDTO { ContractTypeId = c.ContractId, Name = c.Name }).ToListAsync();
-            return new Result<List<ContractTypeDTO>, string>().Success(ContractTypes);
+            var ContractTypes = await _dbContext.ContractTypes.Select(c => new ContractTypeDto { ContractTypeId = c.ContractId, Name = c.Name }).ToListAsync();
+            return new Result<List<ContractTypeDto>, string>().Success(ContractTypes);
         }
         catch (Exception)
         {
 
-            return new Result<List<ContractTypeDTO>, string>().Failure("Failed to retrieve contract types", 500);
+            return new Result<List<ContractTypeDto>, string>().Failure("Failed to retrieve contract types", 500);
         }
     }
 

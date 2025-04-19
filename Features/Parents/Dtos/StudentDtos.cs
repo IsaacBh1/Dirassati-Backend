@@ -1,6 +1,6 @@
 namespace Dirassati_Backend.Features.Parents.Dtos
 {
-    public class getStudentDto
+    public class GetStudentDto
     {
         public Guid StudentId { get; set; }
         public string FirstName { get; set; } = string.Empty;

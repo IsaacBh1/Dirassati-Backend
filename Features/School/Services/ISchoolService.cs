@@ -5,6 +5,6 @@ namespace Dirassati_Backend.Features.School.Services;
 
 public interface ISchoolService
 {
-    public Task<Result<GetSchoolInfoDTO, string>> GetSchoolInfosAsync();
-    public Task<Result<Unit, string>> UpdateSchoolInfos(UpdateSchoolInfosDTO schoolInfosDTO);
+    public Task<Result<GetSchoolInfoDto, string>> GetSchoolInfosAsync();
+    public Task<Result<Unit, string>> UpdateSchoolInfos(UpdateSchoolInfosDto schoolInfosDTO);
 }

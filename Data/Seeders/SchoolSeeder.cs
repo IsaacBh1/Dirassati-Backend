@@ -3,12 +3,11 @@ using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.SignUp;
 using Dirassati_Backend.Persistence;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Data.Seeders
 {
-    public class SchoolSeeder
+    public static class SchoolSeeder
     {
 
 
@@ -20,7 +19,7 @@ namespace Dirassati_Backend.Data.Seeders
                 {
                     Name = "Greenwood High School",
                     SchoolTypeId = 3,
-                    Email = "info@greenwoodhigh.edu",
+                    Email = "mohamedislam.greenwood.org",
                     PhoneNumber = "+1234567890",
                     Address = new AddressDto
                     {

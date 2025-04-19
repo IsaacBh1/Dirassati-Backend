@@ -2,10 +2,8 @@ using System.Security.Claims;
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Features.Teachers.Dtos;
 using Dirassati_Backend.Features.Teachers.Services;
-using Dirassati_Backend.Hubs.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Dirassati_Backend.Features.Teachers.Controllers;
 
@@ -55,7 +53,7 @@ public class TeacherController(TeacherServices teacherServices) : BaseController
     }
 
     [HttpGet("contract-types")]
-    public async Task<ActionResult<List<ContractTypeDTO>>> GetContractTypes()
+    public async Task<ActionResult<List<ContractTypeDto>>> GetContractTypes()
     {
         return HandleResult(await _teacherServices.GetContractTypes());
     }

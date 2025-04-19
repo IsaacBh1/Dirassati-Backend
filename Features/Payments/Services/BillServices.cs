@@ -4,6 +4,7 @@ using AutoMapper;
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Payments.DTOs;
+using Dirassati_Backend.Hubs;
 using Dirassati_Backend.Hubs.Interfaces;
 using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.SignalR;
@@ -61,7 +62,7 @@ public class BillServices(AppDbContext context, IMapper mapper, IHubContext<Pare
         var verificationResult = await VerifyStudentAccessAsync(studentId, parentId, SchoolId);
         if (!verificationResult.IsSuccess)
         {
-            return result.Failure(verificationResult!.Errors!, verificationResult.StatusCode);
+            return result.Failure(verificationResult.Errors!, verificationResult.StatusCode);
         }
         // Fetch the student's payment bills
         var payments = await _context.StudentPayments
@@ -128,15 +129,13 @@ public class BillServices(AppDbContext context, IMapper mapper, IHubContext<Pare
     }
 
 
-    private async Task<bool> SendNewBillAddedNotification(GetBillDto billDto)
+    private async Task SendNewBillAddedNotification(GetBillDto billDto)
     {
         var schoolId = _httpContext.HttpContext?.User.FindFirstValue("SchoolId");
-        if (schoolId == null)
-            return false;
+        if (schoolId == null) return;
         await _hubContext.Clients.Group($"parents-school-{schoolId}").ReceiveNewStudentBill(billDto);
         _logger.LogInformation("New bill notification sent for group {Group} : , Title: {Title}, Amount: {Amount}",
         "parents-school-" + schoolId,
              billDto.Title, billDto.Amount);
-        return true;
     }
 }

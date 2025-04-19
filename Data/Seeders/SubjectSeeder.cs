@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Data.Seeders
 {
-    public class SubjectSeeder
+    public static class SubjectSeeder
     {
         public static void SeedSubjects(ModelBuilder modelBuilder)
         {

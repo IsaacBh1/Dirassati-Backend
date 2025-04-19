@@ -11,7 +11,7 @@ public class SchoolDto
     public string Name { get; set; } = string.Empty;
 
     [Required]
-    public int SchoolTypeId { get; set; }
+    public  int SchoolTypeId { get; set; }
 
     [Required]
     [EmailAddress]

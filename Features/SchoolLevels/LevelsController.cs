@@ -10,7 +10,7 @@ namespace Dirassati_Backend.Features.SchoolLevels;
 public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseController
 {
     [HttpGet]
-    public async Task<ActionResult<List<GetSchoolLevelDTO>>> GetLevels()
+    public async Task<ActionResult<List<GetSchoolLevelDto>>> GetLevels()
     {
         return await schoolLevelServices.GetAllLevelsAsync();
     }
@@ -38,7 +38,7 @@ public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseCon
 
     [HttpPut("specializations/add")]
 
-    public async Task<ActionResult> EditSpecialization(EditSpecializationDTO specializationDTO)
+    public async Task<ActionResult> EditSpecialization(EditSpecializationDto specializationDTO)
     {
         var result = await schoolLevelServices.EditSchoolSpecializations(User.FindFirstValue("SchoolId")!, specializationDTO.SpecializationIds);
         return HandleResult(result);

@@ -6,7 +6,6 @@ using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Features.School.DTOs;
 using Dirassati_Backend.Persistence;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Features.School.Services;
@@ -20,26 +19,26 @@ public class SchoolServices(
     private readonly IMapper _mapper = mapper;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    public async Task<Result<GetSchoolInfoDTO, string>> GetSchoolInfosAsync()
+    public async Task<Result<GetSchoolInfoDto, string>> GetSchoolInfosAsync()
     {
-        var result = new Result<GetSchoolInfoDTO, string>();
+        var result = new Result<GetSchoolInfoDto, string>();
         var schoolId = _httpContextAccessor.HttpContext?.User.FindFirstValue("SchoolId");
         if (schoolId == null)
             return result.Failure("Unauthorized access", 401);
         if (!Guid.TryParse(schoolId, out var schoolIdGuid))
             return result.Failure($"Invalid SchoolId Format {schoolIdGuid}", (int)HttpStatusCode.BadRequest);
-        var school = await _dbContext.Schools.ProjectTo<GetSchoolInfoDTO>(_mapper.ConfigurationProvider)
+        var school = await _dbContext.Schools.ProjectTo<GetSchoolInfoDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
 
         if (school == null)
             return result.Failure("School not found", 404);
 
-        var schoolDTO = _mapper.Map<GetSchoolInfoDTO>(school);
+        var schoolDTO = _mapper.Map<GetSchoolInfoDto>(school);
         return result.Success(schoolDTO);
     }
 
 
-    public async Task<Result<Unit, string>> UpdateSchoolInfos(UpdateSchoolInfosDTO schoolInfosDTO)
+    public async Task<Result<Unit, string>> UpdateSchoolInfos(UpdateSchoolInfosDto schoolInfosDTO)
     {
         var result = new Result<Unit, string>();
 

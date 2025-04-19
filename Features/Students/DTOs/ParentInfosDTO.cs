@@ -1,6 +1,6 @@
 namespace Dirassati_Backend.Features.Students.DTOs;
 
-public class ParentInfosDTO
+public class ParentInfosDto
 {
     public string NationalIdentityNumber { get; set; } = null!;
     public string FirstName { get; set; } = "";

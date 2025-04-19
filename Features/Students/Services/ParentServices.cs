@@ -14,7 +14,7 @@ public class ParentServices(AppDbContext dbContext, UserManager<AppUser> userMan
     public string VerificationToken { get; private set; } = "";
     public string Email { get; private set; } = "";
 
-    public async Task<Guid> RegisterParent(string NationalIdentityNumber, ParentInfosDTO parentInfosDTO)
+    public async Task<Guid> RegisterParent(string NationalIdentityNumber, ParentInfosDto parentInfosDTO)
     {
         var parent = await dbContext.Parents
             .FirstOrDefaultAsync(p => p.NationalIdentityNumber == NationalIdentityNumber);
