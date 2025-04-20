@@ -4,10 +4,9 @@ using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Dirassati_Backend.Domain.Services
+namespace Dirassati_Backend.Domain.Services;
+
+public interface ICsvService
 {
-    public interface ICsvService
-    {
-        Task<List<CsvNoteRecord>> ProcessNotesCsv(IFormFile file);
-    }
+    Task<List<CsvNoteRecord>> ProcessNotesCsv(IFormFile file);
 }

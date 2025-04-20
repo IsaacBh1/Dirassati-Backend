@@ -19,6 +19,8 @@ using Dirassati_Backend.Hubs.Services;
 using Dirassati_Backend.Data;
 using Dirassati_Backend.Features.Classrooms.Services;
 using Dirassati_Backend.Features.Groups.Services;
+using Dirassati_Backend.Features.Notes.Repos;
+using Dirassati_Backend.Features.Notes.Services;
 using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Common;
@@ -115,6 +117,8 @@ public static class AddServicesExtension
         builder.Services.AddScoped<IParentNotificationServices, ParentNotificationServices>();
         builder.Services.AddScoped<IGroupServices, GroupServices>();
         builder.Services.AddScoped<IClassroomServices, ClassroomServices>();
+        builder.Services.AddScoped<INoteRepository, NoteRepository>();
+        builder.Services.AddScoped<INotesServices, NoteService>();
         return builder;
     }
 }

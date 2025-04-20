@@ -1,51 +1,38 @@
-using Dirassati_Backend.Data.Models;
-using Microsoft.AspNetCore.Mvc;
-using Dirassati_Backend.Features.Notes.Repos;
-using Dirassati_Backend.Features.Notes.Dtos;
-using Microsoft.AspNetCore.Authorization;
-using Dirassati_Backend.Features.Students.Repositories;
-using Dirassati_Backend.Domain.Services;
-
-using Microsoft.EntityFrameworkCore;
-using Dirassati_Backend.Data.DTOs;
-using System.Text;
 using System.Globalization;
+using System.Text;
 using CsvHelper;
-using System.Security.Claims;
+using Dirassati_Backend.Common;
+using Dirassati_Backend.Data.DTOs;
+using Dirassati_Backend.Data.Models;
+using Dirassati_Backend.Domain.Services;
+using Dirassati_Backend.Features.Notes.Dtos;
+using Dirassati_Backend.Features.Notes.Repos;
+using Dirassati_Backend.Features.Notes.Services;
+using Dirassati_Backend.Features.Students.Repositories;
 using Dirassati_Backend.Persistence;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace Dirassati_Backend.Controllers
+namespace Dirassati_Backend.Features.Notes.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class NotesController : ControllerBase
+    public class NotesController(
+        INoteRepository noteRepository,
+        IStudentRepository studentRepository,
+        ICsvService csvService,
+        IHttpContextAccessor httpContextAccessor,
+        AppDbContext context,INotesServices notesServices)
+        : BaseController
     {
-        private readonly INoteRepository _noteRepository;
-        private readonly IStudentRepository _studentRepository;
-        private readonly ICsvService _csvService;
-        private readonly AppDbContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public NotesController(
-            INoteRepository noteRepository,
-            IStudentRepository studentRepository,
-            ICsvService csvService,
-            IHttpContextAccessor httpContextAccessor,
-            AppDbContext context)
-        {
-            _noteRepository = noteRepository;
-            _studentRepository = studentRepository;
-            _csvService = csvService;
-            _httpContextAccessor = httpContextAccessor;
-            _context = context;
-
-        }
+        private readonly INotesServices _notesServices = notesServices;
 
         [HttpPost]
         public async Task<ActionResult<Note>> AddNote(CreateNoteDto createNoteDto)
         {
-            var schoolIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("SchoolId");
+            var schoolIdClaim = httpContextAccessor.HttpContext?.User.FindFirst("SchoolId");
             if (schoolIdClaim == null || !Guid.TryParse(schoolIdClaim.Value, out Guid schoolId))
             {
                 return Unauthorized("Invalid School ID in token.");
@@ -64,7 +51,7 @@ namespace Dirassati_Backend.Controllers
                 SchoolId = schoolId
             };
 
-            var addedNote = await _noteRepository.AddNoteAsync(note);
+            var addedNote = await noteRepository.AddNoteAsync(note);
             return CreatedAtAction(nameof(AddNote), new { id = addedNote.NoteId }, addedNote);
         }
 
@@ -76,13 +63,13 @@ namespace Dirassati_Backend.Controllers
                 var schoolId = GetSchoolIdFromToken();
 
                 // Verify group exists in school
-                var groupExists = await _context.Groups
+                var groupExists = await context.Groups
                     .AnyAsync(g => g.GroupId == groupId && g.SchoolId == schoolId);
 
                 if (!groupExists)
                     return BadRequest("Invalid group ID for this school");
 
-                var students = await _studentRepository.GetStudentsByGroupAsync(groupId);
+                var students = await studentRepository.GetStudentsByGroupAsync(groupId);
 
                 if (!students.Any())
                     return NotFound("No students found in this group");
@@ -111,7 +98,7 @@ namespace Dirassati_Backend.Controllers
                 var schoolId = GetSchoolIdFromToken();
                 var teacherId = GetTeacherIdFromToken();
 
-                var teacher = await _context.Teachers
+                var teacher = await context.Teachers
                 .FirstOrDefaultAsync(t =>
                     t.TeacherId == teacherId &&
                     t.SchoolId == schoolId);
@@ -119,14 +106,14 @@ namespace Dirassati_Backend.Controllers
                 if (teacher == null)
                     return Unauthorized("Teacher not found in this school");
 
-                var group = await _context.Groups
+                var group = await context.Groups
                     .FirstOrDefaultAsync(g => g.GroupId == dto.GroupId && g.SchoolId == schoolId);
 
                 if (group == null)
                     return BadRequest("Invalid group ID for this school");
 
-                var students = await _studentRepository.GetStudentsByGroupAsync(dto.GroupId);
-                var csvRecords = await _csvService.ProcessNotesCsv(dto.CsvFile);
+                var students = await studentRepository.GetStudentsByGroupAsync(dto.GroupId);
+                var csvRecords = await csvService.ProcessNotesCsv(dto.CsvFile);
 
                 var notes = new List<Note>();
                 var errors = new List<string>();
@@ -146,7 +133,7 @@ namespace Dirassati_Backend.Controllers
                 if (errors.Any())
                     return BadRequest(new { Errors = errors });
 
-                await _noteRepository.BulkAddAsync(notes);
+                await noteRepository.BulkAddAsync(notes);
                 return Ok(new { Message = $"{notes.Count} notes created for group {dto.GroupId}" });
             }
             catch (Exception ex)
@@ -209,7 +196,7 @@ namespace Dirassati_Backend.Controllers
 
         private Guid GetSchoolIdFromToken()
         {
-            var claim = _httpContextAccessor.HttpContext?.User.FindFirst("SchoolId");
+            var claim = httpContextAccessor.HttpContext?.User.FindFirst("SchoolId");
             if (Guid.TryParse(claim?.Value, out var schoolId))
                 return schoolId;
             throw new UnauthorizedAccessException("Invalid School ID in token");
@@ -217,10 +204,35 @@ namespace Dirassati_Backend.Controllers
 
         private Guid GetTeacherIdFromToken()
         {
-            var claim = _httpContextAccessor.HttpContext?.User.FindFirst("TeacherId");
+            var claim = httpContextAccessor.HttpContext?.User.FindFirst("TeacherId");
             if (Guid.TryParse(claim?.Value, out var teacherId))
                 return teacherId;
             throw new UnauthorizedAccessException("Invalid Teacher ID in token");
+        }
+        [HttpGet]
+        public async Task<ActionResult<List<StudentNotesResponseDto>>> GetAllChildrenNotes()
+        {
+            var parentIdClaim = httpContextAccessor.HttpContext?.User.FindFirst("ParentId");
+            if (parentIdClaim == null || !Guid.TryParse(parentIdClaim.Value, out Guid parentId))
+            {
+                return Unauthorized("Invalid Parent ID in token.");
+            }
+
+            var result = await _notesServices.GetStudentNotesByParentIdAsync(parentId);
+            return HandleResult(result);
+        }
+
+        [HttpGet("{studentId}")]
+        public async Task<ActionResult<StudentNotesResponseDto>> GetStudentNotes(Guid studentId)
+        {
+            var parentIdClaim = httpContextAccessor.HttpContext?.User.FindFirst("ParentId");
+            if (parentIdClaim == null || !Guid.TryParse(parentIdClaim.Value, out Guid parentId))
+            {
+                return Unauthorized("Invalid Parent ID in token.");
+            }
+
+            var result = await _notesServices.GetStudentNotesByStudentIdForParentAsync(parentId, studentId);
+            return HandleResult(result);
         }
     }
 
