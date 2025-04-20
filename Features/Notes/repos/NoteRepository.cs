@@ -1,7 +1,7 @@
 using Dirassati_Backend.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using System.Threading.Tasks;
+using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Features.Notes.Repos
 {

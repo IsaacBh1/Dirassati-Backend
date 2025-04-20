@@ -66,10 +66,10 @@ public static class AddServicesExtension
 
         builder.Services.AddHttpContextAccessor();
         var provider = builder.Configuration["Email:Provider"];
-        if (provider == "smtp") 
+        if (provider == "smtp")
         {
             builder.Services
-    .AddFluentEmail(builder.Configuration["Email:SenderEmail"], builder.Configuration["Email:SenderName"])
+    .AddFluentEmail(builder.Configuration["Email:SenderEmail"] ?? throw new InvalidOperationException("Sender Email not found"), builder.Configuration["Email:SenderName"])
     .AddSmtpSender(new SmtpClient
     {
         Host = builder.Configuration["Email:Host"] ?? throw new InvalidOperationException("Check the SMTP server configuration"),
@@ -80,10 +80,10 @@ public static class AddServicesExtension
         }
         else if (provider == "postmark")
         {
-            var API_KEY = builder.Configuration["Email:PostMartAPI_KEY"];
+            var apiKey = builder.Configuration["Email:PostMartAPI_KEY"];
             builder.Services
        .AddFluentEmail(builder.Configuration["Email:SenderEmail"], builder.Configuration["Email:SenderName"])
-       .AddPostmarkSender(API_KEY);
+       .AddPostmarkSender(apiKey);
         }
         else
             throw new InvalidOperationException("Invalid  Email provider configuration , please choose between smtp or postmark");

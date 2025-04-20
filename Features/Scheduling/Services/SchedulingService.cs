@@ -31,7 +31,8 @@ public class AdvancedScheduler
         var school = _context.Schools
             .Include(s => s.ScheduleConfig)
             .Include(s => s.Groups)
-                .ThenInclude(g => g.Level)
+                .ThenInclude(g => g.Classroom)
+                .ThenInclude(c =>c.SchoolLevel)
             .Include(s => s.Teachers)
                 .ThenInclude(t => t.Availabilities)
             .Include(s => s.Teachers)
@@ -141,7 +142,7 @@ public class AdvancedScheduler
             Guid schoolId)
         {
             var result = new ScheduleResult();
-            var usedClassroomSlots = new HashSet<(int ClassroomId, int TimeslotId)>();
+            var usedClassroomSlots = new HashSet<(Guid ClassroomId, int TimeslotId)>();
             var usedTimeslots = new HashSet<int>();
             var usedTeacherSlots = new HashSet<(Guid TeacherId, int TimeslotId)>();
             var hoursTracking = new Dictionary<(int LevelId, int SubjectId), int>();
@@ -158,12 +159,12 @@ public class AdvancedScheduler
             foreach (var group in groups)
             {
                 var groupLevelHours = orderedSubjects
-                    .Where(lsh => lsh.LevelId == group.Level.LevelId)
+                    .Where(lsh => lsh.LevelId == group.Classroom?.SchoolLevelId)
                     .ToList();
 
                 foreach (var subjectHours in groupLevelHours)
                 {
-                    for (int i = 0; i < subjectHours.HoursPerWeek; i++)
+                    for (var i = 0; i < subjectHours.HoursPerWeek; i++)
                     {
                         var availableSlots = timeslots
                             .Where(ts => ts.SchoolId == schoolId &&
@@ -206,7 +207,7 @@ public class AdvancedScheduler
                                 usedTimeslots.Add(slot.TimeslotId);
                                 usedClassroomSlots.Add((classroom.ClassroomId, slot.TimeslotId));
                                 usedTeacherSlots.Add((teacher.TeacherId, slot.TimeslotId));
-                                hoursTracking[(group.Level.LevelId, subjectHours.SubjectId)]++;
+                                hoursTracking[(group.Classroom!.SchoolLevelId, subjectHours.SubjectId)]++;
 
                                 break; // Lesson created, move to next hour
                             }
@@ -239,7 +240,7 @@ public class AdvancedScheduler
     private static Classroom FindAvailableClassroom(
         List<Classroom> classrooms,
         Timeslot slot,
-        HashSet<(int ClassroomId, int TimeslotId)> usedSlots)
+        HashSet<(Guid ClassroomId, int TimeslotId)> usedSlots)
     {
         return classrooms.FirstOrDefault(c =>
             !usedSlots.Contains((c.ClassroomId, slot.TimeslotId)))!;
@@ -294,9 +295,7 @@ public class AdvancedScheduler
             int index2 = _optimizerRandom.Next(newSchedule.TeacherSchedules.Count);
 
             // Swap two lessons.
-            var temp = newSchedule.TeacherSchedules[index1];
-            newSchedule.TeacherSchedules[index1] = newSchedule.TeacherSchedules[index2];
-            newSchedule.TeacherSchedules[index2] = temp;
+            (newSchedule.TeacherSchedules[index1], newSchedule.TeacherSchedules[index2]) = (newSchedule.TeacherSchedules[index2], newSchedule.TeacherSchedules[index1]);
 
             // Reflect the same change in the GroupSchedules if needed.
             // Here we assume that the same lesson instance appears in both teacher and group lists.

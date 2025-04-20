@@ -17,6 +17,8 @@ public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<
     public virtual DbSet<Parent> Parents { get; set; }
     public virtual DbSet<PhoneNumber> PhoneNumbers { get; set; }
     public virtual DbSet<ParentRelationshipToStudentType> ParentRelationshipToStudentTypes { get; set; }
+    public virtual DbSet<Timeslot> Timeslots { get; set; }
+
     public virtual DbSet<School> Schools { get; set; }
     public virtual DbSet<SchoolLevel> SchoolLevels { get; set; }
     public virtual DbSet<Specialization> Specializations { get; set; }
@@ -30,7 +32,6 @@ public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<
     public virtual DbSet<Bill> Bills { get; set; }
 
     public virtual DbSet<LevelSubjectHours> LevelSubjectHours { get; set; }
-    public virtual DbSet<Timeslot> Timeslots { get; set; }
     public virtual DbSet<Lesson> Lessons { get; set; }
     public virtual DbSet<TeacherAvailability> TeacherAvailabilities { get; set; }
     public virtual DbSet<ExamType> ExamTypes { get; set; }
@@ -133,16 +134,15 @@ public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<
           .WithMany(srs => srs.StudentReports)
           .HasForeignKey(sr => sr.StudentReportStatusId);
 
+        
         // Seed the ReportStatus table
         builder.Entity<StudentReportStatus>().HasData(
             new { StudentReportStatusId = 1, Name = "Pending" },
             new { StudentReportStatusId = 2, Name = "Sent" },
             new { StudentReportStatusId = 3, Name = "Viewed" }
         );
-
+        builder.Entity<Timeslot>()
+            .ToTable(t => t.HasCheckConstraint("CK_Timeslot_EndAfterStart", "EndTime > StartTime"));
         base.OnModelCreating(builder);
     }
-
-
-
 }

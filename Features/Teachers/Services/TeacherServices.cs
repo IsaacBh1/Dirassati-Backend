@@ -134,21 +134,15 @@ public class TeacherServices
     }
     private async Task ValidateSchoolClaims(string SchoolId)
     {
-        if (!Guid.TryParse(SchoolId, out Guid parsedId))
+        if (!Guid.TryParse(SchoolId, out var parsedId))
         {
             throw new ArgumentException("Invalid School Id format");
         }
-        if (!await _dbContext.Schools.AnyAsync(s => s.SchoolId == parsedId))
+        if ((await _dbContext.Schools.FirstOrDefaultAsync(s => s.SchoolId == parsedId)) == null)
         {
-            if ((await _dbContext.Schools.FirstOrDefaultAsync(s => s.SchoolId == parsedId)) == null)
-            {
-                throw new InvalidOperationException("School is not found");
-            }
+            throw new InvalidOperationException("School is not found");
         }
-        else
-        {
-            throw new InvalidOperationException("Invalid School Id");
-        }
+      
 
     }
 
@@ -244,7 +238,7 @@ public class TeacherServices
         var result = new Result<List<GetTeacherInfosDto>, string>();
         if (!Guid.TryParse(SchoolId, out _))
         {
-            return result.Failure($"Invalid teacher ID or school ID format {schoolGuid}", 400);
+            return result.Failure($"Invalid teacher ID or school ID format ", 400);
         }
 
         var rerult = _dbContext.Teachers.Include(t => t.ContractType).Include(t => t.User);

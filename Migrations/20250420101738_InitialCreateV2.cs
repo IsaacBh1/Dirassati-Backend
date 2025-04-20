@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -7,7 +8,7 @@
 namespace Dirassati_Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class InetialCreate : Migration
+    public partial class InitialCreateV2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -57,6 +58,19 @@ namespace Dirassati_Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExamTypes",
+                columns: table => new
+                {
+                    ExamTypeId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamTypes", x => x.ExamTypeId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ParentRelationshipToStudentTypes",
                 columns: table => new
                 {
@@ -93,6 +107,19 @@ namespace Dirassati_Backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Specializations", x => x.SpecializationId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentReportStatuses",
+                columns: table => new
+                {
+                    StudentReportStatusId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentReportStatuses", x => x.StudentReportStatusId);
                 });
 
             migrationBuilder.CreateTable(
@@ -190,14 +217,15 @@ namespace Dirassati_Backend.Migrations
                 columns: table => new
                 {
                     SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
                     AddressId = table.Column<int>(type: "INTEGER", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
                     Logo = table.Column<string>(type: "TEXT", nullable: false),
                     WebsiteUrl = table.Column<string>(type: "TEXT", nullable: false),
                     SchoolConfig = table.Column<string>(type: "TEXT", nullable: false),
                     SchoolTypeId = table.Column<int>(type: "INTEGER", nullable: false),
-                    AcademicYearId = table.Column<int>(type: "INTEGER", nullable: false)
+                    AcademicYearId = table.Column<int>(type: "INTEGER", nullable: false),
+                    BillingCycleDays = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -213,7 +241,7 @@ namespace Dirassati_Backend.Migrations
                         column: x => x.SchoolTypeId,
                         principalTable: "SchoolTypes",
                         principalColumn: "SchoolTypeId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -343,22 +371,65 @@ namespace Dirassati_Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Bills",
+                columns: table => new
+                {
+                    BillId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Amount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
+                    SchoolLevelId = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bills", x => x.BillId);
+                    table.ForeignKey(
+                        name: "FK_Bills_SchoolLevels_SchoolLevelId",
+                        column: x => x.SchoolLevelId,
+                        principalTable: "SchoolLevels",
+                        principalColumn: "LevelId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bills_Schools_SchoolId",
+                        column: x => x.SchoolId,
+                        principalTable: "Schools",
+                        principalColumn: "SchoolId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Classrooms",
                 columns: table => new
                 {
-                    ClassroomId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    ClassroomId = table.Column<Guid>(type: "TEXT", nullable: false),
                     ClassName = table.Column<string>(type: "TEXT", nullable: false),
-                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SchoolLevelId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SpecializationId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Classrooms", x => x.ClassroomId);
                     table.ForeignKey(
+                        name: "FK_Classrooms_SchoolLevels_SchoolLevelId",
+                        column: x => x.SchoolLevelId,
+                        principalTable: "SchoolLevels",
+                        principalColumn: "LevelId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Classrooms_Schools_SchoolId",
                         column: x => x.SchoolId,
                         principalTable: "Schools",
                         principalColumn: "SchoolId");
+                    table.ForeignKey(
+                        name: "FK_Classrooms_Specializations_SpecializationId",
+                        column: x => x.SpecializationId,
+                        principalTable: "Specializations",
+                        principalColumn: "SpecializationId");
                 });
 
             migrationBuilder.CreateTable(
@@ -392,6 +463,39 @@ namespace Dirassati_Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LevelSubjectHours",
+                columns: table => new
+                {
+                    LevelId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SubjectId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    HoursPerWeek = table.Column<int>(type: "INTEGER", nullable: false),
+                    Priority = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LevelSubjectHours", x => new { x.LevelId, x.SubjectId });
+                    table.ForeignKey(
+                        name: "FK_LevelSubjectHours_SchoolLevels_LevelId",
+                        column: x => x.LevelId,
+                        principalTable: "SchoolLevels",
+                        principalColumn: "LevelId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LevelSubjectHours_Schools_SchoolId",
+                        column: x => x.SchoolId,
+                        principalTable: "Schools",
+                        principalColumn: "SchoolId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LevelSubjectHours_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "SubjectId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PhoneNumbers",
                 columns: table => new
                 {
@@ -405,6 +509,31 @@ namespace Dirassati_Backend.Migrations
                     table.PrimaryKey("PK_PhoneNumbers", x => x.PhoneNumberId);
                     table.ForeignKey(
                         name: "FK_PhoneNumbers_Schools_SchoolId",
+                        column: x => x.SchoolId,
+                        principalTable: "Schools",
+                        principalColumn: "SchoolId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SchoolScheduleConfig",
+                columns: table => new
+                {
+                    ConfigId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    MorningStart = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    MorningEnd = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    AfternoonStart = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    AfternoonEnd = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    ShortDays = table.Column<string>(type: "TEXT", nullable: false),
+                    DaysOff = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SchoolScheduleConfig", x => x.ConfigId);
+                    table.ForeignKey(
+                        name: "FK_SchoolScheduleConfig_Schools_SchoolId",
                         column: x => x.SchoolId,
                         principalTable: "Schools",
                         principalColumn: "SchoolId",
@@ -470,17 +599,42 @@ namespace Dirassati_Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Timeslots",
+                columns: table => new
+                {
+                    TimeslotId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Day = table.Column<int>(type: "INTEGER", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    IsMorningSlot = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsSpecialDay = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Timeslots", x => x.TimeslotId);
+                    table.CheckConstraint("CK_Timeslot_EndAfterStart", "EndTime > StartTime");
+                    table.ForeignKey(
+                        name: "FK_Timeslots_Schools_SchoolId",
+                        column: x => x.SchoolId,
+                        principalTable: "Schools",
+                        principalColumn: "SchoolId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Groups",
                 columns: table => new
                 {
-                    GroupId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    GorupName = table.Column<string>(type: "TEXT", nullable: false),
-                    LevelId = table.Column<int>(type: "INTEGER", nullable: false),
-                    AcademicYearId = table.Column<int>(type: "INTEGER", nullable: true),
+                    GroupId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    GroupName = table.Column<string>(type: "TEXT", nullable: false),
                     GroupCapacity = table.Column<int>(type: "INTEGER", nullable: false),
                     SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    StreamId = table.Column<int>(type: "INTEGER", nullable: true)
+                    ClassroomId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AcademicYearId = table.Column<int>(type: "INTEGER", nullable: true),
+                    SchoolLevelLevelId = table.Column<int>(type: "INTEGER", nullable: true),
+                    SpecializationId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -491,11 +645,16 @@ namespace Dirassati_Backend.Migrations
                         principalTable: "AcademicYears",
                         principalColumn: "AcademicYearId");
                     table.ForeignKey(
-                        name: "FK_Groups_SchoolLevels_LevelId",
-                        column: x => x.LevelId,
-                        principalTable: "SchoolLevels",
-                        principalColumn: "LevelId",
+                        name: "FK_Groups_Classrooms_ClassroomId",
+                        column: x => x.ClassroomId,
+                        principalTable: "Classrooms",
+                        principalColumn: "ClassroomId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Groups_SchoolLevels_SchoolLevelLevelId",
+                        column: x => x.SchoolLevelLevelId,
+                        principalTable: "SchoolLevels",
+                        principalColumn: "LevelId");
                     table.ForeignKey(
                         name: "FK_Groups_Schools_SchoolId",
                         column: x => x.SchoolId,
@@ -503,8 +662,8 @@ namespace Dirassati_Backend.Migrations
                         principalColumn: "SchoolId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Groups_Specializations_StreamId",
-                        column: x => x.StreamId,
+                        name: "FK_Groups_Specializations_SpecializationId",
+                        column: x => x.SpecializationId,
                         principalTable: "Specializations",
                         principalColumn: "SpecializationId");
                 });
@@ -534,6 +693,83 @@ namespace Dirassati_Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TeacherAvailabilities",
+                columns: table => new
+                {
+                    AvailabilityId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    TeacherId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Day = table.Column<int>(type: "INTEGER", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TeacherAvailabilities", x => x.AvailabilityId);
+                    table.ForeignKey(
+                        name: "FK_TeacherAvailabilities_Teachers_TeacherId",
+                        column: x => x.TeacherId,
+                        principalTable: "Teachers",
+                        principalColumn: "TeacherId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Lessons",
+                columns: table => new
+                {
+                    LessonId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TimeslotId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ClassroomId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    GroupId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SubjectId = table.Column<int>(type: "INTEGER", nullable: false),
+                    TeacherId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AcademicYearId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Lessons", x => x.LessonId);
+                    table.ForeignKey(
+                        name: "FK_Lessons_Classrooms_ClassroomId",
+                        column: x => x.ClassroomId,
+                        principalTable: "Classrooms",
+                        principalColumn: "ClassroomId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Lessons_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "GroupId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Lessons_Schools_SchoolId",
+                        column: x => x.SchoolId,
+                        principalTable: "Schools",
+                        principalColumn: "SchoolId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Lessons_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "SubjectId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Lessons_Teachers_TeacherId",
+                        column: x => x.TeacherId,
+                        principalTable: "Teachers",
+                        principalColumn: "TeacherId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Lessons_Timeslots_TimeslotId",
+                        column: x => x.TimeslotId,
+                        principalTable: "Timeslots",
+                        principalColumn: "TimeslotId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Students",
                 columns: table => new
                 {
@@ -553,7 +789,7 @@ namespace Dirassati_Backend.Migrations
                     EnrollmentDate = table.Column<DateOnly>(type: "TEXT", nullable: false),
                     ParentId = table.Column<Guid>(type: "TEXT", nullable: false),
                     IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
-                    GroupId = table.Column<int>(type: "INTEGER", nullable: true)
+                    GroupId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -595,44 +831,11 @@ namespace Dirassati_Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Teaches",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    TeacherId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    GroupId = table.Column<int>(type: "INTEGER", nullable: false),
-                    SubjectId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Teaches", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Teaches_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "GroupId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Teaches_Subjects_SubjectId",
-                        column: x => x.SubjectId,
-                        principalTable: "Subjects",
-                        principalColumn: "SubjectId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Teaches_Teachers_TeacherId",
-                        column: x => x.TeacherId,
-                        principalTable: "Teachers",
-                        principalColumn: "TeacherId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Absences",
                 columns: table => new
                 {
                     AbsenceId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    DateTIme = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DateTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     StudentId = table.Column<Guid>(type: "TEXT", nullable: false),
                     IsJustified = table.Column<bool>(type: "INTEGER", nullable: false),
                     Remark = table.Column<string>(type: "TEXT", nullable: false),
@@ -649,6 +852,145 @@ namespace Dirassati_Backend.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Notes",
+                columns: table => new
+                {
+                    NoteId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    StudentId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Tremester = table.Column<int>(type: "INTEGER", nullable: false),
+                    TeacherId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AcademicYearId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ExamTypeId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SubjectId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Value = table.Column<double>(type: "decimal(5, 2)", precision: 5, scale: 2, nullable: false),
+                    SchoolId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    GroupId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notes", x => x.NoteId);
+                    table.ForeignKey(
+                        name: "FK_Notes_AcademicYears_AcademicYearId",
+                        column: x => x.AcademicYearId,
+                        principalTable: "AcademicYears",
+                        principalColumn: "AcademicYearId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notes_ExamTypes_ExamTypeId",
+                        column: x => x.ExamTypeId,
+                        principalTable: "ExamTypes",
+                        principalColumn: "ExamTypeId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notes_Groups_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Groups",
+                        principalColumn: "GroupId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notes_Schools_SchoolId",
+                        column: x => x.SchoolId,
+                        principalTable: "Schools",
+                        principalColumn: "SchoolId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notes_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "StudentId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notes_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "SubjectId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notes_Teachers_TeacherId",
+                        column: x => x.TeacherId,
+                        principalTable: "Teachers",
+                        principalColumn: "TeacherId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentPayments",
+                columns: table => new
+                {
+                    BillId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    StudentId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ParentId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    AmountPaid = table.Column<decimal>(type: "TEXT", nullable: false),
+                    PaymentGatewayCheckoutId = table.Column<string>(type: "TEXT", nullable: true),
+                    PaymentGatewayTransactionId = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentPayments", x => new { x.BillId, x.StudentId });
+                    table.ForeignKey(
+                        name: "FK_StudentPayments_Bills_BillId",
+                        column: x => x.BillId,
+                        principalTable: "Bills",
+                        principalColumn: "BillId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudentPayments_Parents_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "Parents",
+                        principalColumn: "ParentId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudentPayments_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "StudentId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentReports",
+                columns: table => new
+                {
+                    StudentReportId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TeacherId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    StudentId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Title = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    ReportDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    StudentReportStatusId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentReports", x => x.StudentReportId);
+                    table.ForeignKey(
+                        name: "FK_StudentReports_StudentReportStatuses_StudentReportStatusId",
+                        column: x => x.StudentReportStatusId,
+                        principalTable: "StudentReportStatuses",
+                        principalColumn: "StudentReportStatusId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StudentReports_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "StudentId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StudentReports_Teachers_TeacherId",
+                        column: x => x.TeacherId,
+                        principalTable: "Teachers",
+                        principalColumn: "TeacherId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.InsertData(
                 table: "ContractTypes",
                 columns: new[] { "ContractId", "Name" },
@@ -660,6 +1002,17 @@ namespace Dirassati_Backend.Migrations
                     { 4, "Stagiaire" },
                     { 5, "Consultant Pédagogique" },
                     { 6, "Bénévole" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ExamTypes",
+                columns: new[] { "ExamTypeId", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Devoire1" },
+                    { 2, "Devoire2" },
+                    { 3, "Examen" },
+                    { 4, "Controle Continue" }
                 });
 
             migrationBuilder.InsertData(
@@ -701,6 +1054,16 @@ namespace Dirassati_Backend.Migrations
                     { 8, "Technique Mathématiques - Génie Mécanique" },
                     { 9, "Lettres et Philosophie" },
                     { 10, "Langues Etrangeres" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "StudentReportStatuses",
+                columns: new[] { "StudentReportStatusId", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Pending" },
+                    { 2, "Sent" },
+                    { 3, "Viewed" }
                 });
 
             migrationBuilder.InsertData(
@@ -826,9 +1189,29 @@ namespace Dirassati_Backend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bills_SchoolId",
+                table: "Bills",
+                column: "SchoolId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bills_SchoolLevelId",
+                table: "Bills",
+                column: "SchoolLevelId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Classrooms_SchoolId",
                 table: "Classrooms",
                 column: "SchoolId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Classrooms_SchoolLevelId",
+                table: "Classrooms",
+                column: "SchoolLevelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Classrooms_SpecializationId",
+                table: "Classrooms",
+                column: "SpecializationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employees_SchoolId",
@@ -846,9 +1229,10 @@ namespace Dirassati_Backend.Migrations
                 column: "AcademicYearId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Groups_LevelId",
+                name: "IX_Groups_ClassroomId",
                 table: "Groups",
-                column: "LevelId");
+                column: "ClassroomId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Groups_SchoolId",
@@ -856,9 +1240,89 @@ namespace Dirassati_Backend.Migrations
                 column: "SchoolId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Groups_StreamId",
+                name: "IX_Groups_SchoolLevelLevelId",
                 table: "Groups",
-                column: "StreamId");
+                column: "SchoolLevelLevelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Groups_SpecializationId",
+                table: "Groups",
+                column: "SpecializationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_ClassroomId",
+                table: "Lessons",
+                column: "ClassroomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_GroupId",
+                table: "Lessons",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_SchoolId",
+                table: "Lessons",
+                column: "SchoolId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_SubjectId",
+                table: "Lessons",
+                column: "SubjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_TeacherId",
+                table: "Lessons",
+                column: "TeacherId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_TimeslotId",
+                table: "Lessons",
+                column: "TimeslotId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LevelSubjectHours_SchoolId",
+                table: "LevelSubjectHours",
+                column: "SchoolId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LevelSubjectHours_SubjectId",
+                table: "LevelSubjectHours",
+                column: "SubjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_AcademicYearId",
+                table: "Notes",
+                column: "AcademicYearId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_ExamTypeId",
+                table: "Notes",
+                column: "ExamTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_GroupId",
+                table: "Notes",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_SchoolId",
+                table: "Notes",
+                column: "SchoolId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_StudentId",
+                table: "Notes",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_SubjectId",
+                table: "Notes",
+                column: "SubjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_TeacherId",
+                table: "Notes",
+                column: "TeacherId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Parents_UserId",
@@ -879,7 +1343,8 @@ namespace Dirassati_Backend.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Schools_AddressId",
                 table: "Schools",
-                column: "AddressId");
+                column: "AddressId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Schools_SchoolTypeId",
@@ -887,9 +1352,40 @@ namespace Dirassati_Backend.Migrations
                 column: "SchoolTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SchoolScheduleConfig_SchoolId",
+                table: "SchoolScheduleConfig",
+                column: "SchoolId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SchoolSpecialization_SpecializationsSpecializationId",
                 table: "SchoolSpecialization",
                 column: "SpecializationsSpecializationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentPayments_ParentId",
+                table: "StudentPayments",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentPayments_StudentId",
+                table: "StudentPayments",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentReports_StudentId",
+                table: "StudentReports",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentReports_StudentReportStatusId",
+                table: "StudentReports",
+                column: "StudentReportStatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentReports_TeacherId",
+                table: "StudentReports",
+                column: "TeacherId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Students_GroupId",
@@ -927,6 +1423,11 @@ namespace Dirassati_Backend.Migrations
                 column: "TeachersTeacherId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TeacherAvailabilities_TeacherId",
+                table: "TeacherAvailabilities",
+                column: "TeacherId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Teachers_ContractTypeId",
                 table: "Teachers",
                 column: "ContractTypeId");
@@ -942,19 +1443,9 @@ namespace Dirassati_Backend.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Teaches_GroupId",
-                table: "Teaches",
-                column: "GroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Teaches_SubjectId",
-                table: "Teaches",
-                column: "SubjectId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Teaches_TeacherId",
-                table: "Teaches",
-                column: "TeacherId");
+                name: "IX_Timeslots_SchoolId",
+                table: "Timeslots",
+                column: "SchoolId");
         }
 
         /// <inheritdoc />
@@ -979,28 +1470,55 @@ namespace Dirassati_Backend.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Classrooms");
+                name: "Employees");
 
             migrationBuilder.DropTable(
-                name: "Employees");
+                name: "Lessons");
+
+            migrationBuilder.DropTable(
+                name: "LevelSubjectHours");
+
+            migrationBuilder.DropTable(
+                name: "Notes");
 
             migrationBuilder.DropTable(
                 name: "PhoneNumbers");
 
             migrationBuilder.DropTable(
+                name: "SchoolScheduleConfig");
+
+            migrationBuilder.DropTable(
                 name: "SchoolSpecialization");
+
+            migrationBuilder.DropTable(
+                name: "StudentPayments");
+
+            migrationBuilder.DropTable(
+                name: "StudentReports");
 
             migrationBuilder.DropTable(
                 name: "SubjectTeacher");
 
             migrationBuilder.DropTable(
-                name: "Teaches");
-
-            migrationBuilder.DropTable(
-                name: "Students");
+                name: "TeacherAvailabilities");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Timeslots");
+
+            migrationBuilder.DropTable(
+                name: "ExamTypes");
+
+            migrationBuilder.DropTable(
+                name: "Bills");
+
+            migrationBuilder.DropTable(
+                name: "StudentReportStatuses");
+
+            migrationBuilder.DropTable(
+                name: "Students");
 
             migrationBuilder.DropTable(
                 name: "Subjects");
@@ -1024,16 +1542,19 @@ namespace Dirassati_Backend.Migrations
                 name: "AcademicYears");
 
             migrationBuilder.DropTable(
-                name: "SchoolLevels");
-
-            migrationBuilder.DropTable(
-                name: "Specializations");
+                name: "Classrooms");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "SchoolLevels");
+
+            migrationBuilder.DropTable(
                 name: "Schools");
+
+            migrationBuilder.DropTable(
+                name: "Specializations");
 
             migrationBuilder.DropTable(
                 name: "Adresses");

@@ -5,13 +5,14 @@ using Dirassati_Backend.Features.Notes.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Dirassati_Backend.Features.Students.Repositories;
 using Dirassati_Backend.Domain.Services;
-using Persistence;
+
 using Microsoft.EntityFrameworkCore;
 using Dirassati_Backend.Data.DTOs;
 using System.Text;
 using System.Globalization;
 using CsvHelper;
 using System.Security.Claims;
+using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Controllers
 {
@@ -68,7 +69,7 @@ namespace Dirassati_Backend.Controllers
         }
 
         [HttpGet("template")]
-        public async Task<IActionResult> GetCsvTemplate([FromQuery] int groupId)
+        public async Task<IActionResult> GetCsvTemplate([FromQuery] Guid groupId)
         {
             try
             {
@@ -154,7 +155,7 @@ namespace Dirassati_Backend.Controllers
             }
         }
 
-        private (bool IsValid, string ErrorMessage) ValidateRecord(CsvNoteRecord record, List<Student> students, int groupId)
+        private (bool IsValid, string ErrorMessage) ValidateRecord(CsvNoteRecord record, List<Student> students, Guid groupId)
         {
             if (!record.Value.HasValue)
                 return (false, $"Missing value for {record.FirstName} {record.LastName}");

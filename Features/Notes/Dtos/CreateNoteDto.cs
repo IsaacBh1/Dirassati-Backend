@@ -9,6 +9,6 @@ namespace Dirassati_Backend.Features.Notes.Dtos
         public int ExamTypeId { get; set; }
         public int SubjectId { get; set; }
         public double Value { get; set; }
-        public int GroupId { get; set; }
+        public Guid GroupId { get; set; }
     }
 }

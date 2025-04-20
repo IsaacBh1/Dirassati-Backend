@@ -40,7 +40,7 @@ namespace Dirassati_Backend.Data.Models
         public Guid SchoolId { get; set; }
         [ForeignKey(nameof(SchoolId))]
         public School? School { get; set; }
-        public int GroupId { get; set; }
+        public Guid GroupId { get; set; }
         [ForeignKey(nameof(GroupId))]
         public Group? Group { get; set; }
         public DateTime CreatedAt { get; set; }

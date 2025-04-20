@@ -377,11 +377,11 @@ namespace Dirassati_Backend.Migrations
                     b.Property<int>("AcademicYearId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ClassroomId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid>("ClassroomId")
+                        .HasColumnType("TEXT");
 
-                    b.Property<int>("GroupId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("TEXT");
@@ -453,8 +453,8 @@ namespace Dirassati_Backend.Migrations
                     b.Property<int>("ExamTypeId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("GroupId")
-                        .HasColumnType("INTEGER");
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("TEXT");
@@ -1061,54 +1061,7 @@ namespace Dirassati_Backend.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Dirassati_Backend.Domain.Models.ContractType", b =>
-                {
-                    b.Property<int>("ContractId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ContractId");
-
-                    b.ToTable("ContractTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            ContractId = 1,
-                            Name = "Contrats Permanents"
-                        },
-                        new
-                        {
-                            ContractId = 2,
-                            Name = "Contrats à Durée Déterminée"
-                        },
-                        new
-                        {
-                            ContractId = 3,
-                            Name = "Contrats à Temps Partiel ou Horaire"
-                        },
-                        new
-                        {
-                            ContractId = 4,
-                            Name = "Stagiaire"
-                        },
-                        new
-                        {
-                            ContractId = 5,
-                            Name = "Consultant Pédagogique"
-                        },
-                        new
-                        {
-                            ContractId = 6,
-                            Name = "Bénévole"
-                        });
-                });
-
-            modelBuilder.Entity("Dirassati_Backend.Domain.Models.Subject", b =>
+            modelBuilder.Entity("Dirassati_Backend.Data.Models.Subject", b =>
                 {
                     b.Property<int>("SubjectId")
                         .ValueGeneratedOnAdd()
@@ -1417,6 +1370,65 @@ namespace Dirassati_Backend.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Teachers");
+                });
+
+            modelBuilder.Entity("Dirassati_Backend.Data.Models.TeacherAvailability", b =>
+                {
+                    b.Property<int>("AvailabilityId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Day")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("TeacherId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("AvailabilityId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("TeacherAvailabilities");
+                });
+
+            modelBuilder.Entity("Dirassati_Backend.Data.Models.Timeslot", b =>
+                {
+                    b.Property<int>("TimeslotId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Day")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsMorningSlot")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsSpecialDay")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("TimeslotId");
+
+                    b.HasIndex("SchoolId");
+
+                    b.ToTable("Timeslots", t =>
+                        {
+                            t.HasCheckConstraint("CK_Timeslot_EndAfterStart", "EndTime > StartTime");
+                        });
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.ContractType", b =>
@@ -1768,13 +1780,13 @@ namespace Dirassati_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dirassati_Backend.Domain.Models.Subject", "Subject")
+                    b.HasOne("Dirassati_Backend.Data.Models.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Teacher", "Teacher")
+                    b.HasOne("Dirassati_Backend.Data.Models.Teacher", "Teacher")
                         .WithMany()
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1813,7 +1825,7 @@ namespace Dirassati_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dirassati_Backend.Domain.Models.Subject", "Subject")
+                    b.HasOne("Dirassati_Backend.Data.Models.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1858,13 +1870,13 @@ namespace Dirassati_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Dirassati_Backend.Domain.Models.Subject", "Subject")
+                    b.HasOne("Dirassati_Backend.Data.Models.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Teacher", "Teacher")
+                    b.HasOne("Dirassati_Backend.Data.Models.Teacher", "Teacher")
                         .WithMany()
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2049,7 +2061,7 @@ namespace Dirassati_Backend.Migrations
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("Dirassati_Backend.Domain.Models.Teach", b =>
+            modelBuilder.Entity("Dirassati_Backend.Data.Models.Teacher", b =>
                 {
                     b.HasOne("Dirassati_Backend.Domain.Models.ContractType", "ContractType")
                         .WithMany("Teachers")
@@ -2074,6 +2086,28 @@ namespace Dirassati_Backend.Migrations
                     b.Navigation("School");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Dirassati_Backend.Data.Models.TeacherAvailability", b =>
+                {
+                    b.HasOne("Dirassati_Backend.Data.Models.Teacher", "Teacher")
+                        .WithMany("Availabilities")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("Dirassati_Backend.Data.Models.Timeslot", b =>
+                {
+                    b.HasOne("Dirassati_Backend.Data.Models.School", "School")
+                        .WithMany("Timeslots")
+                        .HasForeignKey("SchoolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("School");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -2252,12 +2286,14 @@ namespace Dirassati_Backend.Migrations
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Teacher", b =>
                 {
+                    b.Navigation("Availabilities");
+
                     b.Navigation("StudentReports");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Domain.Models.ContractType", b =>
                 {
-                    b.Navigation("StudentReports");
+                    b.Navigation("Teachers");
                 });
 #pragma warning restore 612, 618
         }
