@@ -77,7 +77,9 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
                 studentDto.parentInfosDTO.NationalIdentityNumber,
                 studentDto.parentInfosDTO
             );
-
+            var isStudentExist =await dbContext.Students.AnyAsync(s => s.FirstName == studentDto.studentInfosDTO.FirstName && s.LastName == studentDto.studentInfosDTO.LastName && s.ParentId == parentId);
+            if (isStudentExist )
+                return result.Failure("Student already exists", 400);
             var student = new Data.Models.Student
             {
                 FirstName = studentDto.studentInfosDTO.FirstName,
@@ -167,6 +169,9 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
             {
                 try
                 {
+                    var allSchoolLevels = await dbContext.SchoolLevels
+                        .Where(s => s.SchoolTypeId == school.SchoolTypeId)
+                        .ToListAsync();
                     // Validate the record
                     var validationErrors = ValidateStudentCsvRecord(record, school.SchoolTypeId);
                     if (validationErrors.Count != 0)
@@ -175,7 +180,7 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
                         importResult.FailedImports++;
                         continue;
                     }
-                    var schoolLevel =(await dbContext.SchoolLevels.FirstOrDefaultAsync(s =>s.SchoolTypeId==school.SchoolTypeId && s.LevelYear == ParseInt(record.LevelYear))) ;
+                    var schoolLevel =( allSchoolLevels.FirstOrDefault(s => s.LevelYear == ParseInt(record.LevelYear))) ;
                     if (schoolLevel == null)
                     {
                         importResult.Errors.Add($"Row for student {record.StudentFirstName} {record.StudentLastName}: Invalid school level");

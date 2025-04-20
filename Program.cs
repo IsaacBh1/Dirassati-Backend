@@ -3,6 +3,7 @@ using Dirassati_Backend.Configurations;
 using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Extensions;
 using Dirassati_Backend.Features.Abcenses.services;
+using Dirassati_Backend.Features.Auth.Register.Services;
 using Dirassati_Backend.Features.Auth.SignUp;
 using Dirassati_Backend.Features.Teachers.Services;
 using Dirassati_Backend.Hubs;
