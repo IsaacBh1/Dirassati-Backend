@@ -10,7 +10,7 @@ namespace Dirassati_Backend.Features.Groups.Controllers;
 [Tags("Group")]
 [Route("api/group/students")]
 [ApiController]
-public class 
+public class
     GroupStudentsController(AppDbContext context, IGroupServices groupServices) : BaseController
 {
     private readonly AppDbContext _context = context;
@@ -44,7 +44,7 @@ public class
 
         return Ok(students);
     }
-   
+
     /// <summary>
     /// Creates a new group with optional student assignments
     /// </summary>
@@ -57,29 +57,15 @@ public class
         {
             return BadRequest(ModelState);
         }
-            
+
         var schoolId = User.FindFirstValue("SchoolId");
         if (string.IsNullOrEmpty(schoolId))
             return Unauthorized("School ID is missing from user claims");
-                
+
         var result = await _groupServices.AddGroupAsync(addGroupDto, schoolId);
         return HandleResult(result);
     }
 
-    /// <summary>
-    /// Gets all groups for a specific school level
-    /// </summary>
-    /// <param name="levelId">The school level ID</param>
-    /// <returns>List of groups for the specified level</returns>
-    [HttpGet("by-level/{levelId:int}")]
-    public async Task<IActionResult> GetGroupsByLevel(int levelId)
-    {
-        var schoolId = User.FindFirstValue("SchoolId");
-        if (string.IsNullOrEmpty(schoolId))
-            return Unauthorized("School ID is missing from user claims");
-                
-        var result = await _groupServices.GetGroupsByLevelIdAsync(levelId, schoolId);
-        return HandleResult(result);
-    }
+
 
 }

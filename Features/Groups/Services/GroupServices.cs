@@ -45,7 +45,7 @@ namespace Dirassati_Backend.Features.Groups.Services
 
                 // Check if group name already exists in the school
                 var groupNameExists = await context.Groups
-                    .AnyAsync(g => g.SchoolId == parsedSchoolId && 
+                    .AnyAsync(g => g.SchoolId == parsedSchoolId &&
                                   g.GroupName.ToLower() == addGroupDto.GroupName.ToLower());
 
                 if (groupNameExists)
@@ -113,10 +113,10 @@ namespace Dirassati_Backend.Features.Groups.Services
                         StudentId = s.StudentId,
                         FirstName = s.FirstName,
                         LastName = s.LastName,
-                   
+
                     })
                     .ToListAsync();
-                var specializationName  = await context.Specializations
+                var specializationName = await context.Specializations
                     .Where(s => s.SpecializationId == classroom.SpecializationId)
                     .Select(s => s.Name)
                     .FirstOrDefaultAsync();
@@ -147,71 +147,111 @@ namespace Dirassati_Backend.Features.Groups.Services
             }
         }
 
-        public async Task<Result<List<GroupListingDto>, string>> GetGroupsByLevelIdAsync(int levelId, string schoolId)
+        public async Task<Result<List<GroupListingDto>, string>> GetAllGroupsOrByLevelIdAsync(int? levelId, string schoolId)
         {
             var result = new Result<List<GroupListingDto>, string>();
 
             try
             {
-                logger.LogInformation("Getting groups for school {SchoolId} and level {LevelId}", schoolId, levelId);
+                logger.LogInformation("Getting groups for school {SchoolId} {LevelFilter}",
+                    schoolId, levelId.HasValue ? $"filtered by level {levelId}" : "for all levels");
 
+                // Validate school ID format
                 if (!Guid.TryParse(schoolId, out var parsedSchoolId))
                 {
-                    logger.LogWarning("Invalid school ID provided: {SchoolId}", schoolId);
-                    return result.Failure("Invalid school ID", (int)HttpStatusCode.BadRequest);
+                    logger.LogWarning("Invalid school ID format: {SchoolId}", schoolId);
+                    return result.Failure("Invalid school ID format", (int)HttpStatusCode.BadRequest);
                 }
 
-                // Verify if level exists
-                bool levelExists = await context.SchoolLevels.AnyAsync(l => l.LevelId == levelId);
-                if (!levelExists)
+                // Verify school exists
+                bool schoolExists = await context.Schools.AnyAsync(s => s.SchoolId == parsedSchoolId);
+                if (!schoolExists)
                 {
-                    logger.LogWarning("School level with ID {LevelId} not found", levelId);
-                    return result.Failure("School level not found", (int)HttpStatusCode.NotFound);
+                    logger.LogWarning("School with ID {SchoolId} not found", schoolId);
+                    return result.Failure("School not found", (int)HttpStatusCode.NotFound);
                 }
 
-                // Get classrooms associated with this level
-                var classroomIds = await context.Classrooms
-                    .Where(c => c.SchoolId == parsedSchoolId && c.SchoolLevelId == levelId)
-                    .Select(c => c.ClassroomId)
+                // Verify level exists if provided
+                if (levelId.HasValue)
+                {
+                    bool levelExists = await context.SchoolLevels.AnyAsync(l => l.LevelId == levelId.Value);
+                    if (!levelExists)
+                    {
+                        logger.LogWarning("School level with ID {LevelId} not found", levelId.Value);
+                        return result.Failure("School level not found", (int)HttpStatusCode.NotFound);
+                    }
+                }
+
+                // Get classroom IDs based on filter criteria
+
+
+
+                List<Guid> classroomIds = [];
+                if (levelId is not null)
+                {
+
+                    classroomIds = await context.Classrooms
+                       .Where(c => c.SchoolId == parsedSchoolId && c.SchoolLevelId == levelId).Select(c => c.ClassroomId).ToListAsync();
+                    // If no classrooms match the criteria
+                    if (classroomIds.Count == 0)
+                    {
+                        logger.LogInformation("No classrooms found for the specified criteria. " +
+                            "SchoolId: {SchoolId}, LevelId: {LevelId}", schoolId, levelId);
+                        return result.Success([]);
+                    }
+                }
+
+
+
+                // Get groups with their details
+                var groups = await context.Groups
+                    .Where(g => levelId != null ? g.SchoolId == parsedSchoolId && classroomIds.Contains(g.ClassroomId) : g.SchoolId == parsedSchoolId)
+                    .Include(g => g.Classroom)
+                        .ThenInclude(c => c!.SchoolLevel)
+
+                    .Select(g => new
+                    {
+                        g.GroupId,
+                        g.GroupName,
+                        g.Classroom!.SchoolLevelId,
+                        g.GroupCapacity,
+                        StudentCount = context.Students.Count(s => s.GroupId == g.GroupId),
+                        g.Classroom.SchoolLevel.LevelYear,
+                        SchoolTypeName = g.Classroom.SchoolLevel.SchoolType.Name,
+                        SpecializationName = g.Classroom.SpecializationId.HasValue ?
+                            context.Specializations
+                                .Where(s => s.SpecializationId == g.Classroom.SpecializationId)
+                                .Select(s => s.Name)
+                                .FirstOrDefault() :
+                            null
+                    })
                     .ToListAsync();
 
-            var groups = await context.Groups
-                        .Where(g => g.SchoolId == parsedSchoolId && classroomIds.Contains(g.ClassroomId))
-                        .Include(g => g.Classroom)
-                            .ThenInclude(c => c!.SchoolLevel)
-                        .Select(g => new
-                        {
-                            g.GroupId,
-                            g.GroupName,
-                            g.Classroom!.SchoolLevelId,
-                            g.GroupCapacity,
-                            StudentCount = context.Students.Count(s => s.GroupId == g.GroupId),
-                            g.Classroom.SchoolLevel.LevelYear
-                        })
-                        .ToListAsync();
-                    
-                    var groupDtos = groups.Select(g => new GroupListingDto
+                // Map to DTOs with full level information
+                var groupDtos = groups.Select(g => new GroupListingDto
+                {
+                    GroupId = g.GroupId,
+                    GroupName = g.GroupName,
+                    LevelId = g.SchoolLevelId,
+                    GroupCapacity = g.GroupCapacity,
+                    StudentCount = g.StudentCount,
+                    Level = new LevelDto
                     {
-                        GroupId = g.GroupId,
-                        GroupName = g.GroupName,
                         LevelId = g.SchoolLevelId,
-                        GroupCapacity = g.GroupCapacity,
-                        StudentCount = g.StudentCount,
-                        Level = new LevelDto
-                        {
-                            LevelId = g.SchoolLevelId,
-                            
-                        }
-                    }).ToList();
+                        Year = g.LevelYear,
+                        SchoolType = g.SchoolTypeName,
+                        Specialization = g.SpecializationName
+                    }
+                }).ToList();
 
-                logger.LogInformation("Retrieved {GroupCount} groups for school {SchoolId} and level {LevelId}",
-                    groups.Count, parsedSchoolId, levelId);
+                logger.LogInformation("Retrieved {GroupCount} groups for school {SchoolId} {LevelInfo}",
+                    groups.Count, parsedSchoolId, levelId.HasValue ? $"for level {levelId}" : "across all levels");
 
                 return result.Success(groupDtos);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error occurred while retrieving groups by level: {ErrorMessage}", ex.Message);
+                logger.LogError(ex, "Error occurred while retrieving groups: {ErrorMessage}", ex.Message);
                 return result.Failure("An error occurred while retrieving the groups", (int)HttpStatusCode.InternalServerError);
             }
         }
