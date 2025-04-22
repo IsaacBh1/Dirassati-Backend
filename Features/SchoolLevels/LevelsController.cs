@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using Dirassati_Backend.Common;
+using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Features.SchoolLevels.DTOs;
 using Dirassati_Backend.Features.SchoolLevels.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -8,14 +10,14 @@ namespace Dirassati_Backend.Features.SchoolLevels;
 public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseController
 {
     [HttpGet]
-    public async Task<ActionResult<List<GetSchoolLevelDTO>>> GetLevels()
+    public async Task<ActionResult<List<GetSchoolLevelDto>>> GetLevels()
     {
         return await schoolLevelServices.GetAllLevelsAsync();
     }
 
 
     [HttpGet("specializations")]
-    public async Task<ActionResult<List<SpecializationDTO>>> GetAllSpecializations()
+    public async Task<ActionResult<List<SpecializationDto>>> GetAllSpecializations()
     {
         return await schoolLevelServices.GetAllSpecializationsAsync();
     }
@@ -23,7 +25,7 @@ public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseCon
 
     [HttpGet("specializations/school")]
 
-    public async Task<ActionResult<List<SpecializationDTO>>> GetSchoolSpecializations()
+    public async Task<ActionResult<List<SpecializationDto>>> GetSchoolSpecializations()
     {
         var schoolId = User.FindFirstValue("SchoolId");
         if (schoolId is null)
@@ -36,7 +38,7 @@ public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseCon
 
     [HttpPut("specializations/add")]
 
-    public async Task<ActionResult> EditSpecialization(EditSpecializationDTO specializationDTO)
+    public async Task<ActionResult> EditSpecialization(EditSpecializationDto specializationDTO)
     {
         var result = await schoolLevelServices.EditSchoolSpecializations(User.FindFirstValue("SchoolId")!, specializationDTO.SpecializationIds);
         return HandleResult(result);

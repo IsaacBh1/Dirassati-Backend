@@ -9,8 +9,8 @@ namespace Dirassati_Backend.Data.Models
         [Required]
         public Guid SchoolId { get; set; }
         public int TimeslotId { get; set; }
-        public int ClassroomId { get; set; }
-        public int GroupId { get; set; }
+        public Guid ClassroomId { get; set; }
+        public Guid GroupId { get; set; }
         public int SubjectId { get; set; }
         public Guid TeacherId { get; set; }
         public int AcademicYearId { get; set; }

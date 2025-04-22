@@ -9,7 +9,7 @@ namespace Dirassati_Backend.Common.Services.ConnectionTracker
         public void AddConnection(string userId, string connectionId)
         {
             _userConnections.AddOrUpdate(userId,
-                new List<string> { connectionId },
+                [connectionId],
                 (key, existingList) =>
                 {
                     existingList.Add(connectionId);
@@ -20,7 +20,7 @@ namespace Dirassati_Backend.Common.Services.ConnectionTracker
         public void RemoveConnection(string userId, string connectionId)
         {
             _userConnections.AddOrUpdate(userId,
-                new List<string>(),
+                [],
                 (key, existingList) =>
                 {
                     existingList.Remove(connectionId);

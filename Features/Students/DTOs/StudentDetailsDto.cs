@@ -1,5 +1,3 @@
-using System;
-
 namespace Dirassati_Backend.Features.Students.DTOs
 {
     public record StudentDetailsDto
@@ -20,6 +18,6 @@ namespace Dirassati_Backend.Features.Students.DTOs
         DateOnly EnrollmentDate,
         Guid ParentId,
         bool IsActive,
-        int? GroupId
+        Guid? GroupId
     );
 }

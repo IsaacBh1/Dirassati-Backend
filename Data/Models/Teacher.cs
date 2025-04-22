@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Domain.Models;
 
-
-public partial class Teacher
+namespace Dirassati_Backend.Data.Models
 {
+
+    public partial class Teacher
+    {
+
     [Key]
     public Guid TeacherId { get; set; } = Guid.NewGuid();
     public string UserId { get; set; } = string.Empty;
@@ -19,4 +21,6 @@ public partial class Teacher
     public virtual ICollection<StudentReport> StudentReports { get; set; } = [];
     public virtual ICollection<TeacherAvailability?>? Availabilities { get; set; } = new List<TeacherAvailability?>();
 
+
+    }
 }

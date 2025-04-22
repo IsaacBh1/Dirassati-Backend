@@ -2,8 +2,8 @@ using AutoMapper;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Common; // Contains PaginatedResult<T>
 using Dirassati_Backend.Features.Parents.Dtos;
+using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Dirassati_Backend.Features.Parents.Repositories
 {
@@ -104,7 +104,7 @@ namespace Dirassati_Backend.Features.Parents.Repositories
         }
 
         // Gets students by a parent's ID (returns a collection of getStudentDto)
-        public async Task<IEnumerable<getStudentDto>> GetStudentsByParentIdAsync(Guid parentId)
+        public async Task<IEnumerable<GetStudentDto>> GetStudentsByParentIdAsync(Guid parentId)
         {
             var students = await _context.Students
                 .Include(s => s.SchoolLevel) // Ensure this relationship is loaded
@@ -112,7 +112,7 @@ namespace Dirassati_Backend.Features.Parents.Repositories
                 .Where(s => s.ParentId == parentId)
                 .ToListAsync();
 
-            return students.Select(s => new getStudentDto
+            return students.Select(s => new GetStudentDto
             {
                 StudentId = s.StudentId,
                 FirstName = s.FirstName,
@@ -125,7 +125,7 @@ namespace Dirassati_Backend.Features.Parents.Repositories
         }
 
         // Gets a parent by a student's ID (returns getStudentParentDto)
-        public async Task<getStudentParentDto?> GetParentByStudentIdAsync(Guid studentId)
+        public async Task<GetStudentParentDto?> GetParentByStudentIdAsync(Guid studentId)
         {
             var student = await _context.Students
                 .Include(s => s.Parent)   // Navigation property in Student
@@ -136,7 +136,7 @@ namespace Dirassati_Backend.Features.Parents.Repositories
             if (student?.Parent == null)
                 return null;
 
-            return new getStudentParentDto
+            return new GetStudentParentDto
             {
                 ParentId = student.Parent.ParentId,
                 FirstName = student.Parent.User.FirstName,

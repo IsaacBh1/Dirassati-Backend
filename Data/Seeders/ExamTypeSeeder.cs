@@ -1,4 +1,3 @@
-using Persistence;
 using Dirassati_Backend.Data.Models;
 using Microsoft.EntityFrameworkCore;
 

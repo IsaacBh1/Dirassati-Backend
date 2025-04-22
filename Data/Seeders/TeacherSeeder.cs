@@ -1,4 +1,5 @@
 using Dirassati_Backend.Domain.Models;
+using Dirassati_Backend.Features.Teachers.Dtos;
 using Dirassati_Backend.Features.Teachers.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,7 +22,7 @@ public static class TeacherSeeder
     public static async Task SeedTeachersAsync(Guid schoolId, TeacherServices teacherServices)
     {
 
-        var teachers = new List<TeacherInfosDTO>
+        var teachers = new List<TeacherInfosDto>
         {
             new() {
                     FirstName = "Alice",
@@ -127,6 +128,7 @@ public static class TeacherSeeder
         foreach (var teacher in teachers)
         {
             await teacherServices.RegisterTeacherAsync(teacher, schoolId.ToString(), true);
+
         }
     }
 }

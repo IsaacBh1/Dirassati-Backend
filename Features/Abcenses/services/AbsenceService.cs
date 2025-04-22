@@ -1,16 +1,17 @@
+using Dirassati_Backend.Common.Services.ConnectionTracker;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Absences.Repos;
 using Dirassati_Backend.Features.Groups.Repos;
-using Dirassati_Backend.Common.Services.ConnectionTracker;
+using Dirassati_Backend.Hubs;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Dirassati_Backend.Features.Absences.Services
+namespace Dirassati_Backend.Features.Abcenses.services
 {
     public class AbsenceService
     {
         private readonly IAbsenceRepository _absenceRepository;
         private readonly IGroupRepository _groupRepository;
-        private readonly IConnectionTracker _connectionTracker;
+
         private readonly IHubContext<ParentNotificationHub> _hubContext;
 
         public AbsenceService(
@@ -21,11 +22,11 @@ namespace Dirassati_Backend.Features.Absences.Services
         {
             _absenceRepository = absenceRepository;
             _groupRepository = groupRepository;
-            _connectionTracker = connectionTracker;
+
             _hubContext = hubContext;
         }
 
-        public async Task MarkAbsencesAsync(int groupId, List<Guid> absentStudentIds)
+        public async Task MarkAbsencesAsync(Guid groupId, List<Guid> absentStudentIds)
         {
             var group = await _groupRepository.GetGroupWithStudentsAsync(groupId);
             if (group == null) throw new ArgumentException("Group not found");

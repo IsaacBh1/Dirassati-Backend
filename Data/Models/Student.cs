@@ -30,15 +30,16 @@ public partial class Student
     public bool IsActive { get; set; } = true;
 
     [ForeignKey("Group")]
-    public int? GroupId { get; set; }
-    public Group? Group { get; set; }
+    public Guid? GroupId { get; set; }
+    public virtual Group? Group { get; set; }
     public ParentRelationshipToStudentType ParentRelationshipToStudentType { get; set; } = null!;
     // Navigation properties
     public virtual SchoolLevel SchoolLevel { get; set; } = null!;
     public virtual Specialization? Specialization { get; set; }
     public virtual Parent Parent { get; set; } = null!;
-    public virtual ICollection<Absence> Absences { get; set; } = new List<Absence>();
+    public virtual ICollection<Absence> Absences { get; set; } = [];
     public virtual ICollection<StudentReport> StudentReports { get; set; } = [];
+    public virtual ICollection<StudentPayment> StudentPayments { get; set; } = [];
 
 
 }

@@ -9,6 +9,6 @@ namespace Dirassati_Backend.Features.Students.Repositories
         Task<PaginatedResult<StudentDto>> GetStudentsBySchoolIdAsync(Guid schoolId, int page, int pageSize);
         Task<bool> SchoolExistsAsync(Guid schoolId);
         Task<StudentDetailsDto?> GetStudentByIdAsync(Guid studentId);
-        Task<List<Student>> GetStudentsByGroupAsync(int groupId);
+        Task<List<Student>> GetStudentsByGroupAsync(Guid groupId);
     }
 }

@@ -1,6 +1,6 @@
 namespace Dirassati_Backend.Features.SchoolLevels.DTOs;
 
-public class GetSchoolLevelDTO
+public class GetSchoolLevelDto
 {
     public int LevelId { get; set; }
     public int SchoolTypeId { get; set; }

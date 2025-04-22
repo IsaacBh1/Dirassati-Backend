@@ -1,4 +1,4 @@
-using Dirassati_Backend.Features.Absences.Services;
+using Dirassati_Backend.Features.Abcenses.services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.Abcenses.Controllers
@@ -15,7 +15,7 @@ namespace Dirassati_Backend.Features.Abcenses.Controllers
         }
 
         [HttpPost("mark/{groupId}")]
-        public async Task<IActionResult> MarkAbsences(int groupId, [FromBody] List<Guid> absentStudentIds)
+        public async Task<IActionResult> MarkAbsences(Guid groupId, [FromBody] List<Guid> absentStudentIds)
         {
             await _absenceService.MarkAbsencesAsync(groupId, absentStudentIds);
             return Ok();

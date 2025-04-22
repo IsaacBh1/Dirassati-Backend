@@ -1,32 +1,30 @@
 // Dirassati_Backend/Shared/Authorization/PermissionHandler.cs
 using Microsoft.AspNetCore.Authorization;
 
-public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
+namespace Dirassati_Backend.Features.Auth.Login
 {
-    protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
+    public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
     {
-        if (context.User.HasClaim(c => c.Type == "Permissions"))
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
         {
-            var claimValue = context.User.FindFirst("Permissions")?.Value;
-            if (int.TryParse(claimValue, out int userPermissions))
+            if (context.User.HasClaim(c => c.Type == "Permissions") &&
+                int.TryParse(context.User.FindFirst("Permissions")?.Value, out int userPermissions) &&
+                (userPermissions & requirement.RequiredPermission) == requirement.RequiredPermission)
             {
-                if ((userPermissions & requirement.RequiredPermission) == requirement.RequiredPermission)//note : this is the logic of autherization
-                {
-                    context.Succeed(requirement);
-                }
+                context.Succeed(requirement);
             }
+            return Task.CompletedTask;
         }
-        return Task.CompletedTask;
     }
-}
 
 
-public class PermissionRequirement : IAuthorizationRequirement
-{
-    public int RequiredPermission { get; }
-
-    public PermissionRequirement(int requiredPermission)
+    public class PermissionRequirement : IAuthorizationRequirement
     {
-        RequiredPermission = requiredPermission;
+        public int RequiredPermission { get; }
+
+        public PermissionRequirement(int requiredPermission)
+        {
+            RequiredPermission = requiredPermission;
+        }
     }
 }

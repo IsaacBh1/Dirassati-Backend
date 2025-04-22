@@ -1,6 +1,7 @@
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Common.Extensions;
 using Dirassati_Backend.Common.Services;
+using Dirassati_Backend.Data;
 using Dirassati_Backend.Features.Auth.Accounts.DTOs;
 using Microsoft.AspNetCore.Identity;
 
@@ -30,7 +31,7 @@ public class AccountServices(UserManager<AppUser> userManager, IEmailService ema
     }
 
 
-    public async Task<Result<string, string>> SendResetPasswordTokenAsync(RequestPasswordResetDTO resetDTO)
+    public async Task<Result<string, string>> SendResetPasswordTokenAsync(RequestPasswordResetDto resetDTO)
     {
         var result = new Result<string, string>();
         try
@@ -57,7 +58,7 @@ public class AccountServices(UserManager<AppUser> userManager, IEmailService ema
 
     private async Task SendResetPasswordEmailAsync(string email, string token)
     {
-        var frontendUrl = _configurationManager["FrontendUrl"] ?? throw new Exception("Can't find front end url");
+        var frontendUrl = _configurationManager["FrontendUrl"] ?? throw new InvalidOperationException("Can't find front end url");
         var link = $"{frontendUrl}/reset-password?token={token}&email={email}";
 
         var body = $"Click on this link to reset your password <a href=\"{link}\">this link</a>\nThe reset link is valid for 1 hour and <b>DON'T SHARE THIS LINK WITH ANYONE</b>";

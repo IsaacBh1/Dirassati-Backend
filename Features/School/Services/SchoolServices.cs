@@ -1,10 +1,12 @@
+using System.Net;
 using System.Security.Claims;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Features.School.DTOs;
+using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Dirassati_Backend.Features.School.Services;
 
@@ -17,25 +19,26 @@ public class SchoolServices(
     private readonly IMapper _mapper = mapper;
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-    public async Task<Result<GetSchoolInfoDTO, string>> GetSchoolInfosAsync()
+    public async Task<Result<GetSchoolInfoDto, string>> GetSchoolInfosAsync()
     {
-        var result = new Result<GetSchoolInfoDTO, string>();
+        var result = new Result<GetSchoolInfoDto, string>();
         var schoolId = _httpContextAccessor.HttpContext?.User.FindFirstValue("SchoolId");
         if (schoolId == null)
             return result.Failure("Unauthorized access", 401);
-
-        var school = await _dbContext.Schools.Include(s => s.SchoolType).Include(s => s.AcademicYear).Include(s => s.PhoneNumbers)
-            .FirstOrDefaultAsync(s => s.SchoolId.ToString() == schoolId);
+        if (!Guid.TryParse(schoolId, out var schoolIdGuid))
+            return result.Failure($"Invalid SchoolId Format {schoolIdGuid}", (int)HttpStatusCode.BadRequest);
+        var school = await _dbContext.Schools.ProjectTo<GetSchoolInfoDto>(_mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
 
         if (school == null)
             return result.Failure("School not found", 404);
 
-        var schoolDTO = _mapper.Map<GetSchoolInfoDTO>(school);
+        var schoolDTO = _mapper.Map<GetSchoolInfoDto>(school);
         return result.Success(schoolDTO);
     }
 
 
-    public async Task<Result<Unit, string>> UpdateSchoolInfos(UpdateSchoolInfosDTO schoolInfosDTO)
+    public async Task<Result<Unit, string>> UpdateSchoolInfos(UpdateSchoolInfosDto schoolInfosDTO)
     {
         var result = new Result<Unit, string>();
 
@@ -44,15 +47,21 @@ public class SchoolServices(
             var schoolId = _httpContextAccessor.HttpContext?.User.FindFirstValue("SchoolId");
             if (schoolId == null)
                 return result.Failure("Unauthorized access", 401);
-
+            if (!Guid.TryParse(schoolId, out var schoolIdGuid))
+                return result.Failure("Invalid School Id", (int)HttpStatusCode.BadRequest);
             var school = await _dbContext.Schools
                 .Include(s => s.Specializations)
-                .FirstOrDefaultAsync(s => s.SchoolId.ToString() == schoolId);
+                .Include(s => s.Address)
+                .Include(s => s.AcademicYear)
+                .Include(s => s.PhoneNumbers)
+                .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
 
             if (school == null)
                 return result.Failure("School not found", 404);
-
             _mapper.Map(schoolInfosDTO, school);
+            _mapper.Map(schoolInfosDTO.Address, school.Address);
+            _mapper.Map(schoolInfosDTO.AcademicYear, school.AcademicYear);
+
 
             if (school.SchoolTypeId == (int)SchoolTypeEnum.Lycee)
             {
@@ -61,7 +70,7 @@ public class SchoolServices(
                     .ToList();
 
                 bool isStudentInSpec = await _dbContext.Students.AnyAsync(s =>
-                    s.SchoolId.ToString() == schoolId &&
+                    s.SchoolId == schoolIdGuid &&
                     s.Specialization != null &&
                     specializationsToRemove.Contains(s.Specialization));
 

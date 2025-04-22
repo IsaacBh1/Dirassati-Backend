@@ -1,4 +1,5 @@
-using Persistence;
+using Dirassati_Backend.Data.Models;
+using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Repositories
 {

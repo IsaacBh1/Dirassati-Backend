@@ -1,6 +1,7 @@
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Common.Extensions;
 using Dirassati_Backend.Common.Services;
+using Dirassati_Backend.Data;
 using Microsoft.AspNetCore.Identity;
 
 namespace Dirassati_Backend.Features.Auth.Register.Services;
@@ -29,12 +30,11 @@ public class SendCridentialsService(IEmailService emailService, UserManager<AppU
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             return result.Failure(ex.Message, 500);
         }
     }
-
-
-
+    
     private async Task SendEmailAsync(string email, string password)
     {
         var body = $@"

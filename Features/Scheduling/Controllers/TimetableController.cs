@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Scheduling.Dtos;
 using Dirassati_Backend.Features.Scheduling.Services;
+using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Dirassati_Backend.Features.Scheduling;
 

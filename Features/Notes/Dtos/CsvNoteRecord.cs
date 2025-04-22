@@ -24,7 +24,7 @@ namespace Dirassati_Backend.Data.DTOs
         public int AcademicYearId { get; set; }
         public int ExamTypeId { get; set; }
         public int SubjectId { get; set; }
-        public int GroupId { get; set; }
+        public Guid GroupId { get; set; }
         public IFormFile CsvFile { get; set; } = null!;
     }
 }

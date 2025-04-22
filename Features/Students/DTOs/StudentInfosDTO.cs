@@ -1,6 +1,6 @@
 namespace Dirassati_Backend.Features.Students.DTOs;
 
-public class StudentInfosDTO
+public class StudentInfosDto
 {
 
     public string FirstName { get; set; } = null!;

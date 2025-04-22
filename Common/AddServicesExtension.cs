@@ -12,8 +12,16 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Persistence;
 using Dirassati_Backend.Common.Services.ConnectionTracker;
+using Dirassati_Backend.Common.Services.EmailService;
+using Dirassati_Backend.Features.Payments.Services;
+using Dirassati_Backend.Hubs.Services;
+using Dirassati_Backend.Data;
+using Dirassati_Backend.Features.Classrooms.Services;
+using Dirassati_Backend.Features.Groups.Services;
+using Dirassati_Backend.Features.Notes.Repos;
+using Dirassati_Backend.Features.Notes.Services;
+using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Common;
 
@@ -59,8 +67,11 @@ public static class AddServicesExtension
         builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
         builder.Services.AddHttpContextAccessor();
-        builder.Services
-    .AddFluentEmail(builder.Configuration["Email:SenderEmail"], builder.Configuration["Email:SenderName"])
+        var provider = builder.Configuration["Email:Provider"];
+        if (provider == "smtp")
+        {
+            builder.Services
+    .AddFluentEmail(builder.Configuration["Email:SenderEmail"] ?? throw new InvalidOperationException("Sender Email not found"), builder.Configuration["Email:SenderName"])
     .AddSmtpSender(new SmtpClient
     {
         Host = builder.Configuration["Email:Host"] ?? throw new InvalidOperationException("Check the SMTP server configuration"),
@@ -68,6 +79,17 @@ public static class AddServicesExtension
         EnableSsl = false,
         DeliveryMethod = SmtpDeliveryMethod.Network
     });
+        }
+        else if (provider == "postmark")
+        {
+            var apiKey = builder.Configuration["Email:PostMartAPI_KEY"];
+            builder.Services
+       .AddFluentEmail(builder.Configuration["Email:SenderEmail"], builder.Configuration["Email:SenderName"])
+       .AddPostmarkSender(apiKey);
+        }
+        else
+            throw new InvalidOperationException("Invalid  Email provider configuration , please choose between smtp or postmark");
+
         // Add logging
         builder.Services.AddLogging(loggingBuilder =>
         {
@@ -89,7 +111,14 @@ public static class AddServicesExtension
         builder.Services.AddScoped<SendCridentialsService>();
         builder.Services.AddScoped<ISchoolService, SchoolServices>();
         builder.Services.AddScoped<AccountServices>();
-
+        builder.Services.AddHttpClient<IChargilyClient, ChargilyClient>();
+        builder.Services.AddScoped<IPaymentService, PaymentService>();
+        builder.Services.AddScoped<BillServices>();
+        builder.Services.AddScoped<IParentNotificationServices, ParentNotificationServices>();
+        builder.Services.AddScoped<IGroupServices, GroupServices>();
+        builder.Services.AddScoped<IClassroomServices, ClassroomServices>();
+        builder.Services.AddScoped<INoteRepository, NoteRepository>();
+        builder.Services.AddScoped<INotesServices, NoteService>();
         return builder;
     }
 }

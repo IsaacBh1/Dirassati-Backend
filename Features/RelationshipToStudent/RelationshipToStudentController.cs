@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Dirassati_Backend.Features.RelationshipToStudent.DTOs;
+using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Features.ParentRelationShip
 {
@@ -10,9 +10,9 @@ namespace Dirassati_Backend.Features.ParentRelationShip
     public class RelationshipToStudentController(AppDbContext context) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetRelationshipsDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<GetRelationshipsDto>>> GetAll()
         {
-            var relationships = await context.ParentRelationshipToStudentTypes.Select(r => new GetRelationshipsDTO { Id = r.Id, Name = r.Name }).ToListAsync();
+            var relationships = await context.ParentRelationshipToStudentTypes.Select(r => new GetRelationshipsDto { Id = r.Id, Name = r.Name }).ToListAsync();
             return Ok(relationships);
         }
     }

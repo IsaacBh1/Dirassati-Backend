@@ -1,3 +1,5 @@
+using Dirassati_Backend.Common;
+using Dirassati_Backend.Data;
 using Dirassati_Backend.Features.Auth.Accounts.DTOs;
 using Dirassati_Backend.Features.Auth.Accounts.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +16,7 @@ public class AccountsController(AccountServices accountServices, UserManager<App
     private readonly UserManager<AppUser> _userManager = userManager;
 
     [HttpPost("request-password-reset")]
-    public async Task<ActionResult> ReqeuestPasswordReset(RequestPasswordResetDTO requestPasswordResetDTO)
+    public async Task<ActionResult> ReqeuestPasswordReset(RequestPasswordResetDto requestPasswordResetDTO)
     {
 
         return HandleResult(await _accountServices.SendResetPasswordTokenAsync(requestPasswordResetDTO));

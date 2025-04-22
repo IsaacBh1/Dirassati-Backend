@@ -1,28 +1,21 @@
 using System.Security.Claims;
+using Dirassati_Backend.Common;
 using Dirassati_Backend.Features.Teachers.Dtos;
 using Dirassati_Backend.Features.Teachers.Services;
-using Dirassati_Backend.Hubs.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Dirassati_Backend.Features.Teachers.Controllers;
 
 [ApiController]
 [Authorize]
 [Route("api/teacher")]
-public class TeacherController : BaseController
+public class TeacherController(TeacherServices teacherServices) : BaseController
 {
-    private readonly TeacherServices _teacherServices;
-    private readonly IHubContext<ParentNotificationHub, IParentClient> _hubContext;
-    public TeacherController(TeacherServices teacherServices, IHubContext<ParentNotificationHub, IParentClient> hubContext)
-    {
-        _teacherServices = teacherServices;
-        _hubContext = hubContext;
-    }
+    private readonly TeacherServices _teacherServices = teacherServices;
 
     [HttpPost("create")]
-    public async Task<IActionResult> CreateTeacher([FromBody] TeacherInfosDTO teacherDto)
+    public async Task<IActionResult> CreateTeacher([FromBody] TeacherInfosDto teacherDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -42,7 +35,7 @@ public class TeacherController : BaseController
     }
 
     [HttpGet("{id}", Name = "GetTeacherInfo")]
-    public async Task<ActionResult<GetTeacherInfosDTO>> GetTeacherInfo(string id)
+    public async Task<ActionResult<GetTeacherInfosDto>> GetTeacherInfo(string id)
     {
         var schoolId = User.FindFirstValue("SchoolId");
         if (schoolId is null)
@@ -51,7 +44,7 @@ public class TeacherController : BaseController
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<GetTeacherInfosDTO>>> GetTeachers()
+    public async Task<ActionResult<List<GetTeacherInfosDto>>> GetTeachers()
     {
         var schoolId = User.FindFirstValue("SchoolId");
         if (schoolId is null)
@@ -60,13 +53,19 @@ public class TeacherController : BaseController
     }
 
     [HttpGet("contract-types")]
-    public async Task<ActionResult<List<ContractTypeDTO>>> GetContractTypes()
+    public async Task<ActionResult<List<ContractTypeDto>>> GetContractTypes()
     {
         return HandleResult(await _teacherServices.GetContractTypes());
     }
 
 
-    [HttpPost("/reports/add")]
+    /// <summary>
+    /// Add teacher report
+    /// </summary>
+    /// <param name="reportDto"></param>
+    /// <returns></returns>
+
+    [HttpPost("reports/add")]
     public async Task<ActionResult<GetStudentReportDto>> AddTeacherReport([FromBody] AddStudentReportDto reportDto)
     {
 

@@ -1,19 +1,36 @@
 @echo off
-echo 🔄 Pulling the latest code...
+setlocal enabledelayedexpansion
+
+:: Function to check if the previous command succeeded
+:check_error
+if %errorlevel% neq 0 (
+    echo [31m❌ Error: %~1[0m
+    exit /b 1
+)
+goto :eof
+
+:: Navigate to project root
+echo [34m📡 Pulling latest code...[0m
+cd ..\..
+call :check_error "Failed to navigate to project root"
+
+:: Pull latest changes
 git pull origin main
+call :check_error "Failed to pull latest changes"
 
-echo ✅ After the container is started the Backend will run at:
-echo    📡 HTTP:  http://localhost:5080
-echo    🔒 HTTPS: https://localhost:5080
+:: Return to Docker directory
+cd Docker\Backend_Docker
+call :check_error "Failed to navigate to Docker directory"
 
-echo 🚀 Starting backend using Docker Compose...
-start cmd /k "docker-compose build"
+:: Print service URLs
+echo [32m✅ Backend will run at:[0m
+echo    🌐 HTTP:  http://localhost:5080
+echo [33m✅ Email Client will run at:[0m
+echo    📧 Web UI: http://localhost:6080
 
-start cmd /k "docker-compose up"
+:: Start services
+echo [34m🚀 Starting backend...[0m
+docker compose up --build
+call :check_error "Failed to start Docker services"
 
-:: Wait a few seconds for the backend to start (adjust if needed)
-timeout /t 5 /nobreak >nul
-
-:: Print backend URL
-
-pause
+endlocal

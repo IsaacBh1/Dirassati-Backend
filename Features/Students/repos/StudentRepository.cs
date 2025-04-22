@@ -1,8 +1,10 @@
 using Dirassati_Backend.Features.Students.DTOs;
 using Dirassati_Backend.Features.Common;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
+
+using Dirassati_Backend.Persistence;
 using Dirassati_Backend.Data.Models;
+
 
 namespace Dirassati_Backend.Features.Students.Repositories
 {
@@ -45,7 +47,7 @@ namespace Dirassati_Backend.Features.Students.Repositories
             );
         }
 
-        public async Task<List<Student>> GetStudentsByGroupAsync(int groupId)
+        public async Task<List<Student>> GetStudentsByGroupAsync(Guid groupId)
 
         {
             var students = await _context.Students

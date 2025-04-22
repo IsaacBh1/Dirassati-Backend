@@ -10,10 +10,10 @@ public partial class Specialization
 
     public string Name { get; set; } = null!;
 
-    public virtual ICollection<Group> Groups { get; set; } = new List<Group>();
+    public virtual ICollection<Group> Groups { get; set; } = [];
 
-    public virtual ICollection<Student> Students { get; set; } = new List<Student>();
+    public virtual ICollection<Student> Students { get; set; } = [];
 
-    public virtual ICollection<School> Schools { get; set; } = new List<School>();
+    public virtual ICollection<School> Schools { get; set; } = [];
 
 }

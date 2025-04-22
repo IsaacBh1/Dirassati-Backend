@@ -1,35 +1,37 @@
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Features.SchoolLevels.DTOs;
+using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using System.Net;
 
 namespace Dirassati_Backend.Features.SchoolLevels.Services;
 
 public class SchoolLevelServices(AppDbContext dbContext)
 {
-    public async Task<List<GetSchoolLevelDTO>> GetAllLevelsAsync()
+    public async Task<List<GetSchoolLevelDto>> GetAllLevelsAsync()
     {
         var levels = await dbContext.SchoolLevels.Include(sl => sl.SchoolType).ToListAsync();
-        return levels.Select(lev => new GetSchoolLevelDTO { LevelId = lev.LevelId, SchoolTypeId = lev.SchoolTypeId, LevelYear = lev.LevelYear, SchoolTypeName = lev.SchoolType.Name }).ToList();
+        return levels.Select(lev => new GetSchoolLevelDto { LevelId = lev.LevelId, SchoolTypeId = lev.SchoolTypeId, LevelYear = lev.LevelYear, SchoolTypeName = lev.SchoolType.Name }).ToList();
 
     }
 
-    public async Task<List<SpecializationDTO>> GetAllSpecializationsAsync()
+    public async Task<List<SpecializationDto>> GetAllSpecializationsAsync()
     {
-        return await dbContext.Specializations.Select(s => new SpecializationDTO { Name = s.Name, SpecializationId = s.SpecializationId }).ToListAsync();
+        return await dbContext.Specializations.Select(s => new SpecializationDto { Name = s.Name, SpecializationId = s.SpecializationId }).ToListAsync();
     }
 
-    public async Task<Result<List<SpecializationDTO>, string>> GetSchoolSpecializations(string schoolId)
+    public async Task<Result<List<SpecializationDto>, string>> GetSchoolSpecializations(string schoolId)
     {
-        var result = new Result<List<SpecializationDTO>, string>();
+        var result = new Result<List<SpecializationDto>, string>();
 
-
+        if (!Guid.TryParse(schoolId, out var schoolIdGuid))
+            return result.Failure("Invalid School Id", (int)HttpStatusCode.BadRequest);
         var school = await dbContext.Schools
             .Include(s => s.SchoolType)
 
-            .FirstOrDefaultAsync(s => s.SchoolId.ToString() == schoolId);
+            .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
 
         if (school is null)
             return result.Failure("School Not Found", 404);
@@ -40,7 +42,7 @@ public class SchoolLevelServices(AppDbContext dbContext)
         await dbContext.Entry(school)
         .Collection(s => s.Specializations)
         .LoadAsync();
-        var specs = school.Specializations.Select(s => new SpecializationDTO { Name = s.Name, SpecializationId = s.SpecializationId }).ToList();
+        var specs = school.Specializations.Select(s => new SpecializationDto { Name = s.Name, SpecializationId = s.SpecializationId }).ToList();
 
         return result.Success(specs);
     }
@@ -50,10 +52,11 @@ public class SchoolLevelServices(AppDbContext dbContext)
         List<int> specializationIds)
     {
         var result = new Result<Unit, string>();
-
+        if (!Guid.TryParse(schoolId, out var schoolIdGuid))
+            return result.Failure("Invalid School Id", (int)HttpStatusCode.BadRequest);
         var school = await dbContext.Schools
             .Include(s => s.Specializations)
-            .FirstOrDefaultAsync(s => s.SchoolId.ToString() == schoolId);
+            .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
 
         if (school == null)
             return result.Failure("School Not Found", 404);

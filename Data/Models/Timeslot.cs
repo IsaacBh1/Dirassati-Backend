@@ -14,7 +14,7 @@ namespace Dirassati_Backend.Data.Models
         public TimeSpan EndTime { get; set; }
 
         [ForeignKey(nameof(SchoolId))]
-        public School? School { get; set; }
+        public School School { get; set; } = null!;
         public bool IsMorningSlot { get; set; }  
         public bool IsSpecialDay { get; set; }   
     }
