@@ -71,14 +71,36 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
         using var transaction = await dbContext.Database.BeginTransactionAsync();
         try
         {
+            // Check if a parent with the same national identity number already exists
+            var existingParentId = await dbContext.Parents
+                .Where(p => p.NationalIdentityNumber == studentDto.parentInfosDTO.NationalIdentityNumber)
+                .Select(p => p.ParentId)
+                .FirstOrDefaultAsync();
+
             // Register or get parent and send confirmation email in case of a new parent
             var parentId = await parentServices.RegisterParent(
                 studentDto.parentInfosDTO.NationalIdentityNumber,
                 studentDto.parentInfosDTO
             );
-            var isStudentExist = await dbContext.Students.AnyAsync(s => s.FirstName == studentDto.studentInfosDTO.FirstName && s.LastName == studentDto.studentInfosDTO.LastName && s.ParentId == parentId);
+
+            // Check if student already exists with the same name and parent
+            var isStudentExist = await dbContext.Students
+                .AnyAsync(s => s.FirstName == studentDto.studentInfosDTO.FirstName &&
+                             s.LastName == studentDto.studentInfosDTO.LastName &&
+                             s.ParentId == parentId);
+
+            // Check if another student exists with the same parent by national identity number
+            if (!isStudentExist && existingParentId != Guid.Empty)
+            {
+                isStudentExist = await dbContext.Students
+                    .AnyAsync(s => s.FirstName == studentDto.studentInfosDTO.FirstName &&
+                                 s.LastName == studentDto.studentInfosDTO.LastName &&
+                                 s.ParentId == existingParentId);
+            }
+
             if (isStudentExist)
                 return result.Failure("Student already exists", 400);
+
             var student = new Data.Models.Student
             {
                 FirstName = studentDto.studentInfosDTO.FirstName,
@@ -234,6 +256,108 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
         catch (Exception ex)
         {
             return result.Failure($"Error processing CSV file: {ex.Message}", 500);
+        }
+    }
+
+    public async Task<Result<Unit, string>> UpdateStudentAsync(Guid studentId, UpdateStudentDto studentDto)
+    {
+        var result = new Result<Unit, string>();
+
+        try
+        {
+            // Check if student exists
+            var student = await dbContext.Students
+                .FirstOrDefaultAsync(s => s.StudentId == studentId);
+
+            if (student == null)
+                return result.Failure("Student not found", 404);
+
+            // Validate school level
+            var schoolLevel = await dbContext.SchoolLevels
+                .FirstOrDefaultAsync(l => l.LevelId == studentDto.SchoolLevelId);
+
+            if (schoolLevel == null)
+                return result.Failure("Invalid school level", 400);
+
+            // Check if school level matches school type
+            var schoolTypeId = await dbContext.Schools
+                .Where(s => s.SchoolId == student.SchoolId)
+                .Select(s => s.SchoolTypeId)
+                .FirstOrDefaultAsync();
+
+            if (schoolLevel.SchoolTypeId != schoolTypeId)
+                return result.Failure("School level does not match school type", 400);
+
+            // Validate specialization if provided
+            if (studentDto.SpecializationId.HasValue)
+            {
+                var specialization = await dbContext.Specializations
+                    .FirstOrDefaultAsync(s => s.SpecializationId == studentDto.SpecializationId.Value);
+
+                if (specialization == null)
+                    return result.Failure("Invalid specialization", 400);
+
+                // Check if school offers this specialization
+                var hasSpecialization = await dbContext.Schools
+                    .Where(s => s.SchoolId == student.SchoolId)
+                    .SelectMany(s => s.Specializations)
+                    .AnyAsync(s => s.SpecializationId == studentDto.SpecializationId.Value);
+
+                if (!hasSpecialization)
+                    return result.Failure("This specialization is not offered by this school", 400);
+
+                // Check specialization compatibility with school level
+                var SchoolLevelId = studentDto.SchoolLevelId;
+                var SpecializationId = studentDto.SpecializationId;
+
+                if ((IsFirstYearLycee(SchoolLevelId) && !IsBasicSpecialization(SpecializationId)) ||
+                    (IsSecondOrThirdYearLycee(SchoolLevelId) && IsBasicSpecialization(SpecializationId)))
+                {
+                    return result.Failure("Student Cannot Take This Specialization", 400);
+                }
+            }
+
+            // Update student information
+            student.FirstName = studentDto.FirstName;
+            student.LastName = studentDto.LastName;
+            student.Address = studentDto.Address;
+            student.BirthDate = studentDto.BirthDate;
+            student.BirthPlace = studentDto.BirthPlace;
+            student.EmergencyContact = studentDto.EmergencyContact;
+            student.SchoolLevelId = studentDto.SchoolLevelId;
+            student.SpecializationId = studentDto.SpecializationId;
+            student.IsActive = studentDto.IsActive;
+
+            await dbContext.SaveChangesAsync();
+            return result.Success(Unit.Value);
+        }
+        catch (Exception ex)
+        {
+            return result.Failure($"Failed to update student: {ex.Message}", 500);
+        }
+    }
+
+    public async Task<Result<Unit, string>> DeleteStudentAsync(Guid studentId)
+    {
+        var result = new Result<Unit, string>();
+
+        try
+        {
+            var student = await dbContext.Students
+                .FirstOrDefaultAsync(s => s.StudentId == studentId);
+
+            if (student == null)
+                return result.Failure("Student not found", 404);
+
+            // Instead of hard deletion, mark as inactive
+            student.IsActive = false;
+
+            await dbContext.SaveChangesAsync();
+            return result.Success(Unit.Value);
+        }
+        catch (Exception ex)
+        {
+            return result.Failure($"Failed to delete student: {ex.Message}", 500);
         }
     }
 
