@@ -13,7 +13,7 @@ public class EmailServices(IFluentEmail fluentEmail, IHttpContextAccessor httpCo
     private readonly ILogger<EmailServices> _logger = logger;
     private string? _schoolEmail;
     private string? _schoolName;
-    
+
     private async Task<bool> InitializeSchoolInfoAsync()
     {
         if (_schoolEmail != null) return false;
@@ -29,7 +29,7 @@ public class EmailServices(IFluentEmail fluentEmail, IHttpContextAccessor httpCo
         {
             var school = await _dbContext.Schools
                 .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
-                
+
             if (school == null)
             {
                 _logger.LogError("School not found for ID: {SchoolId}", schoolId);
@@ -52,8 +52,21 @@ public class EmailServices(IFluentEmail fluentEmail, IHttpContextAccessor httpCo
     {
         try
         {
+            await SendEmailWithTemplateAsync(to, subject, body, new EmailTemplateOptions(), fromName, fromEmail);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception occurred while sending email to {Recipient}", to);
+            throw;
+        }
+    }
+
+    public async Task SendEmailWithTemplateAsync(string to, string subject, string body, EmailTemplateOptions options, string? fromName = null, string? fromEmail = null)
+    {
+        try
+        {
             _logger.LogInformation("Preparing to send email to {Recipient} with subject: {Subject}", to, subject);
-            
+
             bool isEmailFromApp = false;
             if (fromName == null && fromEmail == null)
             {
@@ -74,9 +87,9 @@ public class EmailServices(IFluentEmail fluentEmail, IHttpContextAccessor httpCo
             var response = await _fluentEmail
                 .To(to)
                 .Subject(subject)
-                .Body(body, isHTML)
+                .Body(body, true) // Always use HTML since we're implementing templated emails
                 .SendAsync();
-                
+
             if (response.Successful)
             {
                 _logger.LogInformation("Email sent successfully to {Recipient}", to);

@@ -9,7 +9,6 @@ using Dirassati_Backend.Features.Students.Repositories;
 using Dirassati_Backend.Features.Teachers.Services;
 using Dirassati_Backend.Persistence.Services;
 using Dirassati_Backend.Repositories;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Extensions
 {
@@ -27,7 +26,7 @@ namespace Dirassati_Backend.Extensions
             services.AddScoped<IGroupRepository, GroupRepository>();
             services.AddScoped<IStudentRepository, StudentRepository>();
             services.AddScoped<INoteRepository, NoteRepository>();
-            services.AddScoped<ICsvService , CsvService>();
+            services.AddScoped<ICsvService, CsvService>();
             services.AddHttpContextAccessor();
 
         }

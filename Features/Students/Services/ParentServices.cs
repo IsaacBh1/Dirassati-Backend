@@ -1,5 +1,6 @@
 using Dirassati_Backend.Common.Extensions;
 using Dirassati_Backend.Common.Services;
+using Dirassati_Backend.Common.Services.EmailService;
 using Dirassati_Backend.Data;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Students.DTOs;
@@ -56,7 +57,23 @@ public class ParentServices(AppDbContext dbContext, UserManager<AppUser> userMan
     public async Task SendConfirmationEmailAsync()
     {
         var link = linkGenerator.GetUriByName(httpContext.HttpContext!, "VerifyEmail", new { Email, VerificationToken }) ?? throw new InvalidOperationException("Can't create verification email link");
+
         var body = $"Please Verify your email by clicking on <a href=\"{link}\">this link</a>";
-        await emailService.SendEmailAsync(Email, "Confirmation Email", body, null, null, isHTML: true);
+
+        var options = new EmailTemplateOptions
+        {
+            Header = "Email Verification Required",
+            Footer = "Dirassati - Your Educational Partner"
+        };
+
+        await emailService.SendEmailWithTemplateAsync(
+            Email,
+            "Confirmation Email",
+            body,
+            options,
+            "Dirassati Team",
+            "noreply@dirassati.com"
+
+        );
     }
 }

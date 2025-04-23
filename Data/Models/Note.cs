@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Dirassati_Backend.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Data.Models
@@ -46,5 +45,5 @@ namespace Dirassati_Backend.Data.Models
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
-    
+
 }

@@ -4,7 +4,6 @@ using Dirassati_Backend.Configurations;
 using Dirassati_Backend.Common.Services;
 using Dirassati_Backend.Features.Auth.Accounts.Services;
 using Dirassati_Backend.Features.Auth.Register.Services;
-using Dirassati_Backend.Features.Auth.SignUp;
 using Dirassati_Backend.Features.School.Services;
 using Dirassati_Backend.Features.SchoolLevels.Services;
 using Dirassati_Backend.Features.Students.Services;
@@ -104,7 +103,10 @@ public static class AddServicesExtension
     {
         builder.Services.AddScoped<RegisterService>();
         builder.Services.AddScoped<SchoolLevelServices>();
-        builder.Services.AddScoped<IEmailService, EmailServices>();
+
+        // Use the new EmailTemplateService instead of EmailServices
+        builder.Services.AddScoped<IEmailService, EmailTemplateService>();
+
         builder.Services.AddScoped<ParentServices>();
         builder.Services.AddScoped<StudentServices>();
         builder.Services.AddScoped<VerifyEmailService>();

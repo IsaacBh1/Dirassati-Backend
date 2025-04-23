@@ -1,10 +1,8 @@
 using System.Security.Claims;
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Features.Groups.Dtos;
 using Dirassati_Backend.Features.Groups.Services;
-using Dirassati_Backend.Persistence;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Dirassati_Backend.Features.Groups.Controllers
 {
@@ -29,6 +27,11 @@ namespace Dirassati_Backend.Features.Groups.Controllers
             var result = await _groupServices.GetAllGroupsOrByLevelIdAsync(levelId, schoolId);
             return HandleResult(result);
         }
+
+        /// <summary>
+        /// Gets all groups for the current school
+        /// </summary>
+        /// <returns>List of all groups in the school</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllGroups()
         {
@@ -37,6 +40,55 @@ namespace Dirassati_Backend.Features.Groups.Controllers
                 return Unauthorized("School ID is missing from user claims");
 
             var result = await _groupServices.GetAllGroupsOrByLevelIdAsync(null, schoolId);
+            return HandleResult(result);
+        }
+
+        /// <summary>
+        /// Updates an existing group's information
+        /// </summary>
+        /// <param name="groupId">ID of the group to update</param>
+        /// <param name="updateGroupDto">Group information to update</param>
+        /// <returns>The updated group information</returns>
+        [HttpPut("{groupId}")]
+        public async Task<IActionResult> UpdateGroup(Guid groupId, [FromBody] UpdateGroupDto updateGroupDto)
+        {
+            var schoolId = User.FindFirstValue("SchoolId");
+            if (string.IsNullOrEmpty(schoolId))
+                return Unauthorized("School ID is missing from user claims");
+
+            var result = await _groupServices.UpdateGroupAsync(groupId, updateGroupDto, schoolId);
+            return HandleResult(result);
+        }
+
+        /// <summary>
+        /// Deletes a group
+        /// </summary>
+        /// <param name="groupId">ID of the group to delete</param>
+        /// <returns>Success or error message</returns>
+        [HttpDelete("{groupId}")]
+        public async Task<IActionResult> DeleteGroup(Guid groupId)
+        {
+            var schoolId = User.FindFirstValue("SchoolId");
+            if (string.IsNullOrEmpty(schoolId))
+                return Unauthorized("School ID is missing from user claims");
+
+            var result = await _groupServices.DeleteGroupAsync(groupId, schoolId);
+            return HandleResult(result);
+        }
+
+        /// <summary>
+        /// Assigns a student to a group
+        /// </summary>
+        /// <param name="assignStudentDto">Assignment information containing student and group IDs</param>
+        /// <returns>The updated group information</returns>
+        [HttpPost("assign-student")]
+        public async Task<IActionResult> AssignStudentToGroup([FromBody] AssignStudentToGroupDto assignStudentDto)
+        {
+            var schoolId = User.FindFirstValue("SchoolId");
+            if (string.IsNullOrEmpty(schoolId))
+                return Unauthorized("School ID is missing from user claims");
+
+            var result = await _groupServices.AssignStudentToGroupAsync(assignStudentDto, schoolId);
             return HandleResult(result);
         }
     }

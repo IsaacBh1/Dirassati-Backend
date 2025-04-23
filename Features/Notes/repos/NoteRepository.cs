@@ -1,6 +1,5 @@
 using Dirassati_Backend.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 using Dirassati_Backend.Features.Notes.Dtos;
 using Dirassati_Backend.Persistence;
 
@@ -41,7 +40,7 @@ public class NoteRepository : INoteRepository
         {
             var student = await _context.Students
                 .Include(s => s.Group)
-                .Where(s =>s.StudentId == Id)
+                .Where(s => s.StudentId == Id)
                 .Select(s => new
                 {
                     Student = s,
@@ -50,7 +49,7 @@ public class NoteRepository : INoteRepository
                 }).FirstOrDefaultAsync();
 
             var notes = await GetStudentNotesByStudentId(Id);
-            
+
             result.Add(new StudentNotesResponseDto()
             {
                 StudentName = $"{student!.Student.FirstName} {student.Student.LastName}",
@@ -66,19 +65,19 @@ public class NoteRepository : INoteRepository
     public async Task<List<StudentNoteDto>> GetStudentNotesByStudentId(Guid Id)
     {
         var notes = await _context.Notes
-            .Include(n=>_context.Subjects)
-            .Include(n =>n.ExamType)
-            .Include(n =>n.Teacher)
-            .ThenInclude(t =>t!.User)
+            .Include(n => _context.Subjects)
+            .Include(n => n.ExamType)
+            .Include(n => n.Teacher)
+            .ThenInclude(t => t!.User)
             .Where(n => n.StudentId == Id)
             .Select(n => new StudentNoteDto()
             {
                 NoteId = n.NoteId,
                 Value = n.Value,
                 Tremester = n.Tremester,
-                SubjectName =n.Subject == null ? "Not assigned" : n.Subject.Name,
-                ExamTypeName =  n.ExamType == null ? "Not assigned" : n.ExamType.Name,
-                TeacherName = n.Teacher !=null?  n.Teacher.User.FirstName + " " + n.Teacher.User.LastName: "Not assigned",
+                SubjectName = n.Subject == null ? "Not assigned" : n.Subject.Name,
+                ExamTypeName = n.ExamType == null ? "Not assigned" : n.ExamType.Name,
+                TeacherName = n.Teacher != null ? n.Teacher.User.FirstName + " " + n.Teacher.User.LastName : "Not assigned",
                 CreatedAt = n.CreatedAt
             })
             .OrderByDescending(n => n.CreatedAt)
@@ -91,7 +90,7 @@ public class NoteRepository : INoteRepository
         return await _context.Students
             .AnyAsync(s => s.StudentId == studentId && s.ParentId == parentId);
     }
-    
+
     public async Task<SimpleStudentDetailsDto> GetStudentDetailsAsync(Guid studentId)
     {
         var student = await _context.Students

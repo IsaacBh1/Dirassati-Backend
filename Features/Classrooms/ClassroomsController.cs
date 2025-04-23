@@ -1,7 +1,5 @@
 ﻿using System.Security.Claims;
 using Dirassati_Backend.Common;
-using Dirassati_Backend.Features.Classrooms;
-using Dirassati_Backend.Features.Classrooms;
 using Dirassati_Backend.Features.Classrooms.Dtos;
 using Dirassati_Backend.Features.Classrooms.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +11,7 @@ namespace Dirassati_Backend.Features.Classrooms
     [ApiController]
     public class ClassroomsController(IClassroomServices classroomServices) : BaseController
     {
+
         /// <summary>
         /// Creates a new classroom
         /// </summary>
@@ -100,6 +99,22 @@ namespace Dirassati_Backend.Features.Classrooms
                 return Unauthorized("School ID is missing from user claims");
 
             var result = await classroomServices.UpdateClassroomAsync(classroomId, updateClassroomDto, schoolId);
+            return HandleResult(result);
+        }
+
+        /// <summary>
+        /// Deletes a classroom
+        /// </summary>
+        /// <param name="classroomId">ID of the classroom to delete</param>
+        /// <returns>Success or error message</returns>
+        [HttpDelete("{classroomId}")]
+        public async Task<IActionResult> DeleteClassroom(Guid classroomId)
+        {
+            var schoolId = User.FindFirstValue("SchoolId");
+            if (string.IsNullOrEmpty(schoolId))
+                return Unauthorized("School ID is missing from user claims");
+
+            var result = await classroomServices.DeleteClassroomAsync(classroomId, schoolId);
             return HandleResult(result);
         }
     }

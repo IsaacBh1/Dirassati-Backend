@@ -15,6 +15,7 @@ using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Data;
 using Dirassati_Backend.Hubs;
 using Dirassati_Backend.Persistence;
+using Dirassati_Backend.Common.Services.EmailService;
 namespace Dirassati_Backend.Features.Teachers.Services;
 
 public class TeacherServices
@@ -142,7 +143,7 @@ public class TeacherServices
         {
             throw new InvalidOperationException("School is not found");
         }
-      
+
 
     }
 
@@ -184,13 +185,21 @@ public class TeacherServices
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var confirmationLink = GenerateConfirmationLink(user.Email!, token);
 
-        await _emailService.SendEmailAsync(
+        var emailBody = BuildEmailContent(confirmationLink);
+
+        var options = new EmailTemplateOptions
+        {
+            Header = "Welcome to Dirassati!",
+            Footer = "Dirassati - Your Educational Partner"
+        };
+
+        await _emailService.SendEmailWithTemplateAsync(
             user.Email!,
             "Confirm Your Email",
-            BuildEmailContent(confirmationLink),
+            emailBody,
+            options,
             "Dirassati Team",
-            "noreply@dirassati.com",
-            true
+            "noreply@dirassati.com"
         );
     }
 

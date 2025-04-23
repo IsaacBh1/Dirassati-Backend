@@ -5,7 +5,6 @@ using Dirassati_Backend.Features.Students.DTOs;
 using Dirassati_Backend.Features.Students.Models;
 using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
-using SQLitePCL;
 
 namespace Dirassati_Backend.Features.Students.Services;
 
@@ -77,8 +76,8 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
                 studentDto.parentInfosDTO.NationalIdentityNumber,
                 studentDto.parentInfosDTO
             );
-            var isStudentExist =await dbContext.Students.AnyAsync(s => s.FirstName == studentDto.studentInfosDTO.FirstName && s.LastName == studentDto.studentInfosDTO.LastName && s.ParentId == parentId);
-            if (isStudentExist )
+            var isStudentExist = await dbContext.Students.AnyAsync(s => s.FirstName == studentDto.studentInfosDTO.FirstName && s.LastName == studentDto.studentInfosDTO.LastName && s.ParentId == parentId);
+            if (isStudentExist)
                 return result.Failure("Student already exists", 400);
             var student = new Data.Models.Student
             {
@@ -114,30 +113,30 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
             return result.Failure($"Failed to add student: {ex.Message}", 500);
         }
     }
-  
+
     public async Task<Result<StudentImportResultDto, string>> ImportStudentsFromCsvAsync(
         string schoolId, IFormFile csvFile, bool hasHeaders)
     {
         var result = new Result<StudentImportResultDto, string>();
-        
+
         if (!Guid.TryParse(schoolId, out var schoolIdGuid))
             return result.Failure("Invalid School Id", (int)HttpStatusCode.BadRequest);
-            
+
         var school = await dbContext.Schools
             .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
 
         if (school == null)
             return result.Failure("School not found", 404);
-            
+
         try
         {
             // Class to map CSV columns to
             List<StudentCsvRecord> studentRecords;
-            
+
             // Read CSV file
-            using (var reader = new StreamReader(csvFile.OpenReadStream(),   encoding: null, // Auto-detect encoding including BOMs
+            using (var reader = new StreamReader(csvFile.OpenReadStream(), encoding: null, // Auto-detect encoding including BOMs
                        detectEncodingFromByteOrderMarks: true,
-                       bufferSize: 1024, 
+                       bufferSize: 1024,
                        leaveOpen: false))
             using (var csv = new CsvHelper.CsvReader(reader, new CsvHelper.Configuration.CsvConfiguration(System.Globalization.CultureInfo.InvariantCulture)
             {
@@ -148,14 +147,14 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
             {
                 // Register class map if needed
                 csv.Context.RegisterClassMap<StudentCsvRecordMap>();
-                
+
                 // Read all records
                 studentRecords = csv.GetRecords<StudentCsvRecord>().ToList();
             }
-            
+
             if (studentRecords.Count == 0)
                 return result.Failure("No valid records found in CSV file", 400);
-                
+
             // Process records
             var importResult = new StudentImportResultDto
             {
@@ -164,7 +163,7 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
                 FailedImports = 0,
                 Errors = []
             };
-            
+
             foreach (var record in studentRecords)
             {
                 try
@@ -180,7 +179,7 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
                         importResult.FailedImports++;
                         continue;
                     }
-                    var schoolLevel =( allSchoolLevels.FirstOrDefault(s => s.LevelYear == ParseInt(record.LevelYear))) ;
+                    var schoolLevel = (allSchoolLevels.FirstOrDefault(s => s.LevelYear == ParseInt(record.LevelYear)));
                     if (schoolLevel == null)
                     {
                         importResult.Errors.Add($"Row for student {record.StudentFirstName} {record.StudentLastName}: Invalid school level");
@@ -212,7 +211,7 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
                             PhoneNumber = record.ParentPhoneNumber
                         }
                     };
-                    
+
                     // Add the student
                     var addResult = await AddStudentAsync(schoolId, studentDto);
                     if (addResult.IsSuccess)
@@ -229,7 +228,7 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
                     importResult.Errors.Add($"Row for student {record.StudentFirstName} {record.StudentLastName}: {ex.Message}");
                 }
             }
-            
+
             return result.Success(importResult);
         }
         catch (Exception ex)
@@ -237,13 +236,13 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
             return result.Failure($"Error processing CSV file: {ex.Message}", 500);
         }
     }
-    
+
     private static List<string> ValidateStudentCsvRecord(StudentCsvRecord record, int schoolTypeId)
     {
         var errors = new List<string>();
         switch (schoolTypeId)
         {
-            case (int) SchoolTypeEnum.Lycee when record.SpecializationId == null:
+            case (int)SchoolTypeEnum.Lycee when record.SpecializationId == null:
                 errors.Add("Specialization ID is required for Lycee students");
                 break;
             case (int)SchoolTypeEnum.Moyenne or (int)SchoolTypeEnum.Primaire when record.SpecializationId != null:
@@ -255,59 +254,59 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
         // Required fields validation
         if (string.IsNullOrWhiteSpace(record.StudentFirstName))
             errors.Add("Student first name is required");
-            
+
         if (string.IsNullOrWhiteSpace(record.StudentLastName))
             errors.Add("Student last name is required");
-            
+
         if (string.IsNullOrWhiteSpace(record.StudentAddress))
             errors.Add("Student address is required");
-            
+
         if (string.IsNullOrWhiteSpace(record.StudentBirthDate))
             errors.Add("Student birth date is required");
-        else if (!TryParseDate(record.StudentBirthDate, out  _))
+        else if (!TryParseDate(record.StudentBirthDate, out _))
             errors.Add("Invalid student birth date format");
-            
+
         if (string.IsNullOrWhiteSpace(record.StudentBirthPlace))
             errors.Add("Student birth place is required");
-            
+
         if (string.IsNullOrWhiteSpace(record.EmergencyContact))
             errors.Add("Emergency contact is required");
-            
+
         if (string.IsNullOrWhiteSpace(record.LevelYear))
             errors.Add("School level ID is required");
         else if (!int.TryParse(record.LevelYear, out _))
             errors.Add("Invalid school level ID format");
-            
+
         // Parent validation
         if (string.IsNullOrWhiteSpace(record.ParentNationalIdNumber))
             errors.Add("Parent national ID is required");
-            
+
         if (string.IsNullOrWhiteSpace(record.ParentEmail))
             errors.Add("Parent email is required");
         else if (!IsValidEmail(record.ParentEmail))
             errors.Add("Invalid parent email format");
-            
+
         if (string.IsNullOrWhiteSpace(record.RelationshipToStudentId))
             errors.Add("Relationship to student ID is required");
         else if (!int.TryParse(record.RelationshipToStudentId, out _))
             errors.Add("Invalid relationship ID format");
-            
+
         if (string.IsNullOrWhiteSpace(record.ParentOccupation))
             errors.Add("Parent occupation is required");
-            
+
         if (string.IsNullOrWhiteSpace(record.ParentPhoneNumber))
             errors.Add("Parent phone number is required");
-            
+
         return errors;
     }
-    
+
     private static DateOnly ParseDateOnly(string dateString)
     {
         if (TryParseDate(dateString, out var date))
             return DateOnly.FromDateTime(date);
-        
+
         // Fallback to standard parsing
-        return DateOnly.FromDateTime(DateTime.Parse(dateString, 
+        return DateOnly.FromDateTime(DateTime.Parse(dateString,
             System.Globalization.CultureInfo.InvariantCulture));
     }
     private static int ParseInt(string value)
@@ -318,14 +317,14 @@ public class StudentServices(AppDbContext dbContext, ParentServices parentServic
     {
         // Try specific formats
         string[] formats = {
-            "dd-MM-yyyy", 
+            "dd-MM-yyyy",
             "dd/MM/yyyy",
             "d/MM/yyyy",
-            "d-MM-yyyy",  
-            "dd-M-yyyy",  
-            "d-M-yyyy"    
+            "d-MM-yyyy",
+            "dd-M-yyyy",
+            "d-M-yyyy"
         };
-    
+
         return DateTime.TryParseExact(
             dateString,
             formats,

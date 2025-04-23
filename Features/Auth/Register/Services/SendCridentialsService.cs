@@ -1,6 +1,7 @@
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Common.Extensions;
 using Dirassati_Backend.Common.Services;
+using Dirassati_Backend.Common.Services.EmailService;
 using Dirassati_Backend.Data;
 using Microsoft.AspNetCore.Identity;
 
@@ -34,7 +35,7 @@ public class SendCridentialsService(IEmailService emailService, UserManager<AppU
             return result.Failure(ex.Message, 500);
         }
     }
-    
+
     private async Task SendEmailAsync(string email, string password)
     {
         var body = $@"
@@ -43,6 +44,19 @@ public class SendCridentialsService(IEmailService emailService, UserManager<AppU
             <p>Email: {email}</p>
             <p>Password: {System.Web.HttpUtility.HtmlEncode(password)}</p>";
 
-        await _emailService.SendEmailAsync(email, "Your Dirassati Account Credentials", body, null, null, true);
+        var options = new EmailTemplateOptions
+        {
+            Header = "Your Dirassati Account Credentials",
+            Footer = "Dirassati - Your Educational Partner"
+        };
+
+        await _emailService.SendEmailWithTemplateAsync(
+            email,
+            "Your Dirassati Account Credentials",
+            body,
+            options,
+            "Dirassati Team",
+            "noreply@dirassati.com"
+        );
     }
 }

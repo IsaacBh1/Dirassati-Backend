@@ -1,5 +1,4 @@
 using CsvHelper.Configuration.Attributes;
-using Microsoft.AspNetCore.Http;
 
 namespace Dirassati_Backend.Data.DTOs
 {
