@@ -100,5 +100,20 @@ namespace Dirassati_Backend.Features.Students.Repositories
         }
 
 
+
+        public async Task<Data.Models.School> GetSchoolByStudentIdAsync(Guid id)
+        {
+            var student = await _context.Students
+                .Include(s => s.School)
+                .FirstOrDefaultAsync(s => s.StudentId == id);
+
+            if (student == null)
+            {
+                throw new KeyNotFoundException($"Student with ID {id} not found.");
+            }
+
+            return student.School;
+        }
+
     }
 }

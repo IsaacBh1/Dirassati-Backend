@@ -1,6 +1,7 @@
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Common;
 using Dirassati_Backend.Features.Students.DTOs;
+
 namespace Dirassati_Backend.Features.Students.Repositories
 {
 
@@ -10,5 +11,6 @@ namespace Dirassati_Backend.Features.Students.Repositories
         Task<bool> SchoolExistsAsync(Guid schoolId);
         Task<StudentDetailsDto?> GetStudentByIdAsync(Guid studentId);
         Task<List<Student>> GetStudentsByGroupAsync(Guid groupId);
+        Task<Data.Models.School> GetSchoolByStudentIdAsync(Guid id);
     }
 }

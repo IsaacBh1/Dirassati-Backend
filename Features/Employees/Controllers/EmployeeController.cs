@@ -40,7 +40,7 @@ namespace Dirassati_Backend.Features.Employees.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogWarning(ex, "Failed to create employee: {Message}", ex.Message);
+                    _logger.LogWarning(ex, "Failed to create employee: {Message}", ex.Message);
                 return Conflict(new { message = ex.Message });
             }
             catch (Exception ex)
