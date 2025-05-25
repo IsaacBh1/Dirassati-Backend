@@ -21,6 +21,7 @@ using Dirassati_Backend.Features.Groups.Services;
 using Dirassati_Backend.Features.Notes.Repos;
 using Dirassati_Backend.Features.Notes.Services;
 using Dirassati_Backend.Persistence;
+using Dirassati_Backend.Features.Employees.Services;
 
 namespace Dirassati_Backend.Common;
 
@@ -121,6 +122,8 @@ public static class AddServicesExtension
         builder.Services.AddScoped<IClassroomServices, ClassroomServices>();
         builder.Services.AddScoped<INoteRepository, NoteRepository>();
         builder.Services.AddScoped<INotesServices, NoteService>();
+        builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
         return builder;
     }
 }

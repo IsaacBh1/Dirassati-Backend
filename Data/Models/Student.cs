@@ -33,7 +33,6 @@ public partial class Student
     public Guid? GroupId { get; set; }
     public virtual Group? Group { get; set; }
     public ParentRelationshipToStudentType ParentRelationshipToStudentType { get; set; } = null!;
-    // Navigation properties
     public virtual SchoolLevel SchoolLevel { get; set; } = null!;
     public virtual Specialization? Specialization { get; set; }
     public virtual Parent Parent { get; set; } = null!;

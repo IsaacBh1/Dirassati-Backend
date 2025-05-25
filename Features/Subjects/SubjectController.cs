@@ -67,7 +67,6 @@ namespace Dirassati_Backend.Controllers
             return Ok(subjects);
         }
 
-        // GET: api/Subjects/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSubject(int id)
         {
@@ -78,8 +77,6 @@ namespace Dirassati_Backend.Controllers
             }
             return Ok(subject);
         }
-
-        // POST: api/Subjects
         [HttpPost]
         public async Task<IActionResult> CreateSubject([FromBody] Subject subject)
         {
@@ -93,7 +90,6 @@ namespace Dirassati_Backend.Controllers
             return CreatedAtAction(nameof(GetSubject), new { id = subject.SubjectId }, subject);
         }
 
-        // PUT: api/Subjects/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSubject(int id, [FromBody] Subject updatedSubject)
         {
@@ -123,7 +119,6 @@ namespace Dirassati_Backend.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Subjects/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSubject(int id)
         {
@@ -137,8 +132,6 @@ namespace Dirassati_Backend.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
-
-        // GET: api/Subjects/BySchoolLevel
         private bool SubjectExists(int id)
         {
             return _context.Subjects.Any(e => e.SubjectId == id);
