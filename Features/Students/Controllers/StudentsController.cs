@@ -2,6 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Common.Dtos;
+using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Common;
 using Dirassati_Backend.Features.Students.DTOs;
 using Dirassati_Backend.Features.Students.Models;
@@ -187,6 +189,54 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
         {
             return BadRequest($"Error generating template: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Get the school associated with a student by student ID
+    /// </summary>
+    /// <param name="id">Student ID</param>
+    /// <returns>School details</returns>
+    [HttpGet("{id}/school")]
+    [ProducesResponseType(typeof(SchoolDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetSchoolByStudentId(Guid id)
+    {
+        var student = await _studentRepository.GetStudentByIdAsync(id);
+        if (student == null)
+        {
+            return NotFound($"Student with ID {id} not found.");
+        }
+
+        var school = await _studentRepository.GetSchoolByStudentIdAsync(id);
+        if (school == null)
+        {
+            return NotFound($"School for student with ID {id} not found.");
+        }
+
+        var schoolDto = new SchoolDto
+        {
+            Name = school.Name,
+            Address = new AddressDto
+            {
+                Street = school.Address?.Street ?? string.Empty,
+                City = school.Address?.City ?? string.Empty,
+                State = school.Address?.State ?? string.Empty,
+                PostalCode = school.Address?.PostalCode ?? string.Empty,
+                Country = school.Address?.Country ?? string.Empty
+            },
+            PhoneNumber = school.PhoneNumbers?.FirstOrDefault()?.ToString() ?? string.Empty,
+            SchoolTypeId = school.SchoolTypeId,
+            Email = school.Email,
+            Logo = school.Logo,
+            WebsiteUrl = school.WebsiteUrl,
+            AcademicYear = new AcademicYearDto
+            {
+                StartDate = school.AcademicYear.StartDate,
+                EndDate = school.AcademicYear.EndDate
+            },
+        };
+
+        return Ok(schoolDto);
     }
 
 }
