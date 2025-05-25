@@ -22,8 +22,6 @@ public class StudentPayment
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-
-    // Navigation Properties
     public virtual Bill Bill { get; set; } = null!;
 
     public virtual Student Student { get; set; } = null!;

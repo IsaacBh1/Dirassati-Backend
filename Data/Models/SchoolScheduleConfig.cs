@@ -14,8 +14,10 @@ public class SchoolScheduleConfig
     public TimeSpan AfternoonStart { get; set; } = new TimeSpan(13, 0, 0);
     public TimeSpan AfternoonEnd { get; set; } = new TimeSpan(16, 0, 0);
 
+#pragma warning disable S2325 // Methods and properties that don't access instance data should be static
     public DayOfWeek[] FullDays => new[] { DayOfWeek.Sunday, DayOfWeek.Monday,
                                          DayOfWeek.Tuesday, DayOfWeek.Wednesday };
+#pragma warning restore S2325 // Methods and properties that don't access instance data should be static
     public DayOfWeek[] ShortDays { get; set; }
     public DayOfWeek[] DaysOff { get; set; }
 
