@@ -14,7 +14,7 @@ public class SchoolScheduleConfig
     public TimeSpan AfternoonStart { get; set; } = new TimeSpan(13, 0, 0);
     public TimeSpan AfternoonEnd { get; set; } = new TimeSpan(16, 0, 0);
 
-    public DayOfWeek[] FullDays => new[] { DayOfWeek.Sunday, DayOfWeek.Monday, 
+    public DayOfWeek[] FullDays => new[] { DayOfWeek.Sunday, DayOfWeek.Monday,
                                          DayOfWeek.Tuesday, DayOfWeek.Wednesday };
     public DayOfWeek[] ShortDays { get; set; }
     public DayOfWeek[] DaysOff { get; set; }
