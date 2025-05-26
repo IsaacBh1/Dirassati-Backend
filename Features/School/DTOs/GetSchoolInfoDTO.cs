@@ -13,7 +13,7 @@ public class GetSchoolInfoDto
 
     public string Email { get; set; } = null!;
 
-    public string Logo { get; set; } = null!;
+    public string LogoUrl { get; set; } = null!;
 
     public string WebsiteUrl { get; set; } = null!;
 

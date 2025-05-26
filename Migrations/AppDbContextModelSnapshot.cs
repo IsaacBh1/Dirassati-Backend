@@ -271,6 +271,9 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("SchoolId")
                         .HasColumnType("TEXT");
 
@@ -595,6 +598,34 @@ namespace Dirassati_Backend.Migrations
                     b.ToTable("PhoneNumbers");
                 });
 
+            modelBuilder.Entity("Dirassati_Backend.Data.Models.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiresOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("Dirassati_Backend.Data.Models.School", b =>
                 {
                     b.Property<Guid>("SchoolId")
@@ -607,6 +638,9 @@ namespace Dirassati_Backend.Migrations
                     b.Property<int>("AddressId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("BankCode")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("BillingCycleDays")
                         .HasColumnType("INTEGER");
 
@@ -614,7 +648,7 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Logo")
+                    b.Property<string>("LogoUrl")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -1917,6 +1951,17 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("School");
+                });
+
+            modelBuilder.Entity("Dirassati_Backend.Data.Models.RefreshToken", b =>
+                {
+                    b.HasOne("Dirassati_Backend.Data.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.School", b =>

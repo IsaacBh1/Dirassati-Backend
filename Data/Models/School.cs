@@ -14,7 +14,7 @@ namespace Dirassati_Backend.Data.Models
 
         public string Email { get; set; } = null!;
 
-        public string Logo { get; set; } = string.Empty;
+        public string LogoUrl { get; set; } = string.Empty;
 
         public string WebsiteUrl { get; set; } = string.Empty;
 
@@ -27,8 +27,7 @@ namespace Dirassati_Backend.Data.Models
 
 
         public int BillingCycleDays { get; set; } = 30;
-
-
+        public string? BankCode { get; set; } = "";
         public SchoolScheduleConfig? ScheduleConfig { get; set; }
 
         // Navigation properties

@@ -17,7 +17,7 @@ namespace Dirassati_Backend.Configurations
                     Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token.\r\n\r\nExample: \"Bearer abcdef12345\"",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
+                    Type = SecuritySchemeType.Http,
                     Scheme = "Bearer"
                 });
 
@@ -31,7 +31,7 @@ namespace Dirassati_Backend.Configurations
                                 Type = ReferenceType.SecurityScheme,
                                 Id = "Bearer"
                             },
-                            Scheme = "oauth2",
+                            Scheme = "Bearer",
                             Name = "Bearer",
                             In = ParameterLocation.Header,
                         },

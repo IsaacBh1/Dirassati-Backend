@@ -28,12 +28,12 @@ public class SchoolDto
 
 
 
-    public string? Logo { get; set; }
+    public string? LogoUrl { get; set; }
 
 
     public string? WebsiteUrl { get; set; }
 
-
+    public string? BankCode { get; set; }
     public AcademicYearDto AcademicYear { get; set; } = null!;
 
     [Range(0, double.MaxValue)]

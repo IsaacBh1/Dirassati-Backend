@@ -10,5 +10,6 @@ public class CreatedEmployeeDto
     public required string PhoneNumber { get; set; }
     public required int Permissions { get; set; }
     public string? SchoolId { get; set; }
+    public string? ProfilePicture { get; set; } = "";
 
 }
