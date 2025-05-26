@@ -19,13 +19,11 @@ public class AdvancedScheduler
     private readonly Random _random = new();
     private readonly TimeSpan _lessonDuration = TimeSpan.FromMinutes(60); // Fixed: Should be 45 minutes, not 1 hour
 
-/*************  ✨ Windsurf Command ⭐  *************/
 /// <summary>
 /// Initializes a new instance of the <see cref="AdvancedScheduler"/> class.
 /// </summary>
 /// <param name="context">The application's database context used for accessing data.</param>
 
-/*******  8954ef3c-acae-4807-bcf0-5877e30180ca  *******/
     public AdvancedScheduler(AppDbContext context)
     {
         _context = context;
@@ -64,7 +62,7 @@ public class AdvancedScheduler
             levelSubjectHours,
             school.ScheduleConfig,
             schoolId,
-            academicYearId // Fixed: Pass academicYearId
+            academicYearId 
         );
 
         return SimulatedAnnealingOptimizer.Optimize(initialSchedule, 1000, 0.95);
@@ -83,7 +81,7 @@ public class AdvancedScheduler
     private List<Timeslot> GenerateTimeSlots(SchoolScheduleConfig config, Guid schoolId)
     {
         var slots = new List<Timeslot>();
-        var lessonDuration = TimeSpan.FromMinutes(45);
+        var lessonDuration = TimeSpan.FromMinutes(60);
 
         foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
         {
@@ -120,7 +118,6 @@ public class AdvancedScheduler
 
                 current = current.Add(lessonDuration);
 
-                // Handle lunch break
                 if (current == config.MorningEnd && end > config.AfternoonStart)
                 {
                     current = config.AfternoonStart;
@@ -148,7 +145,6 @@ public class AdvancedScheduler
             var usedTeacherSlots = new HashSet<(Guid TeacherId, int TimeslotId)>();
             var hoursTracking = new Dictionary<(int LevelId, int SubjectId), int>();
 
-            // Initialize hours tracking
             foreach (var lsh in levelSubjectHours)
             {
                 hoursTracking[(lsh.LevelId, lsh.SubjectId)] = 0;
@@ -210,20 +206,18 @@ public class AdvancedScheduler
                                 result.TeacherSchedules.Add(lesson);
                                 result.GroupSchedules.Add(lesson);
 
-                                // Update tracking
                                 usedGroupSlots.Add((group.GroupId, slot.TimeslotId)); // Fixed: Track group usage
                                 usedClassroomSlots.Add((classroom.ClassroomId, slot.TimeslotId));
                                 usedTeacherSlots.Add((teacher.TeacherId, slot.TimeslotId));
                                 hoursTracking[(group.Classroom.SchoolLevelId, subjectHours.SubjectId)]++;
 
                                 lessonScheduled = true;
-                                break; // Lesson created, move to next hour
+                                break; 
                             }
                         }
 
                         if (!lessonScheduled)
                         {
-                            // Log or handle the case where a lesson couldn't be scheduled
                             System.Diagnostics.Debug.WriteLine(
                                 $"Could not schedule lesson for Group {group.GroupName}, Subject {subjectHours.SubjectId}, Hour {i + 1}");
                         }
@@ -339,22 +333,18 @@ public class AdvancedScheduler
         {
             int conflicts = 0;
 
-            // Teacher conflicts
             conflicts += schedule.TeacherSchedules
                 .GroupBy(l => new { l.TeacherId, l.TimeslotId })
                 .Count(g => g.Count() > 1);
 
-            // Classroom conflicts
             conflicts += schedule.TeacherSchedules
                 .GroupBy(l => new { l.ClassroomId, l.TimeslotId })
                 .Count(g => g.Count() > 1);
 
-            // Group conflicts (students can't be in two places at once)
             conflicts += schedule.GroupSchedules
                 .GroupBy(l => new { l.GroupId, l.TimeslotId })
                 .Count(g => g.Count() > 1);
 
-            // Fixed: Add penalty for unfulfilled hours
             conflicts += schedule.HoursCompliance
                 .Where(h => !h.IsFulfilled)
                 .Sum(h => h.RequiredHours - h.ScheduledHours);

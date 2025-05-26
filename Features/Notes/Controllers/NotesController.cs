@@ -24,7 +24,8 @@ namespace Dirassati_Backend.Features.Notes.Controllers
         IStudentRepository studentRepository,
         ICsvService csvService,
         IHttpContextAccessor httpContextAccessor,
-        AppDbContext context,INotesServices notesServices)
+        AppDbContext context,
+        INotesServices notesServices)
         : BaseController
     {
         private readonly INotesServices _notesServices = notesServices;
@@ -62,7 +63,6 @@ namespace Dirassati_Backend.Features.Notes.Controllers
             {
                 var schoolId = GetSchoolIdFromToken();
 
-                // Verify group exists in school
                 var groupExists = await context.Groups
                     .AnyAsync(g => g.GroupId == groupId && g.SchoolId == schoolId);
 
@@ -98,19 +98,39 @@ namespace Dirassati_Backend.Features.Notes.Controllers
                 var schoolId = GetSchoolIdFromToken();
                 var teacherId = GetTeacherIdFromToken();
 
+                // Validate Teacher
                 var teacher = await context.Teachers
-                .FirstOrDefaultAsync(t =>
-                    t.TeacherId == teacherId &&
-                    t.SchoolId == schoolId);
-
+                    .FirstOrDefaultAsync(t => t.TeacherId == teacherId && t.SchoolId == schoolId);
                 if (teacher == null)
                     return Unauthorized("Teacher not found in this school");
 
+                // Validate Group
                 var group = await context.Groups
                     .FirstOrDefaultAsync(g => g.GroupId == dto.GroupId && g.SchoolId == schoolId);
-
                 if (group == null)
                     return BadRequest("Invalid group ID for this school");
+
+                // Validate AcademicYear
+                // var academicYear = await context.AcademicYears
+                //     .FirstOrDefaultAsync(ay => ay.AcademicYearId == dto.AcademicYearId);
+                // if (academicYear == null)
+                //     return BadRequest("Invalid AcademicYearId");
+
+                // Validate ExamType
+                var examType = await context.ExamTypes
+                    .FirstOrDefaultAsync(et => et.ExamTypeId == dto.ExamTypeId);
+                if (examType == null)
+                    return BadRequest("Invalid ExamTypeId");
+
+                // Validate Subject
+                var subject = await context.Subjects
+                    .FirstOrDefaultAsync(s => s.SubjectId == dto.SubjectId);
+                if (subject == null)
+                    return BadRequest("Invalid SubjectId");
+
+                // Validate Tremester
+                if (dto.Tremester < 1 || dto.Tremester > 3)
+                    return BadRequest("Tremester must be between 1 and 3");
 
                 var students = await studentRepository.GetStudentsByGroupAsync(dto.GroupId);
                 var csvRecords = await csvService.ProcessNotesCsv(dto.CsvFile);
@@ -127,7 +147,10 @@ namespace Dirassati_Backend.Features.Notes.Controllers
                         continue;
                     }
 
-                    notes.Add(CreateNoteEntity(record, dto, schoolId, teacherId));
+                    var note = CreateNoteEntity(record, dto, schoolId, teacherId);
+                    // Log note details for debugging
+                    Console.WriteLine($"Inserting Note: AcademicYearId={note.AcademicYearId}, ExamTypeId={note.ExamTypeId}, GroupId={note.GroupId}, SchoolId={note.SchoolId}, StudentId={note.StudentId}, SubjectId={note.SubjectId}, TeacherId={note.TeacherId}, Tremester={note.Tremester}, Value={note.Value}");
+                    notes.Add(note);
                 }
 
                 if (errors.Any())
@@ -209,6 +232,7 @@ namespace Dirassati_Backend.Features.Notes.Controllers
                 return teacherId;
             throw new UnauthorizedAccessException("Invalid Teacher ID in token");
         }
+
         [HttpGet]
         public async Task<ActionResult<List<StudentNotesResponseDto>>> GetAllChildrenNotes()
         {
@@ -235,5 +259,4 @@ namespace Dirassati_Backend.Features.Notes.Controllers
             return HandleResult(result);
         }
     }
-
 }

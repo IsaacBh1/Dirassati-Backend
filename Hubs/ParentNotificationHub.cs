@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
-// Add this
 
 namespace Dirassati_Backend.Hubs;
 
@@ -40,24 +39,19 @@ public class ParentNotificationHub(
         {
             _logger.LogInformation("Parent {ParentId} connected with connection ID {ConnectionId}", parentId, Context.ConnectionId);
 
-            // Track by parentId instead of user ID
             _connectionTracker.AddConnection(parentId, Context.ConnectionId);
 
-            // Add connection to parent-specific group
             await Groups.AddToGroupAsync(Context.ConnectionId, $"parent-{parentId}");
             _logger.LogInformation("Parent {ParentIdFirst} added to group parent-{ParentId}", parentId, parentId);
 
-            // Get all school IDs related to the parent
             var schoolIds = await _parentNotificationServices.GetSchoolIdsByParentIdAsync(parentGuid);
 
             foreach (var schoolId in schoolIds)
             {
-                // Add the parent to the group for each school
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"parents-school-{schoolId}");
                 _logger.LogInformation("Parent {ParentId} added to group parents-school-{SchoolId}", parentId, schoolId);
             }
 
-            // Send pending notifications
             _logger.LogInformation("Sending pending notifications to parent {ParentId}", parentId);
             await SendPendingNotifications(parentGuid);
         }
@@ -147,7 +141,6 @@ public class ParentNotificationHub(
                 return;
             }
 
-            // Map the bills to DTOs
             var notifications = pendingBills.Select(bill => new GetBillDto
             {
                 Title = bill.Title,
@@ -155,7 +148,6 @@ public class ParentNotificationHub(
                 Amount = bill.Amount,
             }).ToList();
 
-            // Send the notifications as a list to all parents in the school group
             await Clients.Group($"parent-{parentId}").ReceivePendingBillNotification(notifications);
 
 

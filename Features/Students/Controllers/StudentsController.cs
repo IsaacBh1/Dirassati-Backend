@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dirassati_Backend.Features.Students;
 
 [Route("api/students")]
-
+[ApiController]
 public class StudentsController(StudentServices studentServices, IStudentRepository studentRepository) : BaseController
 {
     private readonly StudentServices _studentServices = studentServices;

@@ -3,70 +3,65 @@ using Dirassati_Backend.Common;
 using Dirassati_Backend.Features.Notes.Dtos;
 using Dirassati_Backend.Features.Notes.Repos;
 
-namespace Dirassati_Backend.Features.Notes.Services;
-
-public class NoteService:INotesServices
+namespace Dirassati_Backend.Features.Notes.Services
 {
-    private readonly INoteRepository _noteRepository;
-
-    public NoteService(INoteRepository noteRepository)
+    public class NoteService : INotesServices
     {
-        _noteRepository = noteRepository;
-    }
+        private readonly INoteRepository _noteRepository;
 
-    public async Task<Result<List<StudentNotesResponseDto>, string>> GetStudentNotesByParentIdAsync(Guid parentId)
-    {
-        var result = new Result<List<StudentNotesResponseDto>, string>();
-            
-        try
+        public NoteService(INoteRepository noteRepository)
         {
-            var notes = await _noteRepository.GetStudentNotesByParentIdAsync(parentId);
-                
-            return notes.Count == 0 ? result.Failure("No notes found for your children", (int)HttpStatusCode.NotFound) : result.Success(notes);
+            _noteRepository = noteRepository;
         }
-        catch (Exception ex)
-        {
-            return result.Failure($"Error retrieving student notes: {ex.Message}", 500);
-        }
-    }
-    public async Task<Result<StudentNotesResponseDto, string>> GetStudentNotesByStudentIdForParentAsync(Guid parentId, Guid studentId)
-    {
-        var result = new Result<StudentNotesResponseDto, string>();
 
-        try
+        public async Task<Result<List<StudentNotesResponseDto>, string>> GetStudentNotesByParentIdAsync(Guid parentId)
         {
-            // Check if the student belongs to this parent
-            var studentExists = await _noteRepository.CheckStudentBelongsToParentAsync(parentId, studentId);
-        
-            if (!studentExists)
+            var result = new Result<List<StudentNotesResponseDto>, string>();
+
+            try
             {
-                return result.Failure("Student not found or does not belong to this parent", (int)HttpStatusCode.NotFound);
+                var notes = await _noteRepository.GetStudentNotesByParentIdAsync(parentId);
+                return notes.Count == 0 ? result.Failure("No notes found for your children", (int)HttpStatusCode.NotFound) : result.Success(notes);
             }
-
-            // Get the student notes
-            var notes = await _noteRepository.GetStudentNotesByStudentId(studentId);
-        
-            if (notes.Count == 0)
+            catch (Exception ex)
             {
-                return result.Failure("No notes found for this student", (int)HttpStatusCode.NotFound);
+                return result.Failure($"Error retrieving student notes: {ex.Message}", 500);
             }
-        
-            // Get student details
-            var studentDetails = await _noteRepository.GetStudentDetailsAsync(studentId);
-        
-            var response = new StudentNotesResponseDto
-            {
-                StudentName = studentDetails.StudentName,
-                SchoolLevel = studentDetails.SchoolLevel,
-                GroupName = studentDetails.GroupName,
-                Notes = notes
-            };
-
-            return result.Success(response);
         }
-        catch (Exception ex)
+
+        public async Task<Result<StudentNotesResponseDto, string>> GetStudentNotesByStudentIdForParentAsync(Guid parentId, Guid studentId)
         {
-            return result.Failure($"Error retrieving student notes: {ex.Message}", 500);
+            var result = new Result<StudentNotesResponseDto, string>();
+
+            try
+            {
+                var studentExists = await _noteRepository.CheckStudentBelongsToParentAsync(parentId, studentId);
+                if (!studentExists)
+                {
+                    return result.Failure("Student not found or does not belong to this parent", (int)HttpStatusCode.NotFound);
+                }
+
+                var notes = await _noteRepository.GetStudentNotesByStudentId(studentId);
+                if (notes.Count == 0)
+                {
+                    return result.Failure("No notes found for this student", (int)HttpStatusCode.NotFound);
+                }
+
+                var studentDetails = await _noteRepository.GetStudentDetailsAsync(studentId);
+                var response = new StudentNotesResponseDto
+                {
+                    StudentName = studentDetails.StudentName,
+                    SchoolLevel = studentDetails.SchoolLevel,
+                    GroupName = studentDetails.GroupName,
+                    Notes = notes
+                };
+
+                return result.Success(response);
+            }
+            catch (Exception ex)
+            {
+                return result.Failure($"Error retrieving student notes: {ex.Message}", 500);
+            }
         }
     }
 }
