@@ -34,6 +34,7 @@ namespace Dirassati_Backend.Features.Groups.Services
 
                 // Check if classroom exists
                 var classroom = await context.Classrooms
+                .Include(c => c.Group)
                     .Include(c => c.SchoolLevel).ThenInclude(schoolLevel => schoolLevel.SchoolType)
                     .FirstOrDefaultAsync(c => c.ClassroomId == addGroupDto.ClassroomId);
 
@@ -42,6 +43,12 @@ namespace Dirassati_Backend.Features.Groups.Services
                     logger.LogWarning("Classroom with ID {ClassroomId} not found", addGroupDto.ClassroomId);
                     return result.Failure("Classroom not found", (int)HttpStatusCode.NotFound);
                 }
+                if (classroom.Group != null)
+                {
+                    logger.LogWarning("Classroom with ID {ClassroomId} already has a group assigned", classroom.ClassroomId);
+                    return result.Failure("This classroom already has a group assigned", (int)HttpStatusCode.BadRequest);
+                }
+
 
                 // Check if group name already exists in the school
                 var groupNameExists = await context.Groups
@@ -69,7 +76,7 @@ namespace Dirassati_Backend.Features.Groups.Services
                 context.Groups.Add(group);
 
                 // Validate and add students if provided
-                if (addGroupDto.StudentIds is { Count: 0 })
+                if (addGroupDto.StudentIds != null && addGroupDto.StudentIds.Count > 0)
                 {
                     logger.LogInformation("Assigning {StudentCount} students to group {GroupId}",
                         addGroupDto.StudentIds.Count, group.GroupId);
