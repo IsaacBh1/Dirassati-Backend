@@ -1,8 +1,10 @@
 using Dirassati_Backend.Common.Services.ConnectionTracker;
 using Dirassati_Backend.Data.Models;
+using Dirassati_Backend.Features.Abcenses.Dtos;
 using Dirassati_Backend.Features.Absences.Repos;
 using Dirassati_Backend.Features.Groups.Repos;
 using Dirassati_Backend.Hubs;
+using Dirassati_Backend.Hubs.HelperClasses;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Dirassati_Backend.Features.Abcenses.services
@@ -11,7 +13,6 @@ namespace Dirassati_Backend.Features.Abcenses.services
     {
         private readonly IAbsenceRepository _absenceRepository;
         private readonly IGroupRepository _groupRepository;
-
         private readonly IHubContext<ParentNotificationHub> _hubContext;
 
         public AbsenceService(
@@ -22,7 +23,6 @@ namespace Dirassati_Backend.Features.Abcenses.services
         {
             _absenceRepository = absenceRepository;
             _groupRepository = groupRepository;
-
             _hubContext = hubContext;
         }
 
@@ -55,7 +55,7 @@ namespace Dirassati_Backend.Features.Abcenses.services
                 var parentId = student.Parent.ParentId.ToString();
 
                 await _hubContext.Clients.Group($"parent-{parentId}")
-                    .SendAsync("ReceiveAbsenceNotification", new
+                    .SendAsync("ReceiveAbsenceNotification", new AbsenceNotification
                     {
                         StudentName = $"{student.FirstName} {student.LastName}",
                         Date = DateTime.Now
@@ -67,10 +67,48 @@ namespace Dirassati_Backend.Features.Abcenses.services
 
             await _absenceRepository.SaveChangesAsync();
         }
+
         public async Task TestBroadcastNotification()
         {
             await _hubContext.Clients.All.SendAsync("ReceiveBroadcastNotification",
                 "📢 Test broadcast to all connected clients");
+        }
+
+        public async Task<StudentAbsenceDto> GetStudentAbsencesAsync(Guid studentId, Guid parentId)
+        {
+            // Check if the student exists and retrieve their parent
+            var student = await _groupRepository.GetStudentWithParentAsync(studentId);
+
+            // Verify student exists and parent relationship
+            if (student == null)
+            {
+                throw new ArgumentException("Student not found.");
+            }
+
+            if (student.ParentId != parentId)
+            {
+                throw new UnauthorizedAccessException("Parent is not related to the student.");
+            }
+
+            // Retrieve absences for the student
+            var absences = await _absenceRepository.GetAbsencesByStudentIdAsync(studentId);
+
+            // Map to DTO
+            var studentAbsenceDto = new StudentAbsenceDto
+            {
+                StudentId = studentId,
+                StudentName = $"{student.FirstName} {student.LastName}",
+                Absences = absences.Select(a => new AbsenceDto
+                {
+                    AbsenceId = a.AbsenceId,
+                    DateTime = a.DateTime,
+                    IsJustified = a.IsJustified,
+                    Remark = a.Remark ?? string.Empty,
+                    IsNotified = a.IsNotified
+                }).ToList()
+            };
+
+            return studentAbsenceDto;
         }
     }
 }

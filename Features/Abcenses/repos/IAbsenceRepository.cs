@@ -8,5 +8,6 @@ namespace Dirassati_Backend.Features.Absences.Repos
         Task UpdateAbsenceAsync(Absence absence);
         Task SaveChangesAsync();
         Task<List<Absence>> GetAbsencesByStudentIdsAsync(List<Guid> studentIds, bool isNotified);
+        Task<List<Absence>> GetAbsencesByStudentIdAsync(Guid studentId);
     }
 }

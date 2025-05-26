@@ -38,7 +38,7 @@ public class BillServices(AppDbContext context, IMapper mapper, IHubContext<Pare
             SchoolId = schoolIdGuid,
             Amount = billDto.Amount,
             Title = billDto.Title,
-            Description = billDto.Title,
+            Description = billDto.Description,
             SchoolLevelId = billDto.SchoolLevelId
         };
 

@@ -28,6 +28,7 @@ namespace Dirassati_Backend.Features.Absences.Repos
         {
             await _context.SaveChangesAsync();
         }
+
         public async Task<List<Absence>> GetAbsencesByStudentIdsAsync(List<Guid> studentIds, bool isNotified)
         {
             return await _context.Absences
@@ -36,7 +37,13 @@ namespace Dirassati_Backend.Features.Absences.Repos
                 .ToListAsync();
         }
 
+        public async Task<List<Absence>> GetAbsencesByStudentIdAsync(Guid studentId)
+        {
+            return await _context.Absences
+                .Include(a => a.Student)
+                .Where(a => a.StudentId == studentId)
+                .OrderByDescending(a => a.DateTime)
+                .ToListAsync();
+        }
     }
-
-
 }
