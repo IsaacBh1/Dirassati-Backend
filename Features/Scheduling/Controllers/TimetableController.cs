@@ -25,8 +25,8 @@ public class ScheduleController : ControllerBase
 
     [HttpPost("schools/{schoolId}/configure")]
     public async Task<IActionResult> ConfigureSchoolSchedule(
-    [FromRoute, Required] Guid schoolId,
-    [FromBody] SchoolConfigRequest config)
+     [FromRoute, Required] Guid schoolId,
+     [FromBody] SchoolConfigRequest config)
     {
         try
         {
@@ -40,23 +40,39 @@ public class ScheduleController : ControllerBase
             // Update or create configuration
             school.ScheduleConfig = new SchoolScheduleConfig
             {
+                SchoolId = schoolId, // Ensure SchoolId is set
                 MorningStart = config.MorningStart,
                 MorningEnd = config.MorningEnd,
                 AfternoonStart = config.AfternoonStart,
                 AfternoonEnd = config.AfternoonEnd,
                 DaysOff = config.DaysOff,
                 ShortDays = config.ShortDays
+                // Note: FullDays is not set as it's a read-only property
             };
 
             await _context.SaveChangesAsync();
-            return Ok(new { Success = true, school.ScheduleConfig });
+
+            // Map to DTO
+            var responseDto = new ScheduleConfigResponseDto
+            {
+                ConfigId = school.ScheduleConfig.ConfigId,
+                SchoolId = school.ScheduleConfig.SchoolId,
+                MorningStart = school.ScheduleConfig.MorningStart,
+                MorningEnd = school.ScheduleConfig.MorningEnd,
+                AfternoonStart = school.ScheduleConfig.AfternoonStart,
+                AfternoonEnd = school.ScheduleConfig.AfternoonEnd,
+                FullDays = school.ScheduleConfig.FullDays,
+                ShortDays = school.ScheduleConfig.ShortDays,
+                DaysOff = school.ScheduleConfig.DaysOff
+            };
+
+            return Ok(new { Success = true, ScheduleConfig = responseDto });
         }
         catch (Exception ex)
         {
             return StatusCode(500, new { Error = "Configuration failed", Details = ex.Message });
         }
     }
-
 
 
 

@@ -5,20 +5,37 @@ namespace Dirassati_Backend.Features.Scheduling.Dtos;
 
 public class SchoolConfigRequest
 {
-    [Required] public TimeSpan MorningStart { get; set; }
-    [Required] public TimeSpan MorningEnd { get; set; }
-    [Required] public TimeSpan AfternoonStart { get; set; }
-    [Required] public TimeSpan AfternoonEnd { get; set; }
-    public DayOfWeek[] DaysOff { get; set; } = new DayOfWeek[0];
-    public DayOfWeek[] ShortDays { get; set; } = new DayOfWeek[0];
+    [Required] 
+    public TimeSpan MorningStart { get; set; }
+    
+    [Required] 
+    public TimeSpan MorningEnd { get; set; }
+    
+    [Required] 
+    public TimeSpan AfternoonStart { get; set; }
+    
+    [Required] 
+    public TimeSpan AfternoonEnd { get; set; }
+    
+    public DayOfWeek[] FullDays { get; set; } = Array.Empty<DayOfWeek>(); 
+    public DayOfWeek[] DaysOff { get; set; } = Array.Empty<DayOfWeek>();
+    
+    public DayOfWeek[] ShortDays { get; set; } = Array.Empty<DayOfWeek>();
 }
 
 public class SubjectPriorityRequest
 {
-    [Required] public int LevelId { get; set; }
-    [Required] public int SubjectId { get; set; }
-    [Range(1, 5)] public int Priority { get; set; }
+    [Required] 
+    public int LevelId { get; set; }
+    
+    [Required] 
+    public int SubjectId { get; set; }
+    
+    [Range(1, 5)] 
+    public int Priority { get; set; }
 }
+
+
 public class ScheduleResult
 {
     public List<Lesson> TeacherSchedules { get; set; } = new();

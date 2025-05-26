@@ -11,10 +11,18 @@ namespace Dirassati_Backend.Data.Seeders
             modelBuilder.Entity<Subject>()
                 .HasData(
                     // Primaire (SchoolTypeEnum.Primaire)
-                    new Subject { SubjectId = 1, Name = "général", SchoolType = SchoolTypeEnum.Primaire },
-                    new Subject { SubjectId = 2, Name = "Langue Française", SchoolType = SchoolTypeEnum.Primaire },
-                    new Subject { SubjectId = 3, Name = "Langue Anglaise", SchoolType = SchoolTypeEnum.Primaire },
-                    new Subject { SubjectId = 4, Name = "Tamazight", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 1, Name = "Histoire", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 2, Name = "Géographie", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 3, Name = "Éducation Islamique", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 4, Name = "Éducation Civique", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 5, Name = "Mathématiques", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 7, Name = "Sciences Technologiques", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 8, Name = "Langue Arabe", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 9, Name = "Langue Tamazight", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 10, Name = "Langue Française", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 11, Name = "Langue Anglaise", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 12, Name = "EPS", SchoolType = SchoolTypeEnum.Primaire },
+                    new Subject { SubjectId = 13, Name = "Éducation Artistique", SchoolType = SchoolTypeEnum.Primaire },
 
                     // Moyen (SchoolTypeEnum.Moyenne)
                     new Subject { SubjectId = 101, Name = "Histoire", SchoolType = SchoolTypeEnum.Moyenne },
