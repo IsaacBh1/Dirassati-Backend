@@ -16,24 +16,16 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
     [Route("api/teacher/auth")]
     [ApiController]
     [AllowAnonymous]
-    public class TeacherAuthController : ControllerBase
+    public class TeacherAuthController(
+        UserManager<AppUser> userManager,
+        SignInManager<AppUser> signInManager,
+        IConfiguration configuration,
+        AppDbContext context,
+        RefreshTokenRepository refreshTokenRepository,
+        TokenProvider tokenProvider)
+        : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly IConfiguration _configuration;
-        private readonly AppDbContext _context;
-
-        public TeacherAuthController(
-            UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager,
-            IConfiguration configuration,
-            AppDbContext context)
-        {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _configuration = configuration;
-            _context = context;
-        }
+        private readonly IConfiguration _configuration = configuration;
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] TeacherLoginDto loginDto)
@@ -79,10 +71,8 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim("TeacherId", teacherId),
                 new Claim("SchoolId", schoolId),
-                new Claim("SchoolTypeId", schoolTypeId),
                 new Claim(ClaimTypes.Role, "Teacher")
             };
-
             return tokenProvider.GenerateJwtToken(claims);
         }
     }

@@ -233,7 +233,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
             PhoneNumber = school.PhoneNumbers?.FirstOrDefault()?.ToString() ?? string.Empty,
             SchoolTypeId = school.SchoolTypeId,
             Email = school.Email,
-            Logo = school.Logo,
+            LogoUrl = school.LogoUrl,
             WebsiteUrl = school.WebsiteUrl,
             AcademicYear = new AcademicYearDto
             {
