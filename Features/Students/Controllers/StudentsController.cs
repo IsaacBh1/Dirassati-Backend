@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.Students;
 
-[Authorize]
 [Route("api/students")]
 
 public class StudentsController(StudentServices studentServices, IStudentRepository studentRepository) : BaseController
@@ -27,6 +26,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     /// </summary>
     /// <param name="id">Student ID</param>
     /// <returns>Student details</returns>
+    [Authorize]
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(StudentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -44,6 +44,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     /// </summary>
     /// <param name="studentDTO">Student information</param>
     /// <returns>Success or error message</returns>
+    [Authorize]
     [HttpPost("add")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -62,6 +63,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     /// <param name="studentDto">Updated student information</param>
     /// <returns>Success or error message</returns>
     [HttpPut("{id}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -83,6 +85,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     /// <param name="id">Student ID</param>
     /// <returns>Success or error message</returns>
     [HttpDelete("{id}")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -93,6 +96,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     }
 
     [HttpGet("list")]
+    [Authorize]
     [ProducesResponseType(typeof(PaginatedResult<StudentDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -116,6 +120,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
 
     }
     [HttpPost("import-csv")]
+    [Authorize]
     [ProducesResponseType(typeof(StudentImportResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ImportStudentsFromCsv([FromForm] StudentCsvUploadModel model)
@@ -157,6 +162,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     }
 
     [HttpGet("import-template")]
+    [Authorize]
     [ProducesResponseType(typeof(FileContentResult), 200)]
     public IActionResult GetImportTemplate()
     {

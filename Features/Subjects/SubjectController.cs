@@ -10,7 +10,6 @@ namespace Dirassati_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class SubjectsController : ControllerBase
     {
         private readonly AppDbContext _context;

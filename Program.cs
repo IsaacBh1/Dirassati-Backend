@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Configurations;
 using Dirassati_Backend.Data.Seeders;
@@ -7,6 +8,7 @@ using Dirassati_Backend.Features.Auth.Register.Services;
 using Dirassati_Backend.Features.Teachers.Services;
 using Dirassati_Backend.Hubs;
 using Dirassati_Backend.Persistence;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,14 +16,34 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServices();
 builder.AddCustomServices();
 
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.SerializerOptions.WriteIndented = true;
+});
+
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.SerializerOptions.WriteIndented = true;
+});
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials()
-              .SetIsOriginAllowed(_ => true);
+        policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 builder.Services.AddSignalR(options =>
