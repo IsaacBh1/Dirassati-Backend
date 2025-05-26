@@ -3,7 +3,6 @@ using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace Dirassati_Backend.Controllers
 {
     [Route("api/[controller]")]
