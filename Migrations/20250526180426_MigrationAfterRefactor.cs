@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Dirassati_Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class MigrationAfterRefactor : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -220,12 +220,13 @@ namespace Dirassati_Backend.Migrations
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     AddressId = table.Column<int>(type: "INTEGER", nullable: false),
                     Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Logo = table.Column<string>(type: "TEXT", nullable: false),
+                    LogoUrl = table.Column<string>(type: "TEXT", nullable: false),
                     WebsiteUrl = table.Column<string>(type: "TEXT", nullable: false),
                     SchoolConfig = table.Column<string>(type: "TEXT", nullable: false),
                     SchoolTypeId = table.Column<int>(type: "INTEGER", nullable: false),
                     AcademicYearId = table.Column<int>(type: "INTEGER", nullable: false),
-                    BillingCycleDays = table.Column<int>(type: "INTEGER", nullable: false)
+                    BillingCycleDays = table.Column<int>(type: "INTEGER", nullable: false),
+                    BankCode = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -350,6 +351,26 @@ namespace Dirassati_Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Token = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
+                    ExpiresOn = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AcademicYears",
                 columns: table => new
                 {
@@ -443,6 +464,7 @@ namespace Dirassati_Backend.Migrations
                     ContractType = table.Column<string>(type: "TEXT", nullable: false),
                     IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
                     Permissions = table.Column<int>(type: "INTEGER", nullable: false),
+                    ProfilePictureUrl = table.Column<string>(type: "TEXT", nullable: true),
                     SchoolId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -526,6 +548,7 @@ namespace Dirassati_Backend.Migrations
                     MorningEnd = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     AfternoonStart = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     AfternoonEnd = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    FullDays = table.Column<string>(type: "TEXT", nullable: false),
                     ShortDays = table.Column<string>(type: "TEXT", nullable: false),
                     DaysOff = table.Column<string>(type: "TEXT", nullable: false)
                 },
@@ -1344,6 +1367,17 @@ namespace Dirassati_Backend.Migrations
                 column: "SchoolId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_Token",
+                table: "RefreshTokens",
+                column: "Token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SchoolLevels_SchoolTypeId",
                 table: "SchoolLevels",
                 column: "SchoolTypeId");
@@ -1491,6 +1525,9 @@ namespace Dirassati_Backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "PhoneNumbers");
+
+            migrationBuilder.DropTable(
+                name: "RefreshTokens");
 
             migrationBuilder.DropTable(
                 name: "SchoolScheduleConfig");

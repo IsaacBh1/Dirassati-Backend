@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dirassati_Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250525203233_AddRefreshTokenEntity")]
-    partial class AddRefreshTokenEntity
+    [Migration("20250526180426_MigrationAfterRefactor")]
+    partial class MigrationAfterRefactor
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -272,6 +272,9 @@ namespace Dirassati_Backend.Migrations
 
                     b.Property<string>("Position")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProfilePictureUrl")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("SchoolId")
@@ -638,6 +641,9 @@ namespace Dirassati_Backend.Migrations
                     b.Property<int>("AddressId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("BankCode")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("BillingCycleDays")
                         .HasColumnType("INTEGER");
 
@@ -645,7 +651,7 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Logo")
+                    b.Property<string>("LogoUrl")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -780,6 +786,10 @@ namespace Dirassati_Backend.Migrations
                         .HasColumnType("TEXT");
 
                     b.PrimitiveCollection<string>("DaysOff")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.PrimitiveCollection<string>("FullDays")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -1113,25 +1123,73 @@ namespace Dirassati_Backend.Migrations
                         new
                         {
                             SubjectId = 1,
-                            Name = "général",
+                            Name = "Histoire",
                             SchoolType = 1
                         },
                         new
                         {
                             SubjectId = 2,
-                            Name = "Langue Française",
+                            Name = "Géographie",
                             SchoolType = 1
                         },
                         new
                         {
                             SubjectId = 3,
-                            Name = "Langue Anglaise",
+                            Name = "Éducation Islamique",
                             SchoolType = 1
                         },
                         new
                         {
                             SubjectId = 4,
-                            Name = "Tamazight",
+                            Name = "Éducation Civique",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 5,
+                            Name = "Mathématiques",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 7,
+                            Name = "Sciences Technologiques",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 8,
+                            Name = "Langue Arabe",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 9,
+                            Name = "Langue Tamazight",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 10,
+                            Name = "Langue Française",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 11,
+                            Name = "Langue Anglaise",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 12,
+                            Name = "EPS",
+                            SchoolType = 1
+                        },
+                        new
+                        {
+                            SubjectId = 13,
+                            Name = "Éducation Artistique",
                             SchoolType = 1
                         },
                         new
@@ -1993,13 +2051,11 @@ namespace Dirassati_Backend.Migrations
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.SchoolScheduleConfig", b =>
                 {
-                    b.HasOne("Dirassati_Backend.Data.Models.School", "School")
+                    b.HasOne("Dirassati_Backend.Data.Models.School", null)
                         .WithOne("ScheduleConfig")
                         .HasForeignKey("Dirassati_Backend.Data.Models.SchoolScheduleConfig", "SchoolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("School");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Student", b =>
