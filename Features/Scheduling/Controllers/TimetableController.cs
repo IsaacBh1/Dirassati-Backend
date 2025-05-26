@@ -37,7 +37,6 @@ public class ScheduleController : ControllerBase
             if (school == null)
                 return NotFound(new { Error = $"School with ID {schoolId} not found" });
 
-            // Update or create configuration
             school.ScheduleConfig = new SchoolScheduleConfig
             {
                 SchoolId = schoolId, // Ensure SchoolId is set
@@ -47,7 +46,6 @@ public class ScheduleController : ControllerBase
                 AfternoonEnd = config.AfternoonEnd,
                 DaysOff = config.DaysOff,
                 ShortDays = config.ShortDays
-                // Note: FullDays is not set as it's a read-only property
             };
 
             await _context.SaveChangesAsync();
@@ -80,7 +78,7 @@ public class ScheduleController : ControllerBase
     [HttpPost("schools/{schoolId}/generate/{academicYearId}")]
     public async Task<IActionResult> GenerateSchedule(
         [FromRoute, Required] Guid schoolId,
-        [FromRoute, Range(2020, 2100)] int academicYearId)
+        [FromRoute, Range(2000, 2100)] int academicYearId)
     {
         try
         {
@@ -93,8 +91,8 @@ public class ScheduleController : ControllerBase
                 return NotFound(new { Error = $"School with ID {schoolId} not found" });
 
             // Validate academic year
-            if (school.AcademicYearId != academicYearId)
-                return BadRequest(new { Error = "Academic year mismatch for school" });
+            // if (school.AcademicYearId != academicYearId)
+            //     return BadRequest(new { Error = "Academic year mismatch for school" });
 
             // Check for existing schedule
             if (await _context.Lessons.AnyAsync(l =>
@@ -335,4 +333,17 @@ public class ScheduleController : ControllerBase
         [Range(1, 20)] public int Hours { get; set; }
         [Range(1, 10)] public int Priority { get; set; }
     }
+}
+
+internal class ScheduleConfigResponseDto
+{
+    public int ConfigId { get; set; }
+    public Guid SchoolId { get; set; }
+    public TimeSpan MorningStart { get; set; }
+    public TimeSpan MorningEnd { get; set; }
+    public TimeSpan AfternoonStart { get; set; }
+    public TimeSpan AfternoonEnd { get; set; }
+    public required DayOfWeek[] FullDays { get; set; }
+    public required DayOfWeek[] ShortDays { get; set; }
+    public required DayOfWeek[] DaysOff { get; set; }
 }
