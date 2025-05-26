@@ -1,5 +1,7 @@
+using System.Text;
 using AutoMapper;
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Common.Services.PhotoUpload;
 using Dirassati_Backend.Data;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
@@ -14,25 +16,14 @@ namespace Dirassati_Backend.Features.Auth.Register.Services;
 
 [Tags("Employee Authentication")]
 
-public class RegisterService
+public class RegisterService(UserManager<AppUser> userManager, AppDbContext dbContext, IMapper mapper, IPhotoUploadService photoUploadService)
 {
-    private readonly UserManager<AppUser> _userManager;
-    private readonly AppDbContext _dbContext;
-    private readonly IMapper _mapper;
-
-    public RegisterService(UserManager<AppUser> userManager, AppDbContext dbContext, IMapper mapper)
+    public async Task<Result<CreatedEmployeeDto, string>> Register(RegisterDto dto )
     {
-        _userManager = userManager;
-        _dbContext = dbContext;
-        _mapper = mapper;
-    }
-    public async Task<Result<CreatedEmployeeDto, IEnumerable<IdentityError>>> Register(RegisterDto dto)
-    {
-        var result = new Result<CreatedEmployeeDto, IEnumerable<IdentityError>>();
-        using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        var result = new Result<CreatedEmployeeDto, string>();
+        using var transaction = await dbContext.Database.BeginTransactionAsync();
         try
         {
-
             var user = new AppUser
             {
                 FirstName = dto.Employee.FirstName,
@@ -41,19 +32,25 @@ public class RegisterService
                 PhoneNumber = dto.Employee.PhoneNumber,
                 UserName = dto.Employee.Email
             };
-
-            var CreateResult = await _userManager.CreateAsync(user, dto.Employee.Password);
+            
+            var CreateResult = await userManager.CreateAsync(user, dto.Employee.Password);
             if (!CreateResult.Succeeded)
             {
-                return result.Failure(CreateResult.Errors, 400);
+                var errorBuilder = new StringBuilder();
+                foreach (var error in CreateResult.Errors)
+                {
+                    errorBuilder.AppendLine(error.Description);
+                }
+                var errors = errorBuilder.ToString();
+                return result.Failure(errors, 400);
             }
             var Specializations = new List<Specialization>();
 
             if (dto.School.SpecializationsId != null)
             {
-                Specializations = await _dbContext.Specializations.Where(s => dto.School.SpecializationsId.Contains(s.SpecializationId)).ToListAsync();
+                Specializations = await dbContext.Specializations.Where(s => dto.School.SpecializationsId.Contains(s.SpecializationId)).ToListAsync();
             }
-            var school = _mapper.Map<Data.Models.School>(dto.School);
+            var school = mapper.Map<Data.Models.School>(dto.School);
             school.Specializations = Specializations;
             school.PhoneNumbers.Add(new PhoneNumber { Number = dto.School.PhoneNumber });
 
@@ -65,12 +62,13 @@ public class RegisterService
                 Position = "Admin",
                 School = school,
                 User = user,
-                Permissions = dto.Employee.Permission
+                Permissions = dto.Employee.Permission,
+                ProfilePictureUrl = dto.Employee.ProfilePictureUrl
             };
 
-            await _dbContext.Schools.AddAsync(school);
-            var newEmployee = await _dbContext.Employees.AddAsync(employee);
-            await _dbContext.SaveChangesAsync();
+            await dbContext.Schools.AddAsync(school);
+            var newEmployee = await dbContext.Employees.AddAsync(employee);
+            await dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
 
             return result.Success(newEmployee.ToEmployeeResponceDto());
@@ -79,6 +77,41 @@ public class RegisterService
         catch (Exception)
         {
             await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task<Result<CreatedEmployeeDto, string>> RegisterWithImageUpload(ImprovedRegisterDto dto)
+    {
+        var result = new Result<CreatedEmployeeDto, string>();
+        var registerDto = dto.ToRegisterDto();
+        try
+        {
+            if (dto.SchoolLogo is not null)
+            {
+                var schoolLogoUploadResult = await photoUploadService.UploadPhotoAsync(dto.SchoolLogo);
+                if (!schoolLogoUploadResult.IsSuccess)
+                {
+                    return result.Failure(schoolLogoUploadResult.Errors!, schoolLogoUploadResult.StatusCode);
+                }
+
+                registerDto.School.LogoUrl = schoolLogoUploadResult.Value.Url;
+            }
+
+            if (dto.ProfilePicture is null) return await Register(registerDto);
+            var profilePictureUploadResult = await photoUploadService.UploadPhotoAsync(dto.ProfilePicture);
+            if (!profilePictureUploadResult.IsSuccess)
+            {
+                return result.Failure(profilePictureUploadResult.Errors!, profilePictureUploadResult.StatusCode);
+            }
+
+            registerDto.Employee.ProfilePictureUrl = profilePictureUploadResult.Value.Url;
+
+            return await Register(registerDto);
+        }
+        catch (Exception e)
+        {
+            return result.Failure(e.Message, 500);
             throw;
         }
     }

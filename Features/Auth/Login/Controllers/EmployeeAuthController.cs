@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+using Dirassati_Backend.Common.Dtos;
+using Dirassati_Backend.Common.Repositories;
+using Dirassati_Backend.Common.Security;
 using Dirassati_Backend.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Dirassati_Backend.Data.Models;
@@ -12,34 +13,30 @@ using Dirassati_Backend.Data;
 using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Features.Auth.Login.Controllers
-{
+{ 
     [ApiController]
     [Route("api/auth")]
     [Tags("Employee Authentication")]
     [AllowAnonymous]
-    public class EmployeeAuthController : ControllerBase
+    public class EmployeeAuthController(
+        IRefreshTokenRepository refreshTokenRepository,
+        RefreshTokenProvider refreshTokenProvider,
+        TokenProvider tokenProvider,
+        UserManager<AppUser> userManager,
+        AppDbContext context)
+        : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
-        private readonly AppDbContext _context;
-        private readonly IConfiguration _configuration;
-
-        public EmployeeAuthController(UserManager<AppUser> userManager, AppDbContext context, IConfiguration configuration)
-        {
-            _userManager = userManager;
-            _context = context;
-            _configuration = configuration;
-        }
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] EmployeeLoginDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(dto.Email);
+            var user = await userManager.FindByEmailAsync(dto.Email);
             if (user == null)
             {
                 return Unauthorized("Invalid email or password");
             }
 
-            var passwordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+            var passwordValid = await userManager.CheckPasswordAsync(user, dto.Password);
             if (!passwordValid)
             {
                 return Unauthorized("Invalid email or password");
@@ -51,22 +48,39 @@ namespace Dirassati_Backend.Features.Auth.Login.Controllers
             }
 
             // Compare by converting userGuid to string
-            var employee = await _context.Employees
+            var employee = await context.Employees
                 .Include(e => e.School)
-                .FirstOrDefaultAsync(e => e.UserId == userGuid.ToString()); if (employee == null)
+                .FirstOrDefaultAsync(e => e.UserId == userGuid.ToString());
+            if (employee == null)
             {
                 return Unauthorized("Employee record not found.");
             }
 
             var token = GenerateJwtToken(user, employee);
-            return Ok(new { Token = token, user.FirstName, user.LastName });
+            if (string.IsNullOrEmpty(token))
+            {
+                return Unauthorized("Failed to generate token.");
+            }
+
+            var refreshToken =await refreshTokenRepository.AddNewRefreshTokenAsync(employee.UserId);
+            return Ok(new { Token = token,user.FirstName,  user.LastName, RefreshToken = refreshToken});
         }
 
+        [AllowAnonymous]
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<RefreshTokenResponseDto>> RefreshToken(string refreshToken,    [FromHeader(Name = "Authorization")] string authorization)
+        {
+            var accessToken =authorization.Replace("Bearer ", "");
+            var result = await refreshTokenProvider.GenerateNewJwtFromRefreshToken(refreshToken,accessToken );
+            if (!result.IsSuccess)
+            {
+                return Unauthorized(result.Errors);
+            }
+            return Ok(result.Value);
+        }
         private string GenerateJwtToken(AppUser user, Employee employee)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
+         
             var claims = new List<Claim>
     {
         new Claim(JwtRegisteredClaimNames.Sub, user.Id),
@@ -78,16 +92,7 @@ namespace Dirassati_Backend.Features.Auth.Login.Controllers
         new Claim(ClaimTypes.Role, "Employee")
 
     };
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(12),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return tokenProvider.GenerateJwtToken(claims);
         }
     }
 }

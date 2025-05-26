@@ -1,10 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+using Dirassati_Backend.Common.Repositories;
+using Dirassati_Backend.Common.Security;
 using Dirassati_Backend.Features.Teachers.Dtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Dirassati_Backend.Data;
@@ -38,32 +38,39 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] TeacherLoginDto loginDto)
         {
-            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            var user = await userManager.FindByEmailAsync(loginDto.Email);
             if (user == null)
                 return Unauthorized("Invalid email or password");
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+            var result = await signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
             if (!result.Succeeded)
                 return Unauthorized("Invalid email or password");
 
-            var teacher = await _context.Teachers
+            var teacher = await context.Teachers
+                .AsNoTracking()
                 .Include(t => t.School)
                 .FirstOrDefaultAsync(t => t.UserId == user.Id);
 
             if (teacher == null)
                 return Unauthorized("Teacher not found");
 
-            var token = GenerateJwtToken(user, teacher.SchoolId.ToString() , teacher.TeacherId.ToString() , teacher.School.SchoolTypeId.ToString());
-            return Ok(new
+            var token =GenerateJwtToken (user, teacher.SchoolId.ToString() , teacher.TeacherId.ToString());
+            if (string.IsNullOrEmpty(token))
+                return Unauthorized("Failed to generate token");
+            //save the refresh token
+            var refreshToken =await refreshTokenRepository.AddNewRefreshTokenAsync(teacher.UserId);
+          
+            return Ok(new 
             {
+                RefreshToken = refreshToken,
                 Token = token,
-                user.FirstName,
-                user.LastName,
-                teacher.SchoolId
+               user.FirstName,
+               user.LastName,
+              teacher.SchoolId
             });
         }
 
-        private string GenerateJwtToken(AppUser user, string schoolId , string teacherId , string schoolTypeId)
+        private string GenerateJwtToken(AppUser user, string schoolId , string teacherId)
         {
             var claims = new List<Claim>
             {
@@ -76,21 +83,7 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
                 new Claim(ClaimTypes.Role, "Teacher")
             };
 
-            var jwtKey = _configuration["Jwt:Key"]
-                ?? throw new InvalidOperationException("Jwt:Key configuration is missing");
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddDays(15),
-                signingCredentials: creds
-            );
-
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return tokenProvider.GenerateJwtToken(claims);
         }
     }
 }

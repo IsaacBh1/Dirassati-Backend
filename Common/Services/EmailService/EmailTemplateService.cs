@@ -3,7 +3,6 @@ using Dirassati_Backend.Persistence;
 using FluentEmail.Core;
 using Microsoft.EntityFrameworkCore;
 using Fluid;
-using System.IO;
 
 namespace Dirassati_Backend.Common.Services.EmailService;
 

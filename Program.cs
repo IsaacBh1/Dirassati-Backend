@@ -10,7 +10,7 @@ using Dirassati_Backend.Hubs;
 using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
-
+using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServices();
@@ -69,6 +69,13 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dirasati API v1");
     });
+    app.MapScalarApiReference(opt  => opt
+        .WithTitle("Dirasati API Reference")
+        .WithOpenApiRoutePattern("/swagger/v1/swagger.json")
+        .WithTheme(ScalarTheme.Mars)
+        .WithDefaultHttpClient(ScalarTarget.Http, ScalarClient.Http11)
+    
+    );
 }
 //note for front-end : Include the trailing record separator (U+001E) to make the handshake works
 using var scope = app.Services.CreateScope();

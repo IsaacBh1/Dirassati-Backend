@@ -3,6 +3,7 @@ using System;
 using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dirassati_Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250526145005_AddPictureUploadSupportToSchoolAndEmployee")]
+    partial class AddPictureUploadSupportToSchoolAndEmployee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -786,10 +789,6 @@ namespace Dirassati_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.PrimitiveCollection<string>("FullDays")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<TimeSpan>("MorningEnd")
                         .HasColumnType("TEXT");
 
@@ -1120,73 +1119,25 @@ namespace Dirassati_Backend.Migrations
                         new
                         {
                             SubjectId = 1,
-                            Name = "Histoire",
+                            Name = "général",
                             SchoolType = 1
                         },
                         new
                         {
                             SubjectId = 2,
-                            Name = "Géographie",
-                            SchoolType = 1
-                        },
-                        new
-                        {
-                            SubjectId = 3,
-                            Name = "Éducation Islamique",
-                            SchoolType = 1
-                        },
-                        new
-                        {
-                            SubjectId = 4,
-                            Name = "Éducation Civique",
-                            SchoolType = 1
-                        },
-                        new
-                        {
-                            SubjectId = 5,
-                            Name = "Mathématiques",
-                            SchoolType = 1
-                        },
-                        new
-                        {
-                            SubjectId = 7,
-                            Name = "Sciences Technologiques",
-                            SchoolType = 1
-                        },
-                        new
-                        {
-                            SubjectId = 8,
-                            Name = "Langue Arabe",
-                            SchoolType = 1
-                        },
-                        new
-                        {
-                            SubjectId = 9,
-                            Name = "Langue Tamazight",
-                            SchoolType = 1
-                        },
-                        new
-                        {
-                            SubjectId = 10,
                             Name = "Langue Française",
                             SchoolType = 1
                         },
                         new
                         {
-                            SubjectId = 11,
+                            SubjectId = 3,
                             Name = "Langue Anglaise",
                             SchoolType = 1
                         },
                         new
                         {
-                            SubjectId = 12,
-                            Name = "EPS",
-                            SchoolType = 1
-                        },
-                        new
-                        {
-                            SubjectId = 13,
-                            Name = "Éducation Artistique",
+                            SubjectId = 4,
+                            Name = "Tamazight",
                             SchoolType = 1
                         },
                         new
@@ -2048,11 +1999,13 @@ namespace Dirassati_Backend.Migrations
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.SchoolScheduleConfig", b =>
                 {
-                    b.HasOne("Dirassati_Backend.Data.Models.School", null)
+                    b.HasOne("Dirassati_Backend.Data.Models.School", "School")
                         .WithOne("ScheduleConfig")
                         .HasForeignKey("Dirassati_Backend.Data.Models.SchoolScheduleConfig", "SchoolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("School");
                 });
 
             modelBuilder.Entity("Dirassati_Backend.Data.Models.Student", b =>

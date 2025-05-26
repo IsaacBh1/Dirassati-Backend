@@ -1,5 +1,7 @@
 using System.Net.Mail;
 using System.Text;
+using Dirassati_Backend.Common.Repositories;
+using Dirassati_Backend.Common.Security;
 using Dirassati_Backend.Configurations;
 using Dirassati_Backend.Common.Services;
 using Dirassati_Backend.Features.Auth.Accounts.Services;
@@ -13,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Dirassati_Backend.Common.Services.ConnectionTracker;
 using Dirassati_Backend.Common.Services.EmailService;
+using Dirassati_Backend.Common.Services.PhotoUpload;
 using Dirassati_Backend.Features.Payments.Services;
 using Dirassati_Backend.Hubs.Services;
 using Dirassati_Backend.Data;
@@ -21,7 +24,7 @@ using Dirassati_Backend.Features.Groups.Services;
 using Dirassati_Backend.Features.Notes.Repos;
 using Dirassati_Backend.Features.Notes.Services;
 using Dirassati_Backend.Persistence;
-using Dirassati_Backend.Features.Employees.Services;
+using Infrastructure.PhotoUpload;
 
 namespace Dirassati_Backend.Common;
 
@@ -68,27 +71,30 @@ public static class AddServicesExtension
 
         builder.Services.AddHttpContextAccessor();
         var provider = builder.Configuration["Email:Provider"];
-        if (provider == "smtp")
+        switch (provider)
         {
-            builder.Services
-    .AddFluentEmail(builder.Configuration["Email:SenderEmail"] ?? throw new InvalidOperationException("Sender Email not found"), builder.Configuration["Email:SenderName"])
-    .AddSmtpSender(new SmtpClient
-    {
-        Host = builder.Configuration["Email:Host"] ?? throw new InvalidOperationException("Check the SMTP server configuration"),
-        Port = builder.Configuration.GetValue<int?>("Email:Port") ?? throw new InvalidOperationException("Check the SMTP server configuration"),
-        EnableSsl = false,
-        DeliveryMethod = SmtpDeliveryMethod.Network
-    });
+            case "smtp":
+                builder.Services
+                    .AddFluentEmail(builder.Configuration["Email:SenderEmail"] ?? throw new InvalidOperationException("Sender Email not found"), builder.Configuration["Email:SenderName"])
+                    .AddSmtpSender(new SmtpClient
+                    {
+                        Host = builder.Configuration["Email:Host"] ?? throw new InvalidOperationException("Check the SMTP server configuration"),
+                        Port = builder.Configuration.GetValue<int?>("Email:Port") ?? throw new InvalidOperationException("Check the SMTP server configuration"),
+                        EnableSsl = false,
+                        DeliveryMethod = SmtpDeliveryMethod.Network
+                    });
+                break;
+            case "postmark":
+            {
+                var apiKey = builder.Configuration["Email:PostMartAPI_KEY"];
+                builder.Services
+                    .AddFluentEmail(builder.Configuration["Email:SenderEmail"], builder.Configuration["Email:SenderName"])
+                    .AddPostmarkSender(apiKey);
+                break;
+            }
+            default:
+                throw new InvalidOperationException("Invalid  Email provider configuration , please choose between smtp or postmark");
         }
-        else if (provider == "postmark")
-        {
-            var apiKey = builder.Configuration["Email:PostMartAPI_KEY"];
-            builder.Services
-       .AddFluentEmail(builder.Configuration["Email:SenderEmail"], builder.Configuration["Email:SenderName"])
-       .AddPostmarkSender(apiKey);
-        }
-        else
-            throw new InvalidOperationException("Invalid  Email provider configuration , please choose between smtp or postmark");
 
         // Add logging
         builder.Services.AddLogging(loggingBuilder =>
@@ -122,8 +128,10 @@ public static class AddServicesExtension
         builder.Services.AddScoped<IClassroomServices, ClassroomServices>();
         builder.Services.AddScoped<INoteRepository, NoteRepository>();
         builder.Services.AddScoped<INotesServices, NoteService>();
-        builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-
+        builder.Services.AddScoped<TokenProvider>();
+        builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        builder.Services.AddScoped<RefreshTokenProvider>();
+        builder.Services.AddScoped<IPhotoUploadService, PhotoUploadService>();
         return builder;
     }
 }

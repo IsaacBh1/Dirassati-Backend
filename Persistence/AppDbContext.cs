@@ -36,7 +36,8 @@ public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<
     public virtual DbSet<TeacherAvailability> TeacherAvailabilities { get; set; }
     public virtual DbSet<ExamType> ExamTypes { get; set; }
     public virtual DbSet<Note> Notes { get; set; }
-
+    
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
 
 
@@ -133,8 +134,12 @@ public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<
           .HasOne(sr => sr.StudentReportStatus)
           .WithMany(srs => srs.StudentReports)
           .HasForeignKey(sr => sr.StudentReportStatusId);
-
-        
+        builder.Entity<RefreshToken>()
+            .Property(r => r.Token)
+            .HasMaxLength(200);
+        builder.Entity<RefreshToken>()
+            .HasIndex(r => r.Token)
+            .IsUnique();
         // Seed the ReportStatus table
         builder.Entity<StudentReportStatus>().HasData(
             new { StudentReportStatusId = 1, Name = "Pending" },

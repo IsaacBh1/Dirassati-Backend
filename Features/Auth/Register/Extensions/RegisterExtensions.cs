@@ -1,3 +1,4 @@
+using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 
@@ -13,6 +14,45 @@ public static class RegisterExtensions
         EmployeeId = source.Entity.EmployeeId,
         PhoneNumber = source.Entity.User.PhoneNumber!,
         Permissions = source.Entity.Permissions,
-        SchoolId = source.Entity.SchoolId.ToString()
+        SchoolId = source.Entity.SchoolId.ToString(),
+        ProfilePicture = source.Entity.ProfilePictureUrl
+    };
+    public static RegisterDto ToRegisterDto(this ImprovedRegisterDto source) => new RegisterDto
+    {
+        Employee = new EmployeeDto
+        {
+            FirstName = source.FirstName,
+            LastName = source.LastName,
+            Email = source.Email,
+            PhoneNumber = source.PhoneNumber,
+            Password = source.Password,
+            Permission = source.Permission,
+            ProfilePictureUrl = ""
+        },
+        School = new SchoolDto
+        {
+            Name = source.SchoolName,
+            SchoolTypeId = source.SchoolTypeId,
+            Email = source.SchoolEmail,
+            PhoneNumber = source.SchoolPhoneNumber,
+            BankCode = source.BankCode,
+            SpecializationsId = source.SpecializationsId,
+            LogoUrl = "",
+            WebsiteUrl = source.WebsiteUrl,
+            AcademicYear = new AcademicYearDto
+            {
+                StartDate = source.StartDate,
+                EndDate = source.EndDate
+            },
+            Address = new AddressDto
+            {
+                PostalCode = source.PostalCode,
+                City = source.City,
+                Country = source.Country,
+                State = source.State,
+                Street = source.Street
+                
+            }
+        }
     };
 }

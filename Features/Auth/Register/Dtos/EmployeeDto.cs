@@ -7,5 +7,6 @@ public class EmployeeDto
     public required string Email { get; set; }
     public required string PhoneNumber { get; set; }
     public required string Password { get; set; }
+    public string? ProfilePictureUrl  { get; set; }
     public int Permission { get; set; }
 }
