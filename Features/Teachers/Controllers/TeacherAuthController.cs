@@ -19,13 +19,11 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
     public class TeacherAuthController(
         UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager,
-        IConfiguration configuration,
         AppDbContext context,
-        RefreshTokenRepository refreshTokenRepository,
+        IRefreshTokenRepository refreshTokenRepository,
         TokenProvider tokenProvider)
         : ControllerBase
     {
-        private readonly IConfiguration _configuration = configuration;
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] TeacherLoginDto loginDto)
@@ -46,23 +44,23 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
             if (teacher == null)
                 return Unauthorized("Teacher not found");
 
-            var token =GenerateJwtToken (user, teacher.SchoolId.ToString() , teacher.TeacherId.ToString());
+            var token = GenerateJwtToken(user, teacher.SchoolId.ToString(), teacher.TeacherId.ToString());
             if (string.IsNullOrEmpty(token))
                 return Unauthorized("Failed to generate token");
             //save the refresh token
-            var refreshToken =await refreshTokenRepository.AddNewRefreshTokenAsync(teacher.UserId);
-          
-            return Ok(new 
+            var refreshToken = await refreshTokenRepository.AddNewRefreshTokenAsync(teacher.UserId);
+
+            return Ok(new
             {
                 RefreshToken = refreshToken,
                 Token = token,
-               user.FirstName,
-               user.LastName,
-              teacher.SchoolId
+                user.FirstName,
+                user.LastName,
+                teacher.SchoolId
             });
         }
 
-        private string GenerateJwtToken(AppUser user, string schoolId , string teacherId)
+        private string GenerateJwtToken(AppUser user, string schoolId, string teacherId)
         {
             var claims = new List<Claim>
             {
