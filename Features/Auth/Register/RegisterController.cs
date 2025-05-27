@@ -14,34 +14,36 @@ namespace Dirassati_Backend.Features.Auth.SignUp
     [Route("api/auth")]
     [ApiController]
     [Produces("application/json")]
-    public class SignUpController(RegisterService service, VerifyEmailService verifyEmailService, SendCridentialsService sendCridentialsService) : BaseController
+    public class SignUpController(RegisterService registerService, VerifyEmailService verifyEmailService, SendCridentialsService sendCridentialsService) : BaseController
     {
-        private readonly RegisterService _registerService = service;
-        private readonly VerifyEmailService _verifyEmailService = verifyEmailService;
-        private readonly SendCridentialsService _sendCridentialsService = sendCridentialsService;
         [AllowAnonymous]
         [HttpPost("register")]
         [ProducesResponseType(typeof(EmployeeDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Resgister(RegisterDto dto)
         {
-            var result = await _registerService.Register(dto);
+            var result = await registerService.Register(dto);
             if (result.IsSuccess)
                 return Ok(result.Value);
             return BadRequest(result.Errors);
         }
-
-
-
+        [HttpPost("register-v2")]
+        public async Task<IActionResult> RegisterWithPictures([FromForm] ImprovedRegisterDto dto)
+        {
+            var result = await registerService.RegisterWithImageUpload(dto);
+            if (result.IsSuccess)
+                return Ok(result.Value);
+            return BadRequest(result.Errors);
+        }
         [AllowAnonymous]
         [HttpGet("register/verify-email", Name = "VerifyEmail")]
         public async Task<ActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string VerificationToken)
         {
 
-            var result = await _verifyEmailService.VerifyEmailAsync(email, VerificationToken);
+            var result = await verifyEmailService.VerifyEmailAsync(email, VerificationToken);
             if (!result.IsSuccess)
                 return HandleResult(result);
-            var credResult = await _sendCridentialsService.SendCridentialsAsync(email);
+            var credResult = await sendCridentialsService.SendCridentialsAsync(email);
             return HandleResult(credResult);
 
         }

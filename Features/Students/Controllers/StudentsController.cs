@@ -251,6 +251,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
                 PostalCode = "unknown",
                 Country = "unknown"
             },
+
             SpecializationsId = school.Specializations?.Select(s => s.SpecializationId).ToList() ?? new List<int>(),
             Logo = school.Logo ?? string.Empty,
             WebsiteUrl = school.WebsiteUrl ?? string.Empty,

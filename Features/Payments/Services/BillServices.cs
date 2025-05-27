@@ -38,7 +38,7 @@ public class BillServices(AppDbContext context, IMapper mapper, IHubContext<Pare
             SchoolId = schoolIdGuid,
             Amount = billDto.Amount,
             Title = billDto.Title,
-            Description = billDto.Title,
+            Description = billDto.Description,
             SchoolLevelId = billDto.SchoolLevelId
         };
 
@@ -46,6 +46,17 @@ public class BillServices(AppDbContext context, IMapper mapper, IHubContext<Pare
         try
         {
             _context.Bills.Add(newBill);
+            var students = await _context.Students.Select(s => new { s.StudentId, s.SchoolId, s.ParentId, s.SchoolLevelId }).Where(s => s.SchoolId == schoolIdGuid && s.SchoolLevelId == billDto.SchoolLevelId).ToListAsync();
+            foreach (var student in students)
+            {
+                _context.StudentPayments.Add(new StudentPayment
+                {
+                    BillId = newBill.BillId,
+                    ParentId = student.ParentId,
+                    Status = Data.Enums.PaymentStatus.Pending,
+                    StudentId = student.StudentId,
+                });
+            }
             await _context.SaveChangesAsync();
             var newBillResponse = _mapper.Map<GetBillDto>(newBill);
             await SendNewBillAddedNotification(newBillResponse);

@@ -1,0 +1,71 @@
+@startuml Add Note Process
+title Add Note Process
+
+start
+:Teacher selects subject and group;
+:System loads relevant information;
+
+' Individual note path
+if (Adding individual note or bulk notes?) then (individual)
+  :Teacher selects student;
+  :Teacher enters note details (score, comments);
+  :Teacher sets note type (exam, quiz, homework);
+  :Teacher submits note;
+  
+  :System validates input;
+  if (Input valid?) then (yes)
+    :Create note record in database;
+    :Return success confirmation;
+  else (no)
+    :Display validation errors;
+    :Allow correction;
+  endif
+
+' Bulk note path
+else (bulk)
+  :Teacher requests CSV template;
+  :System generates template with student list;
+  :Teacher downloads CSV template;
+  
+  :Teacher fills template with notes data;
+  :Teacher uploads completed CSV file;
+  
+  :System validates CSV format;
+  if (Format valid?) then (yes)
+    :Parse CSV data;
+    :Validate each note entry;
+    
+    ' Process each row
+    while (More records to process?) is (yes)
+      :Read next student note;
+      if (Record valid?) then (yes)
+        :Create note in database;
+        :Increment success counter;
+      else (no)
+        :Log error for this record;
+        :Increment failure counter;
+      endif
+    endwhile
+    
+    :Generate import results summary;
+    :Return results to teacher;
+    
+  else (no)
+    :Return CSV format error;
+  endif
+endif
+
+' Notification flow (common)
+if (Note visibility to parents enabled?) then (yes)
+  :Create notification records for parents;
+  fork
+    :Send real-time notifications via SignalR;
+  fork again
+    if (Email notifications enabled?) then (yes)
+      :Send email notifications to parents;
+    endif
+  endfork
+endif
+
+stop
+@enduml

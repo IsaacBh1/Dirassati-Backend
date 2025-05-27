@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dirassati_Backend.Data.Models;
 
-public partial class Employee
+public class Employee
 {
     [Key]
     public Guid EmployeeId { get; set; } = Guid.NewGuid();
@@ -14,9 +14,10 @@ public partial class Employee
     public string ContractType { get; set; } = string.Empty;
     public bool IsActive { get; set; } = true;
     public int Permissions { get; set; }
-
+    public string? ProfilePictureUrl { get; set; }  
     [ForeignKey(nameof(School))]
     public Guid SchoolId { get; set; } = Guid.Empty;
     public virtual School School { get; set; } = null!;
+    
     public virtual AppUser User { get; set; } = null!;
 }

@@ -1,0 +1,77 @@
+@startuml Add Student Process
+title Add Student Process
+
+start
+:Administrator enters student details;
+note right
+  Name, birth date, address,
+  contact info, school level,
+  parent information, etc.
+end note
+
+:System validates input format;
+if (Format valid?) then (yes)
+  :Extract school ID from user claims;
+  :Verify school exists;
+  
+  if (School exists?) then (yes)
+    :Check if school level exists;
+    
+    if (School level valid?) then (yes)
+      :Check if student with same national ID exists;
+      
+      if (Student doesn't exist?) then (yes)
+        :Create new student entity;
+        
+        ' Parent handling
+        if (Parent information provided?) then (yes)
+          :Check if parent exists by national ID;
+          
+          if (Parent exists?) then (yes)
+            :Link student to existing parent;
+          else (no)
+            :Create parent user account;
+            :Generate random password;
+            :Set account as unverified;
+            :Create parent profile;
+            :Link student to new parent;
+            :Generate verification token;
+            :Prepare welcome email with verification link;
+            :Send email to parent;
+          endif
+        endif
+        
+        if (Group assignment requested?) then (yes)
+          :Verify group exists;
+          if (Group exists?) then (yes)
+            :Check group capacity;
+            if (Group has capacity?) then (yes)
+              :Assign student to group;
+            else (no)
+              :Flag capacity warning;
+              :Student added without group assignment;
+            endif
+          else (no)
+            :Flag invalid group;
+            :Student added without group assignment;
+          endif
+        endif
+        
+        :Save student to database;
+        :Return success with student data;
+        
+      else (no)
+        :Return "Student already exists" error;
+      endif
+    else (no)
+      :Return "Invalid school level" error;
+    endif
+  else (no)
+    :Return "School not found" error;
+  endif
+else (no)
+  :Return validation errors;
+endif
+
+stop
+@enduml

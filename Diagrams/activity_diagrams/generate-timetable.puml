@@ -1,0 +1,64 @@
+@startuml Generate Timetable Process
+title Generate Timetable Process
+
+start
+:Administrator selects school and academic year;
+:System validates selection;
+
+if (School and academic year valid?) then (yes)
+  :Check for existing timetable;
+  if (Timetable already exists?) then (yes)
+    :Confirm overwrite;
+    if (Overwrite confirmed?) then (yes)
+      :Delete existing timetable;
+    else (no)
+      :Abort generation process;
+      stop
+    endif
+  endif
+  
+  :Load school configuration data;
+  :Load school levels;
+  :Load classroom availability;
+  :Load teacher availability;
+  :Load subject hours;
+  :Generate time slots based on schedule config;
+  
+  ' Initial schedule generation using greedy algorithm
+  :Create initial schedule with greedy algorithm;
+  note right
+    Assigns teachers, rooms, subjects
+    based on constraints
+  end note
+  
+  ' Optimization using simulated annealing
+  :Evaluate initial schedule for conflicts;
+  :Set initial temperature for optimization;
+  
+  repeat
+    :Generate neighbor solution;
+    :Calculate energy (conflicts);
+    if (Better solution or probability check passes?) then (yes)
+      :Accept new solution;
+    else (no)
+      :Keep current solution;
+    endif
+    :Decrease temperature;
+  repeat while (Temperature > minimum threshold?) is (yes)
+  
+  if (Solution quality acceptable?) then (yes)
+    :Save lessons to database;
+    :Link lessons to teachers, groups, classrooms;
+    :Create viewable schedule;
+    :Return successful schedule generation;
+  else (no)
+    :Return generation failure with reasons;
+    :Suggest manual adjustments;
+  endif
+  
+else (no)
+  :Return validation error;
+endif
+
+stop
+@enduml

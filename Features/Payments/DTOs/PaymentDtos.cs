@@ -12,7 +12,7 @@ public class InitiatePaymentResponseDto
 {
     public string CheckoutUrl { get; set; } = null!;
     public string CheckoutId { get; set; } = null!;
-
+    
 }
 
 

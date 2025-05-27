@@ -1,0 +1,69 @@
+@startuml Create Group Process
+title Create Group Process
+
+start
+:Administrator provides group details;
+note right
+  Group name, capacity, school level, 
+  classroom assignment, etc.
+end note
+
+:System validates input format;
+if (Format valid?) then (yes)
+  :Extract school ID from user claims;
+  :Verify school exists;
+  
+  if (School exists?) then (yes)
+    :Check if classroom exists;
+    
+    if (Classroom exists?) then (yes)
+      :Verify classroom not already assigned to another group;
+      
+      if (Classroom available?) then (yes)
+        :Check if group name already exists in school;
+        
+        if (Group name unique?) then (yes)
+          :Create new group entity;
+          
+          if (Students provided in request?) then (yes)
+            :Validate student IDs;
+            :Filter valid students (in school, not in other groups);
+            :Count valid students;
+            
+            if (Student count <= group capacity?) then (yes)
+              :Assign students to group;
+            else (no)
+              :Remove excess students from assignment;
+              :Flag capacity warning;
+            endif
+          endif
+          
+          :Save group to database;
+          :Link group to classroom;
+          :Link group to school level;
+          
+          if (Specialization provided?) then (yes)
+            :Link group to specialization;
+          endif
+          
+          :Construct response with group details;
+          :Return success with group data;
+          
+        else (no)
+          :Return "Group name already exists" error;
+        endif
+      else (no)
+        :Return "Classroom already has group" error;
+      endif
+    else (no)
+      :Return "Classroom not found" error;
+    endif
+  else (no)
+    :Return "School not found" error;
+  endif
+else (no)
+  :Return format validation errors;
+endif
+
+stop
+@enduml

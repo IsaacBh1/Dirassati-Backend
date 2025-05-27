@@ -1,0 +1,60 @@
+@startuml View Teacher Schedule Process
+title View Teacher Schedule Process
+
+start
+:User requests teacher schedule;
+
+if (User type?) then (teacher)
+  :Extract teacher ID from claims;
+  :Use teacher's own ID for query;
+else (admin/staff)
+  :Request specifies teacher ID;
+  :Validate teacher ID exists;
+  if (Teacher exists?) then (yes)
+    :Proceed with schedule retrieval;
+  else (no)
+    :Return "Teacher not found" error;
+    stop
+  endif
+endif
+
+:Validate academic year parameter;
+if (Academic year valid?) then (yes)
+  :Get current academic year if not specified;
+else (no)
+  :Return "Invalid academic year" error;
+  stop
+endif
+
+:Query schedule database;
+:Join lesson data with:;
+note right
+  - Group information
+  - Subject details
+  - Classroom location
+  - Day and time slots
+end note
+
+:Organize lessons by day;
+:Sort lessons by time slot;
+
+if (Format parameter specified?) then (yes)
+  if (Format is calendar?) then (yes)
+    :Format data as calendar events;
+  else if (Format is list?) then
+    :Format data as chronological list;
+  else (Format is grid)
+    :Format data as week grid;
+  endif
+else (no)
+  :Use default week grid format;
+endif
+
+:Add free time slots information;
+:Calculate weekly teaching hours;
+:Add subject distribution statistics;
+
+:Return formatted schedule;
+
+stop
+@enduml

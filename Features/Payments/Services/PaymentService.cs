@@ -10,7 +10,9 @@ using Dirassati_Backend.Hubs.Interfaces;
 using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Parlot.Fluent;
 namespace Dirassati_Backend.Features.Payments.Services;
+
 public class PaymentService(
     AppDbContext context,
     IChargilyClient chargilyClient,
@@ -28,19 +30,15 @@ public class PaymentService(
         var result = new Result<InitiatePaymentResponseDto, string>();
         bool isFailed = false;
         //checking if there is a previous failed payment
-        var studentLevelId = (await _context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId))?.SchoolLevelId;
         var bill = await _context.StudentPayments
             .Where(p => p.Status == PaymentStatus.Failed && p.StudentId == studentId)
             .Select(p => p.Bill)
             .FirstOrDefaultAsync();
 
         isFailed = bill is not null;
-        bill ??= await _context.Bills
-               .Where(b => !_context.StudentPayments
-                   .Where(sp => sp.StudentId == studentId)
-                   .Select(sp => sp.BillId)
-                   .Contains(b.BillId) && b.SchoolLevelId == studentLevelId)
-               .FirstOrDefaultAsync();
+        var existingPayment = await _context.StudentPayments.AsNoTracking().Include(p => p.Bill).FirstOrDefaultAsync(p => p.StudentId == studentId && p.Status == PaymentStatus.Pending);
+        bill ??= existingPayment?.Bill;
+
         if (bill == null) return result.Failure($"No bill active for student {studentId} was found.", (int)HttpStatusCode.NotFound);
         var billId = bill.BillId;
 
@@ -105,18 +103,10 @@ public class PaymentService(
                 _logger.LogInformation("Updated failed payment record for Bill {BillId}, Student {StudentId} to Pending status.", billId, studentId);
                 return result.Success(responseDto);
             }
+            if (existingPayment is not null)
+                existingPayment.PaymentGatewayCheckoutId = chargilyResponse.id;
 
-            var studentPayment = new StudentPayment
-            {
-                BillId = billId,
-                StudentId = studentExists.StudentId,
-                Status = PaymentStatus.Pending,
-                AmountPaid = checkoutPayload.Amount,
-                PaymentGatewayCheckoutId = chargilyResponse.id,
-                ParentId = studentExists.ParentId
 
-            };
-            _context.StudentPayments.Add(studentPayment);
             _logger.LogInformation("Webhook {EventId}: Creating new StudentPayment record for Bill {BillId}, Student {StudentId}.", chargilyResponse.id, billId, studentId);
             _logger.LogInformation("Chargily checkout session {CheckoutId} created for Bill {BillId}, Student {StudentId}. Redirect URL issued.", chargilyResponse.id, billId, studentId);
 
@@ -132,8 +122,10 @@ public class PaymentService(
 
     }
 
+
     public async Task<Result<Unit, string>> HandleChargilyWebhookAsync(ChargilyWebhookPayload payload, string rawRequestBody, string signatureHeader)
     {
+
         var result = new Result<Unit, string>();
         _logger.LogInformation("Webhook received. Event ID: {EventId}, Type: {EventType}, Checkout ID: {CheckoutId}", payload.Id, payload.Type, payload.Data?.Id);
 

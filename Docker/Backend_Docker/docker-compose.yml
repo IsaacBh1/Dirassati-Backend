@@ -10,15 +10,27 @@ services:
       - "5080:8080"
       - "5081:5081"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Data Source=/data/dirasatiDb.db
-      - Email__SenderEmail=mohamed@dirasati.org
-      - Email__SenderName=Dirasati
-      - Email__Host=smtp4dev_mail
-      - Email__Port=25
-      - FrontendUrl=http://localhost:5173
+        - ASPNETCORE_ENVIRONMENT=Development
+        - ConnectionStrings__DefaultConnection=Data Source=/data/dirasatiDb.db
+        - Email__SenderEmail=mohamed@dirasati.org
+        - Email__SenderName=Dirasati
+        - Email__Host=smtp4dev_mail
+        - Email__Port=25
+        - FrontendUrl=http://localhost:5173
+        - ChargilyConfigs__ApiKey=${CHARGILY_API_KEY:-default_api_key}
+        - ChargilyConfigs__PublicKey=${CHARGILY_PUBLIC_KEY:-default_public_key}
+        - ChargilyConfigs__SecretKey=${CHARGILY_SECRET_KEY:-default_secret_key}
+        - ChargilyConfigs__ApiBaseUrl=https://pay.chargily.net/test/api/v2
+        - ChargilyConfigs__SuccessUrl=http://localhost:5173
+        - ChargilyConfigs__FailureUrl=http://localhost:5173
+        - ChargilyConfigs__WebhookUrl=${CHARGILY_WEBHOOK_URL:-http://localhost:5080/api/webhook/chargily}
+        - CloudinaryConfig__CloudName=${CLOUDINARY_CLOUD_NAME:-default_cloud_name}
+        - CloudinaryConfig__ApiKey=${CLOUDINARY_API_KEY:-default_api_key}
+        - CloudinaryConfig__ApiSecret=${CLOUDINARY_API_SECRET:-default_secret}
+        - Email__PostMartAPI_KEY=${POSTMART_API_KEY:-default_postmart_key}
     volumes:
       - ./data:/data # Map SQLite file to host
+      - ../../Migrations:/app/Migrations # Map migrations folder to host
     networks:
       - app-network
     restart: always

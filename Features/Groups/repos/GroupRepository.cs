@@ -3,8 +3,6 @@ using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
 namespace Dirassati_Backend.Features.Groups.Repos
 {
-
-
     public class GroupRepository : IGroupRepository
     {
         private readonly AppDbContext _context;
@@ -28,6 +26,14 @@ namespace Dirassati_Backend.Features.Groups.Repos
             }
 
             return group;
+        }
+
+        public async Task<Student?> GetStudentWithParentAsync(Guid studentId)
+        {
+            return await _context.Students
+                .Include(s => s.Parent)
+                .ThenInclude(p => p.User)
+                .FirstOrDefaultAsync(s => s.StudentId == studentId);
         }
     }
 }

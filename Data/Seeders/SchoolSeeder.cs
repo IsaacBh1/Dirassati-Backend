@@ -31,7 +31,7 @@ namespace Dirassati_Backend.Data.Seeders
                         Country = "USA",
                     },
                     SpecializationsId = [1, 2, 3, 4, 5],
-                    Logo = "www.verygoodlogo.com",
+                    LogoUrl = "www.verygoodlogo.com",
                     WebsiteUrl = "www.lesCours.com",
                     AcademicYear = new AcademicYearDto
                     {
@@ -65,10 +65,7 @@ namespace Dirassati_Backend.Data.Seeders
                 Console.WriteLine("Failed to seed Greenwood High School and employee.");
                 if (result.Errors != null)
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        Console.WriteLine($"Error: {error.Description}");
-                    }
+                   Console.WriteLine(result.Errors);
                 }
                 else
                 {

@@ -1,0 +1,67 @@
+@startuml Record Absence Process
+title Record Absence Process
+
+start
+:Teacher/Staff selects group;
+:System loads students in selected group;
+:Display student list;
+
+:Teacher marks absent students;
+:Teacher submits absence form;
+
+:System validates input;
+if (Input valid?) then (yes)
+  fork
+    :Create absence records in database;
+  fork again
+    :Check notification preferences;
+  endfork
+  
+  :Query parent information for absent students;
+  
+  ' Notification process
+  fork
+    :Prepare SignalR notifications;
+    :Get connected parent clients;
+    :Send real-time absence notifications;
+    :Update notification status in database;
+  fork again
+    :Check SMS notification settings;
+    if (SMS notifications enabled?) then (yes)
+      :Prepare SMS messages;
+      :Send SMS to parents;
+      :Log SMS delivery status;
+    endif
+  fork again
+    :Check email notification settings;
+    if (Email notifications enabled?) then (yes)
+      :Prepare email content;
+      :Send emails to parents;
+      :Log email delivery status;
+    endif
+  endfork
+  
+  :Update absence records as notified;
+  :Return success message to teacher;
+  
+else (no)
+  :Return validation error;
+  :Display error message;
+endif
+
+' Optional justification flow
+if (Absence justification submitted later?) then (yes)
+  :Parent or staff submits justification;
+  :System checks authorization;
+  if (Authorized?) then (yes)
+    :Update absence record with justification;
+    :Add justification remarks;
+    :Save changes to database;
+    :Notify relevant parties of justification;
+  else (no)
+    :Return authorization error;
+  endif
+endif
+
+stop
+@enduml
