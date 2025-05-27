@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Dirassati_Backend.Data;
 using Dirassati_Backend.Persistence;
+using Dirassati_Backend.Data.Models;
 namespace Dirassati_Backend.Features.Teachers.Controllers
 {
 
@@ -44,7 +45,7 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
             if (teacher == null)
                 return Unauthorized("Teacher not found");
 
-            var token = GenerateJwtToken(user, teacher.SchoolId.ToString(), teacher.TeacherId.ToString());
+            var token = GenerateJwtToken(user, teacher);
             if (string.IsNullOrEmpty(token))
                 return Unauthorized("Failed to generate token");
             //save the refresh token
@@ -60,16 +61,17 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
             });
         }
 
-        private string GenerateJwtToken(AppUser user, string schoolId, string teacherId)
+        private string GenerateJwtToken(AppUser user, Teacher teacher)
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("TeacherId", teacherId),
-                new Claim("SchoolId", schoolId),
-                new Claim(ClaimTypes.Role, "Teacher")
+                new(JwtRegisteredClaimNames.Sub, user.Id),
+                new(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new("TeacherId", teacher.TeacherId.ToString()),
+                new("SchoolId", teacher.SchoolId.ToString()),
+                new("SchoolTypeId", teacher.SchoolId.ToString()),
+                new(ClaimTypes.Role, "Teacher")
             };
             return tokenProvider.GenerateJwtToken(claims);
         }

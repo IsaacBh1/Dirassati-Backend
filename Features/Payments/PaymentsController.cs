@@ -17,7 +17,7 @@ public class PaymentsController(IPaymentService paymentService, ILogger<Payments
 {
     private readonly IPaymentService _paymentService = paymentService;
     // Cache JsonSerializerOptions as a static readonly field
-    private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+    private static readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };

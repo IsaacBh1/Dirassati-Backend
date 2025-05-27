@@ -55,11 +55,11 @@ namespace Dirassati_Backend.Features.Parents.Controllers
         {
             var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("parentId", parentId),
-            new Claim(ClaimTypes.Role, "Parent")
+            new(JwtRegisteredClaimNames.Sub, user.Id),
+            new(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new("parentId", parentId),
+            new(ClaimTypes.Role, "Parent")
 
         };
             return tokenProvider.GenerateJwtToken(claims);

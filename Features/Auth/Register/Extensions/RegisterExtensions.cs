@@ -6,7 +6,7 @@ namespace Dirassati_Backend.Features.Auth.Register.Extensions;
 
 public static class RegisterExtensions
 {
-    public static CreatedEmployeeDto ToEmployeeResponceDto(this Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<Employee> source) => new CreatedEmployeeDto
+    public static CreatedEmployeeDto ToEmployeeResponceDto(this Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<Employee> source) => new()
     {
         Email = source.Entity.User.Email!,
         FirstName = source.Entity.User.FirstName,
@@ -17,7 +17,7 @@ public static class RegisterExtensions
         SchoolId = source.Entity.SchoolId.ToString(),
         ProfilePicture = source.Entity.ProfilePictureUrl
     };
-    public static RegisterDto ToRegisterDto(this ImprovedRegisterDto source) => new RegisterDto
+    public static RegisterDto ToRegisterDto(this ImprovedRegisterDto source) => new()
     {
         Employee = new EmployeeDto
         {
@@ -51,7 +51,7 @@ public static class RegisterExtensions
                 Country = source.Country,
                 State = source.State,
                 Street = source.Street
-                
+
             }
         }
     };

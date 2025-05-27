@@ -13,7 +13,7 @@ using Dirassati_Backend.Data;
 using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Features.Auth.Login.Controllers
-{ 
+{
     [ApiController]
     [Route("api/auth")]
     [Tags("Employee Authentication")]
@@ -62,16 +62,16 @@ namespace Dirassati_Backend.Features.Auth.Login.Controllers
                 return Unauthorized("Failed to generate token.");
             }
 
-            var refreshToken =await refreshTokenRepository.AddNewRefreshTokenAsync(employee.UserId);
-            return Ok(new { Token = token,user.FirstName,  user.LastName, RefreshToken = refreshToken});
+            var refreshToken = await refreshTokenRepository.AddNewRefreshTokenAsync(employee.UserId);
+            return Ok(new { Token = token, user.FirstName, user.LastName, RefreshToken = refreshToken });
         }
 
         [AllowAnonymous]
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<RefreshTokenResponseDto>> RefreshToken(string refreshToken,    [FromHeader(Name = "Authorization")] string authorization)
+        public async Task<ActionResult<RefreshTokenResponseDto>> RefreshToken(string refreshToken, [FromHeader(Name = "Authorization")] string authorization)
         {
-            var accessToken =authorization.Replace("Bearer ", "");
-            var result = await refreshTokenProvider.GenerateNewJwtFromRefreshToken(refreshToken,accessToken );
+            var accessToken = authorization.Replace("Bearer ", "");
+            var result = await refreshTokenProvider.GenerateNewJwtFromRefreshToken(refreshToken, accessToken);
             if (!result.IsSuccess)
             {
                 return Unauthorized(result.Errors);
@@ -80,16 +80,16 @@ namespace Dirassati_Backend.Features.Auth.Login.Controllers
         }
         private string GenerateJwtToken(AppUser user, Employee employee)
         {
-         
+
             var claims = new List<Claim>
     {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-        new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-        new Claim("EmployeeId", employee.EmployeeId.ToString()),
-        new Claim("Permission", employee.Permissions.ToString()),
-        new Claim("SchoolId", employee.SchoolId.ToString().ToLower()),
-        new Claim("SchoolTypeId" , employee.School.SchoolTypeId.ToString().ToUpper()),
-        new Claim(ClaimTypes.Role, "Employee")
+        new(JwtRegisteredClaimNames.Sub, user.Id),
+        new(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+        new("EmployeeId", employee.EmployeeId.ToString()),
+        new("Permission", employee.Permissions.ToString()),
+        new("SchoolId", employee.SchoolId.ToString().ToLower()),
+        new("SchoolTypeId" , employee.School.SchoolTypeId.ToString().ToUpper()),
+        new(ClaimTypes.Role, "Employee")
 
     };
             return tokenProvider.GenerateJwtToken(claims);
