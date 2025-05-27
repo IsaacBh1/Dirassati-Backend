@@ -11,7 +11,7 @@ public class SchoolDto
     public string Name { get; set; } = string.Empty;
 
     [Required]
-    public  int SchoolTypeId { get; set; }
+    public int SchoolTypeId { get; set; }
 
     [Required]
     [EmailAddress]
@@ -24,16 +24,16 @@ public class SchoolDto
     [Required]
     public AddressDto Address { get; set; } = null!;
 
-    public List<int>? SpecializationsId { get; set; }
+    public List<int>? SpecializationsId { get; set; } = [];
 
 
 
-    public string? LogoUrl { get; set; }
+    public string? LogoUrl { get; set; } = "";
 
 
-    public string? WebsiteUrl { get; set; }
+    public string? WebsiteUrl { get; set; } = "";
 
-    public string? BankCode { get; set; }
+    public string? BankCode { get; set; } = "";
     public AcademicYearDto AcademicYear { get; set; } = null!;
 
     [Range(0, double.MaxValue)]
