@@ -3,23 +3,20 @@ using Dirassati_Backend.Data.DTOs;
 using Dirassati_Backend.Domain.Services;
 using System.Globalization;
 
-namespace Dirassati_Backend.Persistence.Services;
-
-public class CsvService : ICsvService
+namespace Dirassati_Backend.Persistence.Services
 {
-    public CsvService()
+    public class CsvService : ICsvService
     {
-    }
+        public async Task<List<CsvNoteRecord>> ProcessNotesCsv(IFormFile file)
+        {
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            stream.Position = 0;
 
-    public async Task<List<CsvNoteRecord>> ProcessNotesCsv(IFormFile file)
-    {
-        using var stream = new MemoryStream();
-        await file.CopyToAsync(stream);
-        stream.Position = 0;
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
-        using var reader = new StreamReader(stream);
-        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-        return csv.GetRecords<CsvNoteRecord>().ToList();
+            return csv.GetRecords<CsvNoteRecord>().ToList();
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Common.Middlwares;
 using Dirassati_Backend.Configurations;
 using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Extensions;
@@ -9,6 +10,7 @@ using Dirassati_Backend.Features.Teachers.Services;
 using Dirassati_Backend.Hubs;
 using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
@@ -36,7 +38,6 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true;
     });
 
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -56,9 +57,8 @@ builder.Services.AddScoped<AbsenceService>();
 builder.Services.Configure<CloudinaryConfig>(builder.Configuration.GetSection("CloudinaryConfig"));
 
 var app = builder.Build();
-
 app.UseHttpsRedirection();
-
+app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseCors("AllowAll");
 app.UseAuthorization();
 // Configure Swagger UI only in development mode
@@ -69,12 +69,12 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dirasati API v1");
     });
-    app.MapScalarApiReference(opt  => opt
+    app.MapScalarApiReference(opt => opt
         .WithTitle("Dirasati API Reference")
         .WithOpenApiRoutePattern("/swagger/v1/swagger.json")
         .WithTheme(ScalarTheme.Mars)
         .WithDefaultHttpClient(ScalarTarget.Http, ScalarClient.Http11)
-    
+
     );
 }
 //note for front-end : Include the trailing record separator (U+001E) to make the handshake works

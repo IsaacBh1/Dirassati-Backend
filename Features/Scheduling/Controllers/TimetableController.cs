@@ -78,7 +78,7 @@ public class ScheduleController : ControllerBase
     [HttpPost("schools/{schoolId}/generate/{academicYearId}")]
     public async Task<IActionResult> GenerateSchedule(
         [FromRoute, Required] Guid schoolId,
-        [FromRoute, Range(2000, 2100)] int academicYearId)
+        [FromRoute, Range(0, 2100)] int academicYearId)
     {
         try
         {
@@ -105,10 +105,8 @@ public class ScheduleController : ControllerBase
                 });
             }
 
-            // Generate new schedule
             var result = _schedulingService.GenerateSchedule(schoolId, academicYearId);
 
-            // Save to database
             await _context.Lessons.AddRangeAsync(result.TeacherSchedules);
             await _context.SaveChangesAsync();
 
@@ -133,7 +131,7 @@ public class ScheduleController : ControllerBase
     [HttpGet("schools/{schoolId}/schedule/{academicYearId}")]
     public async Task<IActionResult> GetSchedule(
         [FromRoute, Required] Guid schoolId,
-        [FromRoute, Range(2020, 2100)] int academicYearId)
+        [FromRoute, Range(1, 2100)] int academicYearId)
     {
         try
         {
@@ -246,10 +244,8 @@ public class ScheduleController : ControllerBase
                 .Where(lsh => lsh.SchoolId == schoolId)
                 .ToListAsync();
 
-            // Remove old entries
             _context.LevelSubjectHours.RemoveRange(existing);
 
-            // Add new entries
             var newEntries = requests.Select(r => new LevelSubjectHours
             {
                 SchoolId = schoolId,
