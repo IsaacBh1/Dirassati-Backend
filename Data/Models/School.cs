@@ -30,11 +30,9 @@ namespace Dirassati_Backend.Data.Models
         public string? BankCode { get; set; } = "";
         public SchoolScheduleConfig? ScheduleConfig { get; set; }
 
-        // Navigation properties
         public virtual Address Address { get; set; } = new();
         public virtual SchoolType SchoolType { get; set; } = null!;
 
-        // Collections
         public virtual ICollection<Student> Student { get; set; } = [];
 
         public virtual AcademicYear AcademicYear { get; set; } = null!;

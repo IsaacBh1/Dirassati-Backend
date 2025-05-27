@@ -9,17 +9,21 @@ using Dirassati_Backend.Features.Students.DTOs;
 using Dirassati_Backend.Features.Students.Models;
 using Dirassati_Backend.Features.Students.Repositories;
 using Dirassati_Backend.Features.Students.Services;
+using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Features.Students;
 
 [Route("api/students")]
 [ApiController]
-public class StudentsController(StudentServices studentServices, IStudentRepository studentRepository) : BaseController
+public class StudentsController(StudentServices studentServices, IStudentRepository studentRepository, AppDbContext context) : BaseController
 {
     private readonly StudentServices _studentServices = studentServices;
     private readonly IStudentRepository _studentRepository = studentRepository;
+
+    private readonly AppDbContext _context = context;
 
     /// <summary>
     /// Get a student by ID
@@ -201,49 +205,64 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     /// Get the school associated with a student by student ID
     /// </summary>
     /// <param name="id">Student ID</param>
-    /// <returns>School details</returns>
-    [HttpGet("{id}/school")]
+    /// <returns>School details including address and phone numbers</returns>
     [ProducesResponseType(typeof(SchoolDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [HttpGet("{id}/school")]
     public async Task<IActionResult> GetSchoolByStudentId(Guid id)
     {
-        var student = await _studentRepository.GetStudentByIdAsync(id);
-        if (student == null)
+        var student = await _context.Students
+            .Include(s => s.School)
+            .ThenInclude(s => s.Address)
+            .Include(s => s.School)
+            .ThenInclude(s => s.PhoneNumbers)
+            .Include(s => s.School)
+            .ThenInclude(s => s.Specializations)
+            .Include(s => s.School)
+            .ThenInclude(s => s.AcademicYear)
+            .FirstOrDefaultAsync(s => s.StudentId == id);
+
+        if (student == null || student.School == null)
         {
-            return NotFound($"Student with ID {id} not found.");
+            return NotFound($"Student with ID {id} or associated school not found.");
         }
 
-        var school = await _studentRepository.GetSchoolByStudentIdAsync(id);
-        if (school == null)
-        {
-            return NotFound($"School for student with ID {id} not found.");
-        }
+        var school = student.School;
 
         var schoolDto = new SchoolDto
         {
             Name = school.Name,
-            Address = new AddressDto
-            {
-                Street = school.Address?.Street ?? string.Empty,
-                City = school.Address?.City ?? string.Empty,
-                State = school.Address?.State ?? string.Empty,
-                PostalCode = school.Address?.PostalCode ?? string.Empty,
-                Country = school.Address?.Country ?? string.Empty
-            },
-            PhoneNumber = school.PhoneNumbers?.FirstOrDefault()?.ToString() ?? string.Empty,
             SchoolTypeId = school.SchoolTypeId,
-            Email = school.Email,
-            LogoUrl = school.LogoUrl,
-            WebsiteUrl = school.WebsiteUrl,
-            AcademicYear = new AcademicYearDto
+            Email = school.Email ?? "unknown",
+            PhoneNumber = school.PhoneNumbers?.FirstOrDefault()?.Number ?? "unknown",
+            
+            Address = school.Address != null ? new AddressDto
+            {
+                Street = school.Address.Street ?? "unknown",
+                City = school.Address.City ?? "unknown",
+                State = school.Address.State ?? "unknown",
+                PostalCode = school.Address.PostalCode ?? "unknown",
+                Country = school.Address.Country ?? "unknown"
+            } : new AddressDto
+            {
+                Street = "unknown",
+                City = "unknown",
+                State = "unknown",
+                PostalCode = "unknown",
+                Country = "unknown"
+            },
+
+            SpecializationsId = school.Specializations?.Select(s => s.SpecializationId).ToList() ?? new List<int>(),
+            Logo = school.Logo ?? string.Empty,
+            WebsiteUrl = school.WebsiteUrl ?? string.Empty,
+            AcademicYear = school.AcademicYear != null ? new AcademicYearDto
             {
                 StartDate = school.AcademicYear.StartDate,
                 EndDate = school.AcademicYear.EndDate
-            },
+            } : null
         };
 
         return Ok(schoolDto);
     }
-
 }
 
