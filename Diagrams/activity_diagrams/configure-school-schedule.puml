@@ -1,0 +1,79 @@
+@startuml Configure School Schedule Process
+title Configure School Schedule Process
+
+start
+:Administrator selects school;
+:Administrator inputs schedule configuration;
+note right
+  - Morning start/end times
+  - Afternoon start/end times
+  - Days off (weekend days)
+  - Short days configuration
+  - Lunch break duration
+end note
+
+:System validates input format;
+if (Format valid?) then (yes)
+  :Extract school ID from request;
+  :Verify school exists;
+  
+  if (School exists?) then (yes)
+    :Check time logic;
+    
+    if (Morning end > Morning start &&
+        Afternoon end > Afternoon start &&
+        Times in valid range?) then (yes)
+        
+      :Check for existing config;
+      if (Config exists?) then (yes)
+        :Update existing schedule config;
+      else (no)
+        :Create new schedule config;
+      endif
+      
+      :Save morning session times;
+      :Save afternoon session times;
+      :Save lunch break duration;
+      :Save days off configuration;
+      
+      if (Short days provided?) then (yes)
+        :Process short day settings;
+        :Save short day configuration;
+      endif
+      
+      :Save config to database;
+      
+      ' Subject hours setup
+      if (Setting up subject hours?) then (yes)
+        :Get level and subject selections;
+        :Remove existing level-subject hours;
+        
+        while (More subjects to configure?) is (yes)
+          :Get next subject;
+          :Set hours for each level;
+          :Set priority for scheduling;
+          :Save to database;
+        endwhile
+      endif
+      
+      :Return success with config summary;
+      
+    else (no)
+      :Return time logic error;
+    endif
+  else (no)
+    :Return "School not found" error;
+  endif
+else (no)
+  :Return validation errors;
+endif
+
+if (Teacher availability setup?) then (yes)
+  :Navigate to teacher availability;
+  :Select teachers;
+  :Configure availability per day;
+  :Save teacher availability;
+endif
+
+stop
+@enduml

@@ -1,0 +1,72 @@
+@startuml Send Report Notification Process
+title Send Report Notification Process
+
+start
+:Teacher creates student report;
+note right
+  Report can be behavioral,
+  academic, or disciplinary
+end note
+
+:System validates report data;
+if (Report valid?) then (yes)
+  :Save report to database;
+  
+  ' Determine notification recipients
+  if (Report type?) then (behavioral or disciplinary)
+    :Mark for parent notification;
+    :Mark for administration notification;
+  else if (academic)
+    :Mark for parent notification;
+  else (other)
+    :Determine recipients based on report type;
+  endif
+  
+  ' Create notifications
+  :Create notification records;
+  :Set notification priority based on report severity;
+  :Set notification status to "Pending";
+  
+  fork
+    ' Handle real-time notifications
+    :Check for connected parent clients;
+    if (Parents online?) then (yes)
+      :Prepare SignalR notification;
+      :Send real-time notification via Hub;
+      :Update notification status to "Delivered";
+    endif
+  
+  fork again
+    ' Handle email notifications
+    if (Email notifications enabled?) then (yes)
+      :Prepare email content from template;
+      :Add report summary;
+      :Add action links if needed;
+      :Send emails to recipients;
+      :Log email delivery status;
+    endif
+  
+  fork again
+    ' Handle SMS notifications
+    if (SMS notifications enabled AND high priority?) then (yes)
+      :Prepare SMS message;
+      :Send SMS to parent phone number;
+      :Log SMS delivery status;
+    endif
+  endfork
+  
+  ' Follow-up scheduling
+  if (Report requires follow-up?) then (yes)
+    :Create follow-up reminder;
+    :Set follow-up date;
+    :Assign follow-up to responsible staff;
+  endif
+  
+  :Return notification status;
+  
+else (no)
+  :Return validation errors;
+endif
+
+stop
+@enduml

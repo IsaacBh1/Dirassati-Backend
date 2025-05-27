@@ -1,0 +1,109 @@
+
+
+actor "School Admin" as Admin
+participant "ScheduleController" as Controller
+participant "AdvancedScheduler" as Scheduler
+participant "GreedyScheduler" as GreedyScheduler
+participant "SimulatedAnnealingOptimizer" as SAOptimizer
+database "Database (AppDbContext)" as DB
+
+title Schedule Management Process (Emploi de temps)
+
+== Schedule Configuration ==
+
+Admin -> Controller: ConfigureSchoolSchedule(schoolId, config)
+activate Controller
+Controller -> DB: Get School
+DB --> Controller: Return School
+Controller -> DB: Update SchoolScheduleConfig\n(MorningStart, MorningEnd, AfternoonStart,\nAfternoonEnd, DaysOff, ShortDays)
+DB --> Controller: Save Successful
+Controller --> Admin: Return Schedule Config
+deactivate Controller
+
+== Set Subject Hours ==
+
+Admin -> Controller: SetSubjectHours(schoolId, requests)
+activate Controller
+Controller -> DB: Remove Existing LevelSubjectHours
+Controller -> DB: Add New LevelSubjectHours\n(Level, Subject, Hours, Priority)
+DB --> Controller: Save Successful
+Controller --> Admin: Return Success Response
+deactivate Controller
+
+== Set Teacher Availability ==
+
+Admin -> Controller: SetTeacherAvailability(teacherId, availability)
+activate Controller
+Controller -> DB: Get Teacher with Availabilities
+DB --> Controller: Return Teacher
+Controller -> DB: Update TeacherAvailability\n(Day, StartTime, EndTime)
+DB --> Controller: Save Successful
+Controller --> Admin: Return Success Response
+deactivate Controller
+
+== Generate Schedule ==
+
+Admin -> Controller: GenerateSchedule(schoolId, academicYearId)
+activate Controller
+Controller -> DB: Validate school and academic year
+DB --> Controller: Return Validation Result
+Controller -> DB: Check for existing schedule
+DB --> Controller: Return Existence Check
+
+Controller -> Scheduler: GenerateSchedule(schoolId, academicYearId)
+activate Scheduler
+
+Scheduler -> DB: Load school data\n(Groups, Teachers, Classrooms, etc.)
+DB --> Scheduler: Return School Data
+
+Scheduler -> Scheduler: GenerateTimeSlots(config, schoolId)
+Scheduler -> Scheduler: UpdateTimeslots(school, timeslots)
+
+Scheduler -> GreedyScheduler: CreateInitialSchedule(...)
+activate GreedyScheduler
+GreedyScheduler -> GreedyScheduler: Process teachers, groups, rooms, subjects
+GreedyScheduler -> GreedyScheduler: Build initial timetable respecting constraints
+GreedyScheduler --> Scheduler: Return Initial Schedule
+deactivate GreedyScheduler
+
+Scheduler -> SAOptimizer: Optimize(initialSchedule, iterations, coolingRate)
+activate SAOptimizer
+SAOptimizer -> SAOptimizer: Calculate initial energy (conflicts)
+loop For each iteration
+    SAOptimizer -> SAOptimizer: GenerateNeighbor(currentSchedule)
+    SAOptimizer -> SAOptimizer: Calculate new energy
+    SAOptimizer -> SAOptimizer: Accept or reject based on temperature
+    SAOptimizer -> SAOptimizer: Update temperature
+end
+SAOptimizer --> Scheduler: Return Optimized Schedule
+deactivate SAOptimizer
+
+Scheduler --> Controller: Return ScheduleResult
+deactivate Scheduler
+
+Controller -> DB: Save Lessons from ScheduleResult
+DB --> Controller: Save Successful
+
+Controller --> Admin: Return Schedule Generation Result
+deactivate Controller
+
+== Retrieve Schedule ==
+
+Admin -> Controller: GetSchedule(schoolId, academicYearId)
+activate Controller
+Controller -> DB: Get Lessons with related data\n(Teacher, Classroom, Subject, Group)
+DB --> Controller: Return Schedule Data
+Controller -> Controller: FormatSchedule(lessons)
+Controller --> Admin: Return Formatted Schedule
+deactivate Controller
+
+== View Subject Hours ==
+
+Admin -> Controller: GetSubjectHours(schoolId)
+activate Controller
+Controller -> DB: Get LevelSubjectHours with Subject and SchoolLevel
+DB --> Controller: Return Hours Data
+Controller --> Admin: Return Subject Hours
+deactivate Controller
+
+

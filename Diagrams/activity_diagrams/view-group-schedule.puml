@@ -1,0 +1,113 @@
+@startuml View Group Schedule Process
+title View Group Schedule Process
+
+start
+:User requests group schedule;
+
+if (User type?) then (student)
+  :Extract student ID from claims;
+  :Get student's group ID;
+  if (Student has a group?) then (yes)
+    :Use student's group ID;
+  else (no)
+    :Return "Student not assigned to group" error;
+    stop
+  endif
+  
+else if (parent) then
+  :Extract parent ID from claims;
+  
+  if (Child ID specified in request?) then (yes)
+    :Verify child belongs to parent;
+    if (Relationship verified?) then (yes)
+      :Get child's group ID;
+      if (Child has a group?) then (yes)
+        :Use child's group ID;
+      else (no)
+        :Return "Child not assigned to group" error;
+        stop
+      endif
+    else (no)
+      :Return unauthorized error;
+      stop
+    endif
+  else (no)
+    :Return "Child ID required" error;
+    stop
+  endif
+  
+else if (teacher) then
+  :Extract teacher ID from claims;
+  
+  if (Group ID specified?) then (yes)
+    :Verify teacher teaches this group;
+    if (Teaching relationship verified?) then (yes)
+      :Use specified group ID;
+    else (no)
+      :Return unauthorized error;
+      stop
+    endif
+  else (no)
+    :Return "Group ID required" error;
+    stop
+  endif
+  
+else (admin/staff)
+  if (Group ID specified?) then (yes)
+    :Verify group exists;
+    if (Group exists?) then (yes)
+      :Use specified group ID;
+    else (no)
+      :Return "Group not found" error;
+      stop
+    endif
+  else (no)
+    :Return "Group ID required" error;
+    stop
+  endif
+endif
+
+:Validate academic year parameter;
+if (Academic year specified?) then (yes)
+  :Verify academic year exists;
+  if (Academic year valid?) then (yes)
+    :Use specified academic year;
+  else (no)
+    :Return "Invalid academic year" error;
+    stop
+  endif
+else (no)
+  :Use current academic year;
+endif
+
+:Query schedule database for group;
+:Join lesson data with:;
+note right
+  - Teacher information
+  - Subject details
+  - Classroom location
+  - Day and time slots
+end note
+
+:Organize lessons by day;
+:Sort lessons by time slot;
+
+if (Format parameter specified?) then (yes)
+  if (Format is calendar?) then (yes)
+    :Format data as calendar events;
+  else if (Format is list?) then
+    :Format data as chronological list;
+  else (Format is grid)
+    :Format data as week grid;
+  endif
+else (no)
+  :Use default week grid format;
+endif
+
+:Add free time slots information;
+:Add subject distribution statistics;
+
+:Return formatted schedule;
+
+stop
+@enduml
