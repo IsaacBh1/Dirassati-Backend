@@ -19,7 +19,6 @@ if (Format valid?) then (yes)
   
   if (School exists?) then (yes)
     :Check time logic;
-    
     if (Morning end > Morning start &&
         Afternoon end > Afternoon start &&
         Times in valid range?) then (yes)
