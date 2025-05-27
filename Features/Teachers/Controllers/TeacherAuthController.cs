@@ -70,7 +70,7 @@ namespace Dirassati_Backend.Features.Teachers.Controllers
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new("TeacherId", teacher.TeacherId.ToString()),
                 new("SchoolId", teacher.SchoolId.ToString()),
-                new("SchoolTypeId", teacher.SchoolId.ToString()),
+                new("SchoolTypeId", teacher.School.SchoolTypeId.ToString()),
                 new(ClaimTypes.Role, "Teacher")
             };
             return tokenProvider.GenerateJwtToken(claims);
