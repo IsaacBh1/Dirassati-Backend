@@ -526,6 +526,7 @@ namespace Dirassati_Backend.Migrations
                     MorningEnd = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     AfternoonStart = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     AfternoonEnd = table.Column<TimeSpan>(type: "TEXT", nullable: false),
+                    FullDays = table.Column<string>(type: "TEXT", nullable: false),
                     ShortDays = table.Column<string>(type: "TEXT", nullable: false),
                     DaysOff = table.Column<string>(type: "TEXT", nullable: false)
                 },

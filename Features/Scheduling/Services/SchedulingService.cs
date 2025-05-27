@@ -7,22 +7,18 @@ namespace Dirassati_Backend.Features.Scheduling.Services;
 
 public class ScheduleResult
 {
-    // The teacher-centric view: each entry can be interpreted by teacher
     public List<Lesson> TeacherSchedules { get; set; } = new();
     public List<Lesson> GroupSchedules { get; set; } = new();
     public int TotalConflicts { get; set; }
     public List<SubjectHoursStatus> HoursCompliance { get; set; } = new();
+    public List<string> DebugMessages { get; set; } = new(); // Added for debugging
 }
+
 public class AdvancedScheduler
 {
     private readonly AppDbContext _context;
     private readonly Random _random = new();
-    private readonly TimeSpan _lessonDuration = TimeSpan.FromMinutes(60); // Fixed: Should be 45 minutes, not 1 hour
-
-/// <summary>
-/// Initializes a new instance of the <see cref="AdvancedScheduler"/> class.
-/// </summary>
-/// <param name="context">The application's database context used for accessing data.</param>
+    private readonly TimeSpan _lessonDuration = TimeSpan.FromMinutes(45); // Fixed: 45 minutes, not 60
 
     public AdvancedScheduler(AppDbContext context)
     {
@@ -51,8 +47,15 @@ public class AdvancedScheduler
         UpdateTimeslots(school, timeslots);
 
         var levelSubjectHours = _context.LevelSubjectHours
+            .Include(lsh => lsh.Subject)
+            .Include(lsh => lsh.SchoolLevel)
             .Where(lsh => lsh.SchoolId == schoolId)
             .ToList();
+
+        Console.WriteLine($"Found {levelSubjectHours.Count} level subject hour configurations");
+        Console.WriteLine($"Found {school.Groups.Count} groups");
+        Console.WriteLine($"Found {school.Teachers.Count} teachers");
+        Console.WriteLine($"Generated {timeslots.Count} timeslots");
 
         var initialSchedule = GreedyScheduler.CreateInitialSchedule(
             school.Groups.ToList(),
@@ -81,7 +84,7 @@ public class AdvancedScheduler
     private List<Timeslot> GenerateTimeSlots(SchoolScheduleConfig config, Guid schoolId)
     {
         var slots = new List<Timeslot>();
-        var lessonDuration = TimeSpan.FromMinutes(60);
+        var lessonDuration = _lessonDuration;
 
         foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
         {
@@ -118,12 +121,15 @@ public class AdvancedScheduler
 
                 current = current.Add(lessonDuration);
 
+                // Handle break between morning and afternoon
                 if (current == config.MorningEnd && end > config.AfternoonStart)
                 {
                     current = config.AfternoonStart;
                 }
             }
         }
+
+        Console.WriteLine($"Generated {slots.Count} time slots for school {schoolId}");
         return slots;
     }
 
@@ -137,14 +143,15 @@ public class AdvancedScheduler
             List<LevelSubjectHours> levelSubjectHours,
             SchoolScheduleConfig config,
             Guid schoolId,
-            int academicYearId) // Fixed: Added missing parameter
+            int academicYearId)
         {
             var result = new ScheduleResult();
             var usedClassroomSlots = new HashSet<(Guid ClassroomId, int TimeslotId)>();
-            var usedGroupSlots = new HashSet<(Guid GroupId, int TimeslotId)>(); // Fixed: Track group conflicts
+            var usedGroupSlots = new HashSet<(Guid GroupId, int TimeslotId)>();
             var usedTeacherSlots = new HashSet<(Guid TeacherId, int TimeslotId)>();
             var hoursTracking = new Dictionary<(int LevelId, int SubjectId), int>();
 
+            // Initialize hours tracking
             foreach (var lsh in levelSubjectHours)
             {
                 hoursTracking[(lsh.LevelId, lsh.SubjectId)] = 0;
@@ -152,79 +159,132 @@ public class AdvancedScheduler
 
             var orderedSubjects = levelSubjectHours
                 .OrderByDescending(lsh => lsh.Priority)
-                .ThenByDescending(lsh => lsh.HoursPerWeek) // Fixed: Consider hours for better scheduling
+                .ThenByDescending(lsh => lsh.HoursPerWeek)
                 .ToList();
+
+            Console.WriteLine($"Processing {groups.Count} groups");
 
             foreach (var group in groups)
             {
-                if (group.Classroom?.SchoolLevelId == null) continue; // Fixed: Null check
+                Console.WriteLine($"Processing group {group.GroupName} (ID: {group.GroupId})");
+                
+                if (group.Classroom?.SchoolLevelId == null)
+                {
+                    Console.WriteLine($"Group {group.GroupName} has no classroom or school level assigned");
+                    result.DebugMessages.Add($"Group {group.GroupName} has no classroom or school level assigned");
+                    continue;
+                }
 
                 var groupLevelHours = orderedSubjects
                     .Where(lsh => lsh.LevelId == group.Classroom.SchoolLevelId)
                     .ToList();
 
+                Console.WriteLine($"Found {groupLevelHours.Count} subjects for group {group.GroupName} at level {group.Classroom.SchoolLevelId}");
+
                 foreach (var subjectHours in groupLevelHours)
                 {
+                    Console.WriteLine($"Scheduling {subjectHours.HoursPerWeek} hours of subject {subjectHours.SubjectId} for group {group.GroupName}");
+                    
                     for (var i = 0; i < subjectHours.HoursPerWeek; i++)
                     {
+                        // Find available teachers for this subject
+                        var availableTeachers = teachers
+                            .Where(t => t.Subjects != null && 
+                                       t.Subjects.Any(s => s.SubjectId == subjectHours.SubjectId) &&
+                                       t.Availabilities != null && 
+                                       t.Availabilities.Any())
+                            .ToList();
+
+                        if (!availableTeachers.Any())
+                        {
+                            Console.WriteLine($"No teachers available for subject {subjectHours.SubjectId}");
+                            result.DebugMessages.Add($"No teachers available for subject {subjectHours.SubjectId}");
+                            continue;
+                        }
+
+                        Console.WriteLine($"Found {availableTeachers.Count} teachers for subject {subjectHours.SubjectId}");
+
+                        // Find available time slots
                         var availableSlots = timeslots
                             .Where(ts => ts.SchoolId == schoolId &&
-                                  !usedGroupSlots.Contains((group.GroupId, ts.TimeslotId)) && // Fixed: Check group conflicts
-                                  IsTeacherAvailable(teachers, ts, subjectHours.SubjectId) &&
-                                  !usedClassroomSlots.Contains((group.ClassroomId, ts.TimeslotId))) // Fixed: Check classroom availability
+                                        !usedGroupSlots.Contains((group.GroupId, ts.TimeslotId)))
                             .OrderByDescending(ts => ts.IsMorningSlot)
                             .ThenBy(ts => ts.Day)
                             .ThenBy(ts => ts.StartTime)
                             .ToList();
 
+                        Console.WriteLine($"Found {availableSlots.Count} available time slots");
+
                         bool lessonScheduled = false;
+                        
                         foreach (var slot in availableSlots)
                         {
-                            var teacher = teachers.FirstOrDefault(t =>
-                                t.Subjects.Any(s => s.SubjectId == subjectHours.SubjectId) &&
+                            // Find a teacher available for this slot
+                            var teacher = availableTeachers.FirstOrDefault(t =>
                                 IsTeacherAvailableForSlot(t, slot) &&
                                 !usedTeacherSlots.Contains((t.TeacherId, slot.TimeslotId)));
 
-                            var classroom = classrooms.FirstOrDefault(c =>
-                                c.ClassroomId == group.ClassroomId ||
-                                (!usedClassroomSlots.Contains((c.ClassroomId, slot.TimeslotId)) &&
-                                 c.SchoolLevelId == group.Classroom.SchoolLevelId)); // Fixed: Better classroom selection
-
-                            if (teacher != null && classroom != null)
+                            if (teacher == null)
                             {
-                                var lesson = new Lesson
-                                {
-                                    SchoolId = schoolId,
-                                    AcademicYearId = academicYearId, // Fixed: Set academic year
-                                    GroupId = group.GroupId,
-                                    TeacherId = teacher.TeacherId,
-                                    ClassroomId = classroom.ClassroomId,
-                                    TimeslotId = slot.TimeslotId,
-                                    SubjectId = subjectHours.SubjectId,
-                                };
-
-                                result.TeacherSchedules.Add(lesson);
-                                result.GroupSchedules.Add(lesson);
-
-                                usedGroupSlots.Add((group.GroupId, slot.TimeslotId)); // Fixed: Track group usage
-                                usedClassroomSlots.Add((classroom.ClassroomId, slot.TimeslotId));
-                                usedTeacherSlots.Add((teacher.TeacherId, slot.TimeslotId));
-                                hoursTracking[(group.Classroom.SchoolLevelId, subjectHours.SubjectId)]++;
-
-                                lessonScheduled = true;
-                                break; 
+                                continue; // Try next slot
                             }
+
+                            // Find an available classroom
+                            var classroom = classrooms.FirstOrDefault(c =>
+                                (c.ClassroomId == group.ClassroomId ||
+                                 (c.SchoolLevelId == group.Classroom.SchoolLevelId &&
+                                  !usedClassroomSlots.Contains((c.ClassroomId, slot.TimeslotId)))));
+
+                            if (classroom == null)
+                            {
+                                continue; // Try next slot
+                            }
+
+                            // Create the lesson
+                            var lesson = new Lesson
+                            {
+                                SchoolId = schoolId,
+                                AcademicYearId = academicYearId,
+                                GroupId = group.GroupId,
+                                TeacherId = teacher.TeacherId,
+                                ClassroomId = classroom.ClassroomId,
+                                TimeslotId = slot.TimeslotId,
+                                SubjectId = subjectHours.SubjectId,
+                            };
+
+                            result.TeacherSchedules.Add(lesson);
+                            result.GroupSchedules.Add(lesson);
+
+                            // Mark slots as used
+                            usedGroupSlots.Add((group.GroupId, slot.TimeslotId));
+                            usedClassroomSlots.Add((classroom.ClassroomId, slot.TimeslotId));
+                            usedTeacherSlots.Add((teacher.TeacherId, slot.TimeslotId));
+                            
+                            // Update hours tracking
+                            hoursTracking[(group.Classroom.SchoolLevelId, subjectHours.SubjectId)]++;
+
+                            Console.WriteLine($"Scheduled lesson: Group {group.GroupName}, Subject {subjectHours.SubjectId}, Teacher {teacher.TeacherId}, Slot {slot.Day} {slot.StartTime}");
+                            
+                            lessonScheduled = true;
+                            break;
                         }
 
                         if (!lessonScheduled)
                         {
-                            System.Diagnostics.Debug.WriteLine(
-                                $"Could not schedule lesson for Group {group.GroupName}, Subject {subjectHours.SubjectId}, Hour {i + 1}");
+                            var debugMsg = $"Could not schedule lesson {i + 1}/{subjectHours.HoursPerWeek} for Group {group.GroupName}, Subject {subjectHours.SubjectId}";
+                            Console.WriteLine(debugMsg);
+                            result.DebugMessages.Add(debugMsg);
+                            
+                            // Additional debugging
+                            Console.WriteLine($"  - Available teachers: {availableTeachers.Count}");
+                            Console.WriteLine($"  - Available slots: {availableSlots.Count}");
+                            Console.WriteLine($"  - Used group slots: {usedGroupSlots.Count(x => x.GroupId == group.GroupId)}");
                         }
                     }
                 }
             }
 
+            // Create hours compliance report
             result.HoursCompliance = levelSubjectHours.Select(lsh => new SubjectHoursStatus
             {
                 LevelId = lsh.LevelId,
@@ -233,24 +293,39 @@ public class AdvancedScheduler
                 ScheduledHours = hoursTracking.GetValueOrDefault((lsh.LevelId, lsh.SubjectId), 0)
             }).ToList();
 
+            Console.WriteLine($"Final result: {result.TeacherSchedules.Count} lessons scheduled");
+            
             return result;
         }
 
         private static bool IsTeacherAvailableForSlot(Teacher teacher, Timeslot slot)
         {
-            return teacher.Availabilities.Any(a =>
-                a.Day == slot.Day &&
+            if (teacher.Availabilities == null || !teacher.Availabilities.Any())
+            {
+                Console.WriteLine($"Teacher {teacher.TeacherId} has no availability set");
+                return false;
+            }
+
+            var isAvailable = teacher.Availabilities.Any(a =>
+                a?.Day == slot.Day &&
                 a.StartTime <= slot.StartTime &&
                 a.EndTime >= slot.EndTime);
+
+            if (!isAvailable)
+            {
+                Console.WriteLine($"Teacher {teacher.TeacherId} not available for {slot.Day} {slot.StartTime}-{slot.EndTime}");
+            }
+
+            return isAvailable;
         }
     }
 
     private static bool IsTeacherAvailable(List<Teacher> teachers, Timeslot slot, int subjectId)
     {
         return teachers.Any(t =>
-            t.Subjects.Any(s => s.SubjectId == subjectId) &&
-            t.Availabilities.Any(a =>
-                a.Day == slot.Day &&
+            t.Subjects != null && t.Subjects.Any(s => s.SubjectId == subjectId) &&
+            t.Availabilities != null && t.Availabilities.Any(a =>
+                a?.Day == slot.Day &&
                 a.StartTime <= slot.StartTime &&
                 a.EndTime >= slot.EndTime));
     }
@@ -262,7 +337,7 @@ public class AdvancedScheduler
         public static ScheduleResult Optimize(ScheduleResult initialSchedule, int iterations, double coolingRate)
         {
             var current = initialSchedule;
-            var best = DeepClone(current); // Fixed: Clone the best solution
+            var best = DeepClone(current);
             double temperature = 1.0;
 
             for (int i = 0; i < iterations; i++)
@@ -277,7 +352,7 @@ public class AdvancedScheduler
                     current = neighbor;
                     if (neighborEnergy < CalculateEnergy(best))
                     {
-                        best = DeepClone(neighbor); // Fixed: Clone the new best solution
+                        best = DeepClone(neighbor);
                     }
                 }
 
@@ -295,7 +370,6 @@ public class AdvancedScheduler
             if (newSchedule.TeacherSchedules.Count < 2)
                 return newSchedule;
 
-            // Fixed: More intelligent neighbor generation
             var attempts = 10;
             for (int attempt = 0; attempt < attempts; attempt++)
             {
@@ -304,14 +378,13 @@ public class AdvancedScheduler
 
                 if (index1 != index2)
                 {
-                    // Try swapping timeslots instead of entire lessons
                     var lesson1 = newSchedule.TeacherSchedules[index1];
                     var lesson2 = newSchedule.TeacherSchedules[index2];
 
                     // Swap timeslots
                     (lesson1.TimeslotId, lesson2.TimeslotId) = (lesson2.TimeslotId, lesson1.TimeslotId);
 
-                    // Update the corresponding lessons in GroupSchedules
+                    // Update corresponding group schedules
                     var groupLesson1 = newSchedule.GroupSchedules.FirstOrDefault(l =>
                         l.GroupId == lesson1.GroupId && l.SubjectId == lesson1.SubjectId && l.TeacherId == lesson1.TeacherId);
                     var groupLesson2 = newSchedule.GroupSchedules.FirstOrDefault(l =>
@@ -333,21 +406,25 @@ public class AdvancedScheduler
         {
             int conflicts = 0;
 
+            // Teacher conflicts (same teacher, same timeslot)
             conflicts += schedule.TeacherSchedules
                 .GroupBy(l => new { l.TeacherId, l.TimeslotId })
                 .Count(g => g.Count() > 1);
 
+            // Classroom conflicts (same classroom, same timeslot)
             conflicts += schedule.TeacherSchedules
                 .GroupBy(l => new { l.ClassroomId, l.TimeslotId })
                 .Count(g => g.Count() > 1);
 
+            // Group conflicts (same group, same timeslot)
             conflicts += schedule.GroupSchedules
                 .GroupBy(l => new { l.GroupId, l.TimeslotId })
                 .Count(g => g.Count() > 1);
 
+            // Hours compliance penalty
             conflicts += schedule.HoursCompliance
                 .Where(h => !h.IsFulfilled)
-                .Sum(h => h.RequiredHours - h.ScheduledHours);
+                .Sum(h => Math.Abs(h.RequiredHours - h.ScheduledHours));
 
             return conflicts;
         }
@@ -388,7 +465,8 @@ public class AdvancedScheduler
                         SubjectId = h.SubjectId,
                         RequiredHours = h.RequiredHours,
                         ScheduledHours = h.ScheduledHours
-                    }).ToList()
+                    }).ToList(),
+                DebugMessages = new List<string>(source.DebugMessages)
             };
         }
     }
