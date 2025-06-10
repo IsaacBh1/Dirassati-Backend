@@ -235,7 +235,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
             SchoolTypeId = school.SchoolTypeId,
             Email = school.Email ?? "unknown",
             PhoneNumber = school.PhoneNumbers?.FirstOrDefault()?.Number ?? "unknown",
-            
+
             Address = school.Address != null ? new AddressDto
             {
                 Street = school.Address.Street ?? "unknown",
@@ -253,7 +253,7 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
             },
 
             SpecializationsId = school.Specializations?.Select(s => s.SpecializationId).ToList() ?? new List<int>(),
-            Logo = school.Logo ?? string.Empty,
+            LogoUrl = school.LogoUrl ?? string.Empty,
             WebsiteUrl = school.WebsiteUrl ?? string.Empty,
             AcademicYear = school.AcademicYear != null ? new AcademicYearDto
             {

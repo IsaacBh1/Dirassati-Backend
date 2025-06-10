@@ -20,7 +20,8 @@ dirasatiDb.db
 *.user
 *.userosscache
 *.sln.docstates
-
+Diagrams
+out
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
