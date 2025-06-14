@@ -7,23 +7,17 @@ namespace Dirassati_Backend.Features.Scheduling.Services;
 
 public class ScheduleResult
 {
-    public List<Lesson> TeacherSchedules { get; set; } = new();
-    public List<Lesson> GroupSchedules { get; set; } = new();
+    public List<Lesson> TeacherSchedules { get; set; } = [];
+    public List<Lesson> GroupSchedules { get; set; } = [];
     public int TotalConflicts { get; set; }
-    public List<SubjectHoursStatus> HoursCompliance { get; set; } = new();
-    public List<string> DebugMessages { get; set; } = new(); // Added for debugging
+    public List<SubjectHoursStatus> HoursCompliance { get; set; } = [];
+    public List<string> DebugMessages { get; set; } = []; // Added for debugging
 }
 
-public class AdvancedScheduler
+public class AdvancedScheduler(AppDbContext context)
 {
-    private readonly AppDbContext _context;
-    private readonly Random _random = new();
+    private readonly AppDbContext _context = context;
     private readonly TimeSpan _lessonDuration = TimeSpan.FromMinutes(45); // Fixed: 45 minutes, not 60
-
-    public AdvancedScheduler(AppDbContext context)
-    {
-        _context = context;
-    }
 
     public ScheduleResult GenerateSchedule(Guid schoolId, int academicYearId)
     {
@@ -31,7 +25,7 @@ public class AdvancedScheduler
             .Include(s => s.ScheduleConfig)
             .Include(s => s.Groups)
                 .ThenInclude(g => g.Classroom)
-                .ThenInclude(c => c.SchoolLevel)
+                .ThenInclude(c => c!.SchoolLevel)
             .Include(s => s.Teachers)
                 .ThenInclude(t => t.Availabilities)
             .Include(s => s.Teachers)
@@ -63,9 +57,8 @@ public class AdvancedScheduler
             school.Classrooms.ToList(),
             timeslots,
             levelSubjectHours,
-            school.ScheduleConfig,
             schoolId,
-            academicYearId 
+            academicYearId
         );
 
         return SimulatedAnnealingOptimizer.Optimize(initialSchedule, 1000, 0.95);
@@ -86,7 +79,7 @@ public class AdvancedScheduler
         var slots = new List<Timeslot>();
         var lessonDuration = _lessonDuration;
 
-        foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+        foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
         {
             if (config.DaysOff.Contains(day)) continue;
 
@@ -141,7 +134,6 @@ public class AdvancedScheduler
             List<Classroom> classrooms,
             List<Timeslot> timeslots,
             List<LevelSubjectHours> levelSubjectHours,
-            SchoolScheduleConfig config,
             Guid schoolId,
             int academicYearId)
         {
@@ -167,7 +159,7 @@ public class AdvancedScheduler
             foreach (var group in groups)
             {
                 Console.WriteLine($"Processing group {group.GroupName} (ID: {group.GroupId})");
-                
+
                 if (group.Classroom?.SchoolLevelId == null)
                 {
                     Console.WriteLine($"Group {group.GroupName} has no classroom or school level assigned");
@@ -184,18 +176,18 @@ public class AdvancedScheduler
                 foreach (var subjectHours in groupLevelHours)
                 {
                     Console.WriteLine($"Scheduling {subjectHours.HoursPerWeek} hours of subject {subjectHours.SubjectId} for group {group.GroupName}");
-                    
+
                     for (var i = 0; i < subjectHours.HoursPerWeek; i++)
                     {
                         // Find available teachers for this subject
                         var availableTeachers = teachers
-                            .Where(t => t.Subjects != null && 
+                            .Where(t => t.Subjects != null &&
                                        t.Subjects.Any(s => s.SubjectId == subjectHours.SubjectId) &&
-                                       t.Availabilities != null && 
-                                       t.Availabilities.Any())
+                                       t.Availabilities != null &&
+                                       t.Availabilities.Count != 0)
                             .ToList();
 
-                        if (!availableTeachers.Any())
+                        if (availableTeachers.Count == 0)
                         {
                             Console.WriteLine($"No teachers available for subject {subjectHours.SubjectId}");
                             result.DebugMessages.Add($"No teachers available for subject {subjectHours.SubjectId}");
@@ -216,7 +208,7 @@ public class AdvancedScheduler
                         Console.WriteLine($"Found {availableSlots.Count} available time slots");
 
                         bool lessonScheduled = false;
-                        
+
                         foreach (var slot in availableSlots)
                         {
                             // Find a teacher available for this slot
@@ -259,12 +251,12 @@ public class AdvancedScheduler
                             usedGroupSlots.Add((group.GroupId, slot.TimeslotId));
                             usedClassroomSlots.Add((classroom.ClassroomId, slot.TimeslotId));
                             usedTeacherSlots.Add((teacher.TeacherId, slot.TimeslotId));
-                            
+
                             // Update hours tracking
                             hoursTracking[(group.Classroom.SchoolLevelId, subjectHours.SubjectId)]++;
 
                             Console.WriteLine($"Scheduled lesson: Group {group.GroupName}, Subject {subjectHours.SubjectId}, Teacher {teacher.TeacherId}, Slot {slot.Day} {slot.StartTime}");
-                            
+
                             lessonScheduled = true;
                             break;
                         }
@@ -274,7 +266,7 @@ public class AdvancedScheduler
                             var debugMsg = $"Could not schedule lesson {i + 1}/{subjectHours.HoursPerWeek} for Group {group.GroupName}, Subject {subjectHours.SubjectId}";
                             Console.WriteLine(debugMsg);
                             result.DebugMessages.Add(debugMsg);
-                            
+
                             // Additional debugging
                             Console.WriteLine($"  - Available teachers: {availableTeachers.Count}");
                             Console.WriteLine($"  - Available slots: {availableSlots.Count}");
@@ -294,13 +286,13 @@ public class AdvancedScheduler
             }).ToList();
 
             Console.WriteLine($"Final result: {result.TeacherSchedules.Count} lessons scheduled");
-            
+
             return result;
         }
 
         private static bool IsTeacherAvailableForSlot(Teacher teacher, Timeslot slot)
         {
-            if (teacher.Availabilities == null || !teacher.Availabilities.Any())
+            if (teacher.Availabilities == null || teacher.Availabilities.Count == 0)
             {
                 Console.WriteLine($"Teacher {teacher.TeacherId} has no availability set");
                 return false;
@@ -320,15 +312,7 @@ public class AdvancedScheduler
         }
     }
 
-    private static bool IsTeacherAvailable(List<Teacher> teachers, Timeslot slot, int subjectId)
-    {
-        return teachers.Any(t =>
-            t.Subjects != null && t.Subjects.Any(s => s.SubjectId == subjectId) &&
-            t.Availabilities != null && t.Availabilities.Any(a =>
-                a?.Day == slot.Day &&
-                a.StartTime <= slot.StartTime &&
-                a.EndTime >= slot.EndTime));
-    }
+
 
     private static class SimulatedAnnealingOptimizer
     {

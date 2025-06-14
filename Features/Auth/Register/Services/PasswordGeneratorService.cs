@@ -5,26 +5,26 @@ namespace Dirassati_Backend.Features.Auth.Register.Services
 {
     public static class PasswordGeneratorService
     {
-        private const string Lowercase = "abcdefghijklmnopqrstuvwxyz";
-        private const string Uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private const string Numbers = "0123456789";
-        private const string SpecialCharacters = "!@#$%^&*()-_=+[]{}|;:,.<>?";
-        private const int DefaultLength = 12;
+        private const string _lowercase = "abcdefghijklmnopqrstuvwxyz";
+        private const string _uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        private const string _numbers = "0123456789";
+        private const string _specialCharacters = "!@#$%^&*()-_=+[]{}|;:,.<>?";
+        private const int _defaultLength = 12;
 
-        public static string GeneratePassword(int length = DefaultLength)
+        public static string GeneratePassword(int length = _defaultLength)
         {
             if (length < 8)
                 throw new ArgumentException("Password length must be at least 8 characters.", nameof(length));
 
             // Ensure at least one character from each category
             var password = new StringBuilder();
-            password.Append(GetRandomCharacter(Lowercase)); // At least one lowercase
-            password.Append(GetRandomCharacter(Uppercase)); // At least one uppercase
-            password.Append(GetRandomCharacter(Numbers)); // At least one number
-            password.Append(GetRandomCharacter(SpecialCharacters)); // At least one special character
+            password.Append(GetRandomCharacter(_lowercase)); // At least one lowercase
+            password.Append(GetRandomCharacter(_uppercase)); // At least one uppercase
+            password.Append(GetRandomCharacter(_numbers)); // At least one number
+            password.Append(GetRandomCharacter(_specialCharacters)); // At least one special character
 
             // Fill the remaining length with random characters from all categories
-            var allCharacters = Lowercase + Uppercase + Numbers + SpecialCharacters;
+            var allCharacters = _lowercase + _uppercase + _numbers + _specialCharacters;
             for (int i = password.Length; i < length; i++)
             {
                 password.Append(GetRandomCharacter(allCharacters));

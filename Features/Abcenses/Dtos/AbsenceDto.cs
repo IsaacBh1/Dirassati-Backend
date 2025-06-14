@@ -15,7 +15,7 @@ namespace Dirassati_Backend.Features.Abcenses.Dtos
     {
         public Guid StudentId { get; set; }
         public string StudentName { get; set; } = string.Empty;
-        public List<AbsenceDto> Absences { get; set; } = new List<AbsenceDto>();
+        public List<AbsenceDto> Absences { get; set; } = [];
     }
 
     public class GetStudentAbsencesRequestDto

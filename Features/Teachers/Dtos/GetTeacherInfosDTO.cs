@@ -24,7 +24,7 @@ namespace Dirassati_Backend.Features.Teachers.Dtos
         public int ContractTypeId { get; set; }
         public string ContractType { get; set; } = "";
 
-        public List<int> SubjectIds { get; set; } = new List<int>();
+        public List<int> SubjectIds { get; set; } = [];
 
         public Guid SchoolId { get; set; }
 

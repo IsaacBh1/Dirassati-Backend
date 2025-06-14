@@ -1,5 +1,4 @@
 using Dirassati_Backend.Common.Extensions;
-using Dirassati_Backend.Common.Services;
 using Dirassati_Backend.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,38 +17,24 @@ using Dirassati_Backend.Persistence;
 using Dirassati_Backend.Common.Services.EmailService;
 namespace Dirassati_Backend.Features.Teachers.Services;
 
-public class TeacherServices
+public class TeacherServices(
+    ITeacherRepository teacherRepository,
+    AppDbContext dbContext,
+    UserManager<AppUser> userManager,
+    LinkGenerator linkGenerator,
+    IHttpContextAccessor httpContextAccessor,
+    IEmailService emailService,
+    IMapper mapper,
+     IHubContext<ParentNotificationHub, IParentClient> hubContext)
 {
-    private readonly ITeacherRepository _teacherRepository;
-    private readonly AppDbContext _dbContext;
-    private readonly UserManager<AppUser> _userManager;
-    private readonly LinkGenerator _linkGenerator;
-    private readonly IHttpContextAccessor _httpContext;
-    private readonly IEmailService _emailService;
-    private readonly IMapper _mapper;
-    private readonly IHubContext<ParentNotificationHub, IParentClient> _hubContext;
-
-    public TeacherServices(
-        ITeacherRepository teacherRepository,
-        AppDbContext dbContext,
-        UserManager<AppUser> userManager,
-        LinkGenerator linkGenerator,
-        IHttpContextAccessor httpContext,
-        IEmailService emailService,
-        SendCridentialsService sendCridentialsService,
-        IMapper mapper,
-         IHubContext<ParentNotificationHub, IParentClient> hubContext)
-    {
-        _teacherRepository = teacherRepository;
-        _dbContext = dbContext;
-        _userManager = userManager;
-        _linkGenerator = linkGenerator;
-        _httpContext = httpContext;
-        _emailService = emailService;
-
-        _mapper = mapper;
-        _hubContext = hubContext;
-    }
+    private readonly ITeacherRepository _teacherRepository = teacherRepository;
+    private readonly AppDbContext _dbContext = dbContext;
+    private readonly UserManager<AppUser> _userManager = userManager;
+    private readonly LinkGenerator _linkGenerator = linkGenerator;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly IEmailService _emailService = emailService;
+    private readonly IMapper _mapper = mapper;
+    private readonly IHubContext<ParentNotificationHub, IParentClient> _hubContext = hubContext;
 
     public async Task<Guid> RegisterTeacherAsync(TeacherInfosDto teacherDto, string schoolId, bool isSeed = false)
     {
@@ -205,7 +190,7 @@ public class TeacherServices
 
     private string GenerateConfirmationLink(string email, string VerificationToken)
     {
-        var httpContext = _httpContext.HttpContext ?? throw new InvalidOperationException("HttpContext is null");
+        var httpContext = _httpContextAccessor.HttpContext ?? throw new InvalidOperationException("HttpContext is null");
         var encodedToken = Uri.EscapeDataString(VerificationToken);
         // Remove URL encoding for the token
         var link = _linkGenerator.GetUriByName(

@@ -21,7 +21,6 @@ namespace Dirassati_Backend.Features.Parents.Controllers
         TokenProvider tokenProvider,
         UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager,
-        IConfiguration configuration,
         AppDbContext context)
         : ControllerBase
     {

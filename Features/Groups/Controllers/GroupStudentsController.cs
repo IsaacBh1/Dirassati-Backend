@@ -3,6 +3,7 @@ using Dirassati_Backend.Common;
 using Dirassati_Backend.Features.Groups.Dtos;
 using Dirassati_Backend.Features.Groups.Services;
 using Dirassati_Backend.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 namespace Dirassati_Backend.Features.Groups.Controllers;
@@ -18,6 +19,8 @@ public class
 
 
     [HttpGet("by-group/{groupId}")]
+    [Authorize(Roles = "Employee,Teacher")]
+
     public async Task<IActionResult> GetStudentsByGroup(Guid groupId)
     {
         var groupExists = await _context.Groups.AnyAsync(g => g.GroupId == groupId);
@@ -51,6 +54,8 @@ public class
     /// <param name="addGroupDto">Group information and optional student IDs</param>
     /// <returns>The created group with details</returns>
     [HttpPost]
+    [Authorize(Roles = "Employee")]
+
     public async Task<IActionResult> AddGroup(AddGroupDto addGroupDto)
     {
         if (!ModelState.IsValid)

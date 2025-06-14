@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Dirassati_Backend.Common;
-using Dirassati_Backend.Common.Middlwares;
 using Dirassati_Backend.Configurations;
 using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Extensions;
@@ -10,7 +9,6 @@ using Dirassati_Backend.Features.Teachers.Services;
 using Dirassati_Backend.Hubs;
 using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Http.Json;
-using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
@@ -55,10 +53,8 @@ builder.Services.AddSignalR(options =>
 builder.Services.AddRepositories();
 builder.Services.AddScoped<AbsenceService>();
 builder.Services.Configure<CloudinaryConfig>(builder.Configuration.GetSection("CloudinaryConfig"));
-
 var app = builder.Build();
 app.UseHttpsRedirection();
-app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseCors("AllowAll");
 app.UseAuthorization();
 // Configure Swagger UI only in development mode

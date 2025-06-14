@@ -93,7 +93,7 @@ namespace Dirassati_Backend.Features.Groups.Services
                         .Except(validStudents.Select(s => s.StudentId))
                         .ToList();
 
-                    if (invalidStudentIds.Any())
+                    if (invalidStudentIds.Count != 0)
                     {
                         logger.LogWarning("Some student IDs are invalid or already in another group: {InvalidIds}",
                             string.Join(", ", invalidStudentIds));
@@ -332,7 +332,7 @@ namespace Dirassati_Backend.Features.Groups.Services
                 }
 
                 // Add new students if provided
-                if (updateGroupDto.StudentIds != null && updateGroupDto.StudentIds.Any())
+                if (updateGroupDto.StudentIds != null && updateGroupDto.StudentIds.Count != 0)
                 {
                     // Get current student count to check capacity
                     var currentStudentCount = await context.Students
@@ -367,7 +367,7 @@ namespace Dirassati_Backend.Features.Groups.Services
                         .Except(newStudents.Select(s => s.StudentId))
                         .ToList();
 
-                    if (invalidStudentIds.Any())
+                    if (invalidStudentIds.Count != 0)
                     {
                         logger.LogWarning("Some student IDs are invalid or already in the group: {InvalidIds}",
                             string.Join(", ", invalidStudentIds));

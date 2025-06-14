@@ -15,6 +15,7 @@ public class TeacherController(TeacherServices teacherServices) : BaseController
     private readonly TeacherServices _teacherServices = teacherServices;
 
     [HttpPost("create")]
+    [Authorize(Roles = "Employee")]
     public async Task<IActionResult> CreateTeacher([FromBody] TeacherInfosDto teacherDto)
     {
         if (!ModelState.IsValid)
@@ -35,6 +36,8 @@ public class TeacherController(TeacherServices teacherServices) : BaseController
     }
 
     [HttpGet("{id}", Name = "GetTeacherInfo")]
+    [Authorize(Roles = "Employee,Teacher,Parent")]
+
     public async Task<ActionResult<GetTeacherInfosDto>> GetTeacherInfo(string id)
     {
         var schoolId = User.FindFirstValue("SchoolId");
@@ -44,6 +47,8 @@ public class TeacherController(TeacherServices teacherServices) : BaseController
     }
 
     [HttpGet]
+    [Authorize(Roles = "Employee")]
+
     public async Task<ActionResult<List<GetTeacherInfosDto>>> GetTeachers()
     {
         var schoolId = User.FindFirstValue("SchoolId");
@@ -66,6 +71,7 @@ public class TeacherController(TeacherServices teacherServices) : BaseController
     /// <returns></returns>
 
     [HttpPost("reports/add")]
+    [Authorize(Roles = "Employee,Teacher")]
     public async Task<ActionResult<GetStudentReportDto>> AddTeacherReport([FromBody] AddStudentReportDto reportDto)
     {
 

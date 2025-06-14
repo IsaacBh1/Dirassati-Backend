@@ -30,10 +30,10 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     /// </summary>
     /// <param name="id">Student ID</param>
     /// <returns>Student details</returns>
-    [Authorize]
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(StudentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Employee,Teacher,Parent")]
     public async Task<IActionResult> GetStudentById(Guid id)
     {
         var student = await _studentRepository.GetStudentByIdAsync(id);
@@ -48,11 +48,13 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     /// </summary>
     /// <param name="studentDTO">Student information</param>
     /// <returns>Success or error message</returns>
-    [Authorize]
+
     [HttpPost("add")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Employee")]
+
     public async Task<ActionResult> AddStudent(AddStudentDto studentDTO)
     {
         var schoolId = User.FindFirstValue("SchoolId")!;
@@ -67,11 +69,14 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     /// <param name="studentDto">Updated student information</param>
     /// <returns>Success or error message</returns>
     [HttpPut("{id}")]
-    [Authorize]
+
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "Employee")]
+
+
     public async Task<IActionResult> UpdateStudent(Guid id, UpdateStudentDto studentDto)
     {
         if (!ModelState.IsValid)
@@ -89,7 +94,8 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     /// <param name="id">Student ID</param>
     /// <returns>Success or error message</returns>
     [HttpDelete("{id}")]
-    [Authorize]
+    [Authorize(Roles = "Employee")]
+
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -100,10 +106,12 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     }
 
     [HttpGet("list")]
-    [Authorize]
+
     [ProducesResponseType(typeof(PaginatedResult<StudentDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Employee,Teacher,Parent")]
+
     public async Task<IActionResult> GetStudentsBySchoolId(
     [FromQuery][Range(1, int.MaxValue, ErrorMessage = "Page number must be at least 1")] int page = 1,
     [FromQuery][Range(1, 100, ErrorMessage = "Page size must be between 1 and 100")] int pageSize = 10)
@@ -124,9 +132,11 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
 
     }
     [HttpPost("import-csv")]
-    [Authorize]
+
     [ProducesResponseType(typeof(StudentImportResultDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Employee")]
+
     public async Task<IActionResult> ImportStudentsFromCsv([FromForm] StudentCsvUploadModel model)
     {
         if (!ModelState.IsValid)
@@ -166,7 +176,9 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     }
 
     [HttpGet("import-template")]
-    [Authorize]
+    [Authorize(Roles = "Employee")]
+
+
     [ProducesResponseType(typeof(FileContentResult), 200)]
     public IActionResult GetImportTemplate()
     {
@@ -208,6 +220,8 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
     /// <returns>School details including address and phone numbers</returns>
     [ProducesResponseType(typeof(SchoolDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Employee,Teacher,Parent")]
+
     [HttpGet("{id}/school")]
     public async Task<IActionResult> GetSchoolByStudentId(Guid id)
     {
@@ -252,14 +266,14 @@ public class StudentsController(StudentServices studentServices, IStudentReposit
                 Country = "unknown"
             },
 
-            SpecializationsId = school.Specializations?.Select(s => s.SpecializationId).ToList() ?? new List<int>(),
+            SpecializationsId = school.Specializations?.Select(s => s.SpecializationId).ToList() ?? [],
             LogoUrl = school.LogoUrl ?? string.Empty,
             WebsiteUrl = school.WebsiteUrl ?? string.Empty,
             AcademicYear = school.AcademicYear != null ? new AcademicYearDto
             {
                 StartDate = school.AcademicYear.StartDate,
                 EndDate = school.AcademicYear.EndDate
-            } : null
+            } : null!
         };
 
         return Ok(schoolDto);

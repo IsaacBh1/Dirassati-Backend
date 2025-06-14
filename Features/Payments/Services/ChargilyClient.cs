@@ -22,7 +22,7 @@ public class ChargilyClient : IChargilyClient
             throw new InvalidOperationException("Chargily client configuration is missing.");
         }
 
-        _httpClient.BaseAddress = new Uri(apiBaseUrl + "/");
+        _httpClient.BaseAddress = new Uri(apiBaseUrl);
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
     }
@@ -61,7 +61,7 @@ public class ChargilyClient : IChargilyClient
         catch (HttpRequestException httpEx)
         {
             _logger.LogError(httpEx, "HTTP request error while creating Chargily checkout session. {Error}", httpEx);
-            throw ; // Re-throw network-related errors
+            throw; // Re-throw network-related errors
         }
         catch (Exception ex)
         {

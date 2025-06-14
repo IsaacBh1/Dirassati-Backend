@@ -7,16 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Features.Parents.Repositories
 {
-    public class ParentRepository : IParentRepository
+    public class ParentRepository(AppDbContext context, IMapper mapper) : IParentRepository
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
-
-        public ParentRepository(AppDbContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
+        private readonly AppDbContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
         // Gets all parents for a given school (non-paginated)
         public async Task<IEnumerable<GetParentDto>> GetAllBySchoolIdAsync(Guid schoolId)

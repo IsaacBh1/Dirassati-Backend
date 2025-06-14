@@ -26,7 +26,10 @@ namespace Dirassati_Backend.Features.Auth.Login.Controllers
         AppDbContext context)
         : ControllerBase
     {
-        [AllowAnonymous]
+        public sealed class RefreshTokenDto
+        {
+            public required string refreshToken { get; set; }
+        }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] EmployeeLoginDto dto)
         {
@@ -66,12 +69,11 @@ namespace Dirassati_Backend.Features.Auth.Login.Controllers
             return Ok(new { Token = token, user.FirstName, user.LastName, RefreshToken = refreshToken });
         }
 
-        [AllowAnonymous]
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<RefreshTokenResponseDto>> RefreshToken(string refreshToken, [FromHeader(Name = "Authorization")] string authorization)
+        public async Task<ActionResult<RefreshTokenResponseDto>> RefreshToken(RefreshTokenDto dto, [FromHeader(Name = "Authorization")] string authorization)
         {
             var accessToken = authorization.Replace("Bearer ", "");
-            var result = await refreshTokenProvider.GenerateNewJwtFromRefreshToken(refreshToken, accessToken);
+            var result = await refreshTokenProvider.GenerateNewJwtFromRefreshToken(dto.refreshToken, accessToken);
             if (!result.IsSuccess)
             {
                 return Unauthorized(result.Errors);

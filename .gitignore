@@ -20,8 +20,10 @@ dirasatiDb.db
 *.user
 *.userosscache
 *.sln.docstates
-Diagrams
-out
+*.puml
+# Diagrams folder
+Diagrams/
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

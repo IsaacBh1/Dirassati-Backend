@@ -7,12 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dirassati_Backend.Features.School;
 
 [Route("api/[controller]")]
-[Authorize]
 public class SchoolController(ISchoolService schoolService) : BaseController
 {
     private readonly ISchoolService _schoolService = schoolService;
 
     [HttpGet]
+    [Authorize(Roles = "Employee,Teacher,Parent")]
 
     public async Task<ActionResult<GetSchoolInfoDto>> GetSchoolInfo()
     {
@@ -24,7 +24,7 @@ public class SchoolController(ISchoolService schoolService) : BaseController
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-
+    [Authorize(Roles = "Employee")]
     public async Task<IActionResult> UpdateSchoolInfos(UpdateSchoolInfosDto schoolInfosDTO)
     {
         var result = await _schoolService.UpdateSchoolInfos(schoolInfosDTO);

@@ -1,20 +1,15 @@
 using System.Security.Claims;
-using Dirassati_Backend.Features.Abcenses.Dtos;
 using Dirassati_Backend.Features.Abcenses.services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.Abcenses.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AbsenceController : ControllerBase
+    public class AbsenceController(AbsenceService absenceService) : ControllerBase
     {
-        private readonly AbsenceService _absenceService;
-
-        public AbsenceController(AbsenceService absenceService)
-        {
-            _absenceService = absenceService;
-        }
+        private readonly AbsenceService _absenceService = absenceService;
 
         /// <summary>
         /// Mark students as absent for a group
@@ -23,6 +18,8 @@ namespace Dirassati_Backend.Features.Abcenses.Controllers
         /// <param name="absentStudentIds">List of student IDs to mark as absent</param>
         /// <returns>Success status</returns>
         [HttpPost("mark/{groupId}")]
+        [Authorize(Roles = "Teacher")]
+
         public async Task<IActionResult> MarkAbsences(Guid groupId, [FromBody] List<Guid> absentStudentIds)
         {
             await _absenceService.MarkAbsencesAsync(groupId, absentStudentIds);
@@ -47,6 +44,8 @@ namespace Dirassati_Backend.Features.Abcenses.Controllers
         /// <param name="parentId">ID of the parent making the request</param>
         /// <returns>List of absences for the student</returns>
         [HttpGet("student/{studentId}/absences")]
+        [Authorize(Roles = "Employee,Teacher, Parent")]
+
         public async Task<IActionResult> GetStudentAbsences(Guid studentId, [FromQuery] Guid parentId)
         {
             var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;

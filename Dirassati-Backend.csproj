@@ -7,7 +7,7 @@
     <RootNamespace>Dirassati_Backend</RootNamespace>
     <UserSecretsId>bccd9f42-3409-44b7-84bb-a3def67be801</UserSecretsId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591</NoWarn> 
+    <NoWarn>$(NoWarn);1591;S3928;S6964;S2139</NoWarn> 
 
   </PropertyGroup>
 

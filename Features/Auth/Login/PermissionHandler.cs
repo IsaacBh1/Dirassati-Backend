@@ -18,13 +18,8 @@ namespace Dirassati_Backend.Features.Auth.Login
     }
 
 
-    public class PermissionRequirement : IAuthorizationRequirement
+    public class PermissionRequirement(int requiredPermission) : IAuthorizationRequirement
     {
-        public int RequiredPermission { get; }
-
-        public PermissionRequirement(int requiredPermission)
-        {
-            RequiredPermission = requiredPermission;
-        }
+        public int RequiredPermission { get; } = requiredPermission;
     }
 }

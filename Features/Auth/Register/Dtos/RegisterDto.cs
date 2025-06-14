@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Dirassati_Backend.Common.Dtos;
 
 namespace Dirassati_Backend.Features.Auth.Register.Dtos;
 
@@ -17,7 +16,7 @@ public class ImprovedRegisterDto
     public string SchoolName { get; set; } = string.Empty;
 
     [Required]
-    public  int SchoolTypeId { get; set; }
+    public int SchoolTypeId { get; set; }
 
     [Required]
     [EmailAddress]
@@ -42,13 +41,13 @@ public class ImprovedRegisterDto
     [Required]
     [MaxLength(50)]
     public string Country { get; set; } = null!;
-    
+
     [Required]
     [MaxLength(20)]
     public string PostalCode { get; set; } = null!;
-    
+
     public List<int>? SpecializationsId { get; set; }
-    
+
     public IFormFile? SchoolLogo { get; set; }
 
     public string BankCode { get; set; } = null!;
@@ -59,7 +58,7 @@ public class ImprovedRegisterDto
 
     [Range(0, double.MaxValue)]
     public decimal BillAmount { get; set; }
-    
+
     //Employee Informations
     public required string FirstName { get; set; }
     public required string LastName { get; set; }

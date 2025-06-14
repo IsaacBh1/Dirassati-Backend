@@ -25,7 +25,7 @@ public class PaymentsController(IPaymentService paymentService, ILogger<Payments
     private readonly BillServices _billServices = billServices;
 
     [HttpPost("initiate")]
-
+    [Authorize(Roles = "Employee")]
     public async Task<ActionResult<InitiatePaymentResponseDto>> InitiatePayment([FromBody] InitiatePaymentRequestDto request)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -49,10 +49,10 @@ public class PaymentsController(IPaymentService paymentService, ILogger<Payments
         }
     }
 
-    // POST: api/payments/webhook/chargily
+
     [HttpPost("webhook/chargily")]
-    [AllowAnonymous] // MUST be anonymous
-    public async Task<IActionResult> ChargilyWebhook()
+    [AllowAnonymous]
+    public async Task<IActionResult> ChargilyWebhook([FromHeader(Name = "signature")] string signatureHeader)
     {
         string rawRequestBody;
         try
@@ -71,7 +71,7 @@ public class PaymentsController(IPaymentService paymentService, ILogger<Payments
             return StatusCode(StatusCodes.Status500InternalServerError, "Error reading request body.");
         }
 
-        var signatureHeader = Request.Headers["signature"].FirstOrDefault();
+
         if (string.IsNullOrEmpty(signatureHeader))
         {
 
@@ -130,7 +130,8 @@ public class PaymentsController(IPaymentService paymentService, ILogger<Payments
     }
 
     [HttpGet("student/{studentId}/bills")]
-    [Authorize] // Ensure the user is authenticated
+    [Authorize(Roles = "Employee,Parent")]
+
     public async Task<ActionResult<List<StudentPaymentBillDto>>> GetStudentPaymentBills(Guid studentId)
     {
         var parentId = User.FindFirstValue("parentId");

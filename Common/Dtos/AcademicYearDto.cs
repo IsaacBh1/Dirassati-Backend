@@ -6,5 +6,4 @@ public class AcademicYearDto
     public DateOnly EndDate { get; set; }
 
 
-
 }

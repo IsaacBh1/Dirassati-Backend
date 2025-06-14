@@ -3,13 +3,17 @@ using Dirassati_Backend.Common;
 using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Features.SchoolLevels.DTOs;
 using Dirassati_Backend.Features.SchoolLevels.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.SchoolLevels;
+
 [Route("api/[controller]")]
 public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseController
 {
     [HttpGet]
+    [Authorize(Roles = "Employee,Teacher,Parent")]
+
     public async Task<ActionResult<List<GetSchoolLevelDto>>> GetLevels()
     {
         return await schoolLevelServices.GetAllLevelsAsync();
@@ -17,6 +21,8 @@ public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseCon
 
 
     [HttpGet("specializations")]
+    [Authorize(Roles = "Employee,Teacher,Parent")]
+
     public async Task<ActionResult<List<SpecializationDto>>> GetAllSpecializations()
     {
         return await schoolLevelServices.GetAllSpecializationsAsync();
@@ -24,6 +30,8 @@ public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseCon
 
 
     [HttpGet("specializations/school")]
+    [Authorize(Roles = "Employee,Teacher,Parent")]
+
 
     public async Task<ActionResult<List<SpecializationDto>>> GetSchoolSpecializations()
     {
@@ -37,6 +45,8 @@ public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseCon
 
 
     [HttpPut("specializations/add")]
+    [Authorize(Roles = "Employee")]
+
 
     public async Task<ActionResult> EditSpecialization(EditSpecializationDto specializationDTO)
     {

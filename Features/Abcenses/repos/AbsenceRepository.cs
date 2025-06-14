@@ -4,14 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Features.Absences.Repos
 {
-    public class AbsenceRepository : IAbsenceRepository
+    public class AbsenceRepository(AppDbContext context) : IAbsenceRepository
     {
-        private readonly AppDbContext _context;
-
-        public AbsenceRepository(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly AppDbContext _context = context;
 
         public async Task AddAbsenceAsync(Absence absence)
         {

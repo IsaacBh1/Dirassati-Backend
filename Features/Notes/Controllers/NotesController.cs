@@ -31,6 +31,8 @@ namespace Dirassati_Backend.Features.Notes.Controllers
         private readonly INotesServices _notesServices = notesServices;
 
         [HttpPost]
+        [Authorize(Roles = "Employee,Teacher")]
+
         public async Task<ActionResult<Note>> AddNote(CreateNoteDto createNoteDto)
         {
             var schoolIdClaim = httpContextAccessor.HttpContext?.User.FindFirst("SchoolId");
@@ -57,6 +59,8 @@ namespace Dirassati_Backend.Features.Notes.Controllers
         }
 
         [HttpGet("template")]
+        [Authorize(Roles = "Employee,Teacher")]
+
         public async Task<IActionResult> GetCsvTemplate([FromQuery] Guid groupId)
         {
             try
@@ -71,7 +75,7 @@ namespace Dirassati_Backend.Features.Notes.Controllers
 
                 var students = await studentRepository.GetStudentsByGroupAsync(groupId);
 
-                if (!students.Any())
+                if (students.Count == 0)
                     return NotFound("No students found in this group");
 
                 var records = students.Select(s => new CsvNoteRecord
@@ -91,6 +95,8 @@ namespace Dirassati_Backend.Features.Notes.Controllers
         }
 
         [HttpPost("bulk")]
+        [Authorize(Roles = "Employee,Teacher")]
+
         public async Task<IActionResult> BulkCreateNotes([FromForm] BulkNoteCreateDto dto)
         {
             try
@@ -110,11 +116,6 @@ namespace Dirassati_Backend.Features.Notes.Controllers
                 if (group == null)
                     return BadRequest("Invalid group ID for this school");
 
-                // Validate AcademicYear
-                // var academicYear = await context.AcademicYears
-                //     .FirstOrDefaultAsync(ay => ay.AcademicYearId == dto.AcademicYearId);
-                // if (academicYear == null)
-                //     return BadRequest("Invalid AcademicYearId");
 
                 // Validate ExamType
                 var examType = await context.ExamTypes
@@ -153,7 +154,7 @@ namespace Dirassati_Backend.Features.Notes.Controllers
                     notes.Add(note);
                 }
 
-                if (errors.Any())
+                if (errors.Count != 0)
                     return BadRequest(new { Errors = errors });
 
                 await noteRepository.BulkAddAsync(notes);
@@ -165,7 +166,7 @@ namespace Dirassati_Backend.Features.Notes.Controllers
             }
         }
 
-        private (bool IsValid, string ErrorMessage) ValidateRecord(CsvNoteRecord record, List<Student> students, Guid groupId)
+        private static (bool IsValid, string ErrorMessage) ValidateRecord(CsvNoteRecord record, List<Student> students, Guid groupId)
         {
             if (!record.Value.HasValue)
                 return (false, $"Missing value for {record.FirstName} {record.LastName}");
@@ -187,7 +188,7 @@ namespace Dirassati_Backend.Features.Notes.Controllers
             return (true, string.Empty);
         }
 
-        private Note CreateNoteEntity(CsvNoteRecord record, BulkNoteCreateDto dto, Guid schoolId, Guid teacherId)
+        private static Note CreateNoteEntity(CsvNoteRecord record, BulkNoteCreateDto dto, Guid schoolId, Guid teacherId)
         {
             return new Note
             {
@@ -234,6 +235,8 @@ namespace Dirassati_Backend.Features.Notes.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Parent")]
+
         public async Task<ActionResult<List<StudentNotesResponseDto>>> GetAllChildrenNotes()
         {
             var parentIdClaim = httpContextAccessor.HttpContext?.User.FindFirst("ParentId");
@@ -247,6 +250,8 @@ namespace Dirassati_Backend.Features.Notes.Controllers
         }
 
         [HttpGet("{studentId}")]
+        [Authorize(Roles = "Parent")]
+
         public async Task<ActionResult<StudentNotesResponseDto>> GetStudentNotes(Guid studentId)
         {
             var parentIdClaim = httpContextAccessor.HttpContext?.User.FindFirst("ParentId");

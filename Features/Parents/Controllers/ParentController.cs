@@ -1,6 +1,7 @@
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Parents.Dtos;
 using Dirassati_Backend.Features.Parents.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.Parents.Controllers
@@ -8,16 +9,13 @@ namespace Dirassati_Backend.Features.Parents.Controllers
     [Route("api/parents")]
     [ApiController]
 
-    public class ParentController : ControllerBase
+    public class ParentController(IParentRepository parentRepository) : ControllerBase
     {
-        private readonly IParentRepository _parentRepository;
-
-        public ParentController(IParentRepository parentRepository)
-        {
-            _parentRepository = parentRepository;
-        }
+        private readonly IParentRepository _parentRepository = parentRepository;
 
         [HttpGet]
+        [Authorize(Roles = "Employee")]
+
         public async Task<IActionResult> GetAll(Guid SchoolId)
         {
             var parents = await _parentRepository.GetAllBySchoolIdAsync(SchoolId);
@@ -25,6 +23,8 @@ namespace Dirassati_Backend.Features.Parents.Controllers
         }
 
         [HttpGet("paginated")]
+        [Authorize(Roles = "Employee")]
+
         public async Task<IActionResult> GetAllPaginated(Guid SchoolId, int pageNumber, int pageSize)
         {
             var paginatedParents = await _parentRepository.GetAllBySchoolIdAsync(SchoolId, pageNumber, pageSize);
@@ -32,6 +32,8 @@ namespace Dirassati_Backend.Features.Parents.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [Authorize(Roles = "Employee")]
+
         public async Task<IActionResult> GetById(Guid id)
         {
             var parent = await _parentRepository.GetParentByIdAsync(id);
@@ -40,6 +42,8 @@ namespace Dirassati_Backend.Features.Parents.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Employee")]
+
         public async Task<IActionResult> Create([FromBody] Parent parent)
         {
             if (!ModelState.IsValid)
@@ -50,6 +54,8 @@ namespace Dirassati_Backend.Features.Parents.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [Authorize(Roles = "Employee")]
+
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateParentDto parent)
         {
             if (!ModelState.IsValid)
@@ -63,7 +69,10 @@ namespace Dirassati_Backend.Features.Parents.Controllers
             return Ok(updatedParent);
         }
 
+
         [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "Employee")]
+
         public async Task<IActionResult> Delete(Guid id)
         {
             var success = await _parentRepository.DeleteAsync(id);
@@ -72,6 +81,8 @@ namespace Dirassati_Backend.Features.Parents.Controllers
         }
 
         [HttpGet("{parentId:guid}/students")]
+        [Authorize(Roles = "Employee, Parent")]
+
         public async Task<IActionResult> GetStudentsByParent(Guid parentId)
         {
             var students = await _parentRepository.GetStudentsByParentIdAsync(parentId);
@@ -83,6 +94,8 @@ namespace Dirassati_Backend.Features.Parents.Controllers
         }
 
         [HttpGet("{studentId:guid}/parent")]
+        [Authorize(Roles = "Employee, Parent")]
+
         public async Task<IActionResult> GetParentByStudentId(Guid studentId)
         {
             var parent = await _parentRepository.GetParentByStudentIdAsync(studentId);

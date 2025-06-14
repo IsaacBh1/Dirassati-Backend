@@ -3,7 +3,6 @@ using System.Text;
 using Dirassati_Backend.Common.Repositories;
 using Dirassati_Backend.Common.Security;
 using Dirassati_Backend.Configurations;
-using Dirassati_Backend.Common.Services;
 using Dirassati_Backend.Features.Auth.Accounts.Services;
 using Dirassati_Backend.Features.Auth.Register.Services;
 using Dirassati_Backend.Features.School.Services;
@@ -65,7 +64,9 @@ public static class AddServicesExtension
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
                 ValidateIssuer = false,
-                ValidateAudience = false
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromMinutes(1)
             };
         });
         builder.Services.AddAutoMapper(typeof(Program).Assembly);
@@ -102,7 +103,6 @@ public static class AddServicesExtension
         {
             loggingBuilder.AddConsole(); // Add console logger
             loggingBuilder.AddDebug();   // Add debug logger
-            // Add other log providers as needed (e.g., ApplicationInsights, Seq)
         });
         return builder;
     }

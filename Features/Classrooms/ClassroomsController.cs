@@ -2,6 +2,7 @@
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Features.Classrooms.Dtos;
 using Dirassati_Backend.Features.Classrooms.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.Classrooms
@@ -18,6 +19,8 @@ namespace Dirassati_Backend.Features.Classrooms
         /// <param name="addClassroomDto">Classroom information to add</param>
         /// <returns>The newly created classroom</returns>
         [HttpPost]
+        [Authorize(Roles = "Employee")]
+
         public async Task<ActionResult<ClassroomDto>> AddClassroom(AddClassroomDto addClassroomDto)
         {
             if (!ModelState.IsValid)
@@ -39,6 +42,8 @@ namespace Dirassati_Backend.Features.Classrooms
         /// <param name="levelId">The school level ID</param>
         /// <returns>List of classrooms for the specified level</returns>
         [HttpGet("by-level/{levelId:int}")]
+        [Authorize(Roles = "Employee,Teacher")]
+
         public async Task<ActionResult<ClassroomDto>> GetClassroomsByLevel(int levelId)
         {
             var schoolId = User.FindFirstValue("SchoolId");
@@ -54,6 +59,8 @@ namespace Dirassati_Backend.Features.Classrooms
         /// </summary>
         /// <returns>List of all classrooms in the school</returns>
         [HttpGet]
+        [Authorize(Roles = "Employee,Teacher")]
+
         public async Task<ActionResult<List<ClassroomDto>>> GetAllClassrooms()
         {
             var schoolId = User.FindFirstValue("SchoolId");
@@ -70,6 +77,8 @@ namespace Dirassati_Backend.Features.Classrooms
         /// <param name="classroomId">The classroom ID</param>
         /// <returns>Detailed information about the classroom</returns>
         [HttpGet("{classroomId}")]
+        [Authorize(Roles = "Employee,Teacher")]
+
         public async Task<ActionResult<ClassroomDetailDto>> GetClassroomDetails(Guid classroomId)
         {
             var schoolId = User.FindFirstValue("SchoolId");
@@ -87,6 +96,8 @@ namespace Dirassati_Backend.Features.Classrooms
         /// <param name="updateClassroomDto">Updated classroom information</param>
         /// <returns>The updated classroom</returns>
         [HttpPut("{classroomId}")]
+        [Authorize(Roles = "Employee")]
+
         public async Task<ActionResult<ClassroomDto>> UpdateClassroom(Guid classroomId, UpdateClassroomDto updateClassroomDto)
         {
             if (!ModelState.IsValid)
@@ -108,6 +119,8 @@ namespace Dirassati_Backend.Features.Classrooms
         /// <param name="classroomId">ID of the classroom to delete</param>
         /// <returns>Success or error message</returns>
         [HttpDelete("{classroomId}")]
+        [Authorize(Roles = "Employee")]
+
         public async Task<IActionResult> DeleteClassroom(Guid classroomId)
         {
             var schoolId = User.FindFirstValue("SchoolId");

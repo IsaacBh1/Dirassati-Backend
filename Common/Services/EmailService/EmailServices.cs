@@ -103,7 +103,7 @@ public class EmailServices(IFluentEmail fluentEmail, IHttpContextAccessor httpCo
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception occurred while sending email to {Recipient}", to);
+            _logger.LogError(ex, "Exceptioclearn occurred while sending email to {Recipient}", to);
             throw;
         }
     }

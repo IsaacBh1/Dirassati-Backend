@@ -5,43 +5,43 @@ namespace Dirassati_Backend.Features.Scheduling.Dtos;
 
 public class SchoolConfigRequest
 {
-    [Required] 
+    [Required]
     public TimeSpan MorningStart { get; set; }
-    
-    [Required] 
+
+    [Required]
     public TimeSpan MorningEnd { get; set; }
-    
-    [Required] 
+
+    [Required]
     public TimeSpan AfternoonStart { get; set; }
-    
-    [Required] 
+
+    [Required]
     public TimeSpan AfternoonEnd { get; set; }
-    
-    public DayOfWeek[] FullDays { get; set; } = Array.Empty<DayOfWeek>(); 
+
+    public DayOfWeek[] FullDays { get; set; } = Array.Empty<DayOfWeek>();
     public DayOfWeek[] DaysOff { get; set; } = Array.Empty<DayOfWeek>();
-    
+
     public DayOfWeek[] ShortDays { get; set; } = Array.Empty<DayOfWeek>();
 }
 
 public class SubjectPriorityRequest
 {
-    [Required] 
+    [Required]
     public int LevelId { get; set; }
-    
-    [Required] 
+
+    [Required]
     public int SubjectId { get; set; }
-    
-    [Range(1, 5)] 
+
+    [Range(1, 5)]
     public int Priority { get; set; }
 }
 
 
 public class ScheduleResult
 {
-    public List<Lesson> TeacherSchedules { get; set; } = new();
-    public List<Lesson> GroupSchedules { get; set; } = new();
+    public List<Lesson> TeacherSchedules { get; set; } = [];
+    public List<Lesson> GroupSchedules { get; set; } = [];
     public int TotalConflicts { get; set; }
-    public List<SubjectHoursStatus> HoursCompliance { get; set; } = new();
+    public List<SubjectHoursStatus> HoursCompliance { get; set; } = [];
 }
 
 public class SubjectHoursStatus

@@ -1,6 +1,6 @@
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Common.Extensions;
-using Dirassati_Backend.Common.Services;
+using Dirassati_Backend.Common.Services.EmailService;
 using Dirassati_Backend.Data;
 using Dirassati_Backend.Features.Auth.Accounts.DTOs;
 using Microsoft.AspNetCore.Identity;

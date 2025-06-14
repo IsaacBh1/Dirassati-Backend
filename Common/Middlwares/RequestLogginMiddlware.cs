@@ -1,23 +1,10 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Dirassati_Backend.Common.Middlwares
 
 {
-    public class RequestLoggingMiddleware
+    public class RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<RequestLoggingMiddleware> _logger;
-
-        public RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
-        {
-            _next = next;
-            _logger = logger;
-        }
+        private readonly RequestDelegate _next = next;
+        private readonly ILogger<RequestLoggingMiddleware> _logger = logger;
 
         public async Task InvokeAsync(HttpContext context)
         {
@@ -74,7 +61,7 @@ namespace Dirassati_Backend.Common.Middlwares
             return Task.CompletedTask;
         }
 
-        private string MaskAuthorizationHeader(string authHeader)
+        private static string MaskAuthorizationHeader(string authHeader)
         {
             // Mask token details but leave scheme visible
             if (string.IsNullOrEmpty(authHeader)) return string.Empty;

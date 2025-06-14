@@ -3,18 +3,13 @@ using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dirassati_Backend.Controllers
+namespace Dirassati_Backend.Features.Notes.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ExamTypesController : ControllerBase
+    public class ExamTypesController(AppDbContext context) : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public ExamTypesController(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly AppDbContext _context = context;
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExamType>>> GetExamTypes()

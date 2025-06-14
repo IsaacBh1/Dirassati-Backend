@@ -10,16 +10,10 @@ namespace Dirassati_Backend.Features.Scheduling;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ScheduleController : ControllerBase
+public class ScheduleController(AdvancedScheduler schedulingService, AppDbContext context) : ControllerBase
 {
-    private readonly AdvancedScheduler _schedulingService;
-    private readonly AppDbContext _context;
-
-    public ScheduleController(AdvancedScheduler schedulingService, AppDbContext context)
-    {
-        _schedulingService = schedulingService;
-        _context = context;
-    }
+    private readonly AdvancedScheduler _schedulingService = schedulingService;
+    private readonly AppDbContext _context = context;
 
     [HttpPost("schools/{schoolId}/configure")]
     public async Task<IActionResult> ConfigureSchoolSchedule(
@@ -96,13 +90,13 @@ public class ScheduleController : ControllerBase
             // Clear existing availability
             if (teacher.Availabilities != null)
             {
-                _context.TeacherAvailabilities.RemoveRange(teacher.Availabilities.Where(a => a != null));
+                _context.TeacherAvailabilities.RemoveRange(teacher.Availabilities.Where(a => a != null)!);
             }
 
             var newAvailabilities = new List<TeacherAvailability>();
 
             // Generate availability for each day of the week
-            foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+            foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
             {
                 // Skip days off
                 if (config.DaysOff.Contains(day))
@@ -168,14 +162,14 @@ public class ScheduleController : ControllerBase
             // Clear existing availability
             if (teacher.Availabilities != null)
             {
-                _context.TeacherAvailabilities.RemoveRange(teacher.Availabilities.Where(a => a != null));
+                _context.TeacherAvailabilities.RemoveRange(teacher.Availabilities.Where(a => a != null)!);
             }
 
             var config = teacher.School.ScheduleConfig;
             var newAvailabilities = new List<TeacherAvailability>();
 
             // Generate availability for each day of the week
-            foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+            foreach (DayOfWeek day in Enum.GetValues<DayOfWeek>())
             {
                 // Skip days off
                 if (config.DaysOff.Contains(day))
@@ -351,7 +345,7 @@ public class ScheduleController : ControllerBase
             .Include(s => s.ScheduleConfig)
             .Include(s => s.Groups)
                 .ThenInclude(g => g.Classroom)
-                    .ThenInclude(c => c.SchoolLevel)
+                    .ThenInclude(c => c!.SchoolLevel)
             .Include(s => s.Teachers)
                 .ThenInclude(t => t.Availabilities)
             .Include(s => s.Teachers)
@@ -372,7 +366,7 @@ public class ScheduleController : ControllerBase
         var detailedValidation = new
         {
             SchoolExists = school != null,
-            HasScheduleConfig = school.ScheduleConfig != null,
+            HasScheduleConfig = school!.ScheduleConfig != null,
             ScheduleConfig = school.ScheduleConfig != null ? new
             {
                 school.ScheduleConfig.MorningStart,
@@ -410,7 +404,7 @@ public class ScheduleController : ControllerBase
                     t.TeacherId,
                     AvailabilitySlots = t.Availabilities?.Count ?? 0,
                     Subjects = t.Subjects?.Count ?? 0,
-                    SubjectIds = t.Subjects?.Select(s => s.SubjectId).ToList() ?? new List<int>()
+                    SubjectIds = t.Subjects?.Select(s => s.SubjectId).ToList() ?? []
                 }).ToList()
             },
 
@@ -429,7 +423,7 @@ public class ScheduleController : ControllerBase
             {
                 Total = school.Timeslots?.Count ?? 0,
                 ByDay = school.Timeslots?.GroupBy(t => t.Day)
-                    .ToDictionary(g => g.Key.ToString(), g => g.Count()) ?? new Dictionary<string, int>()
+                    .ToDictionary(g => g.Key.ToString(), g => g.Count()) ?? []
             },
 
             LevelSubjectHours = new
@@ -449,7 +443,7 @@ public class ScheduleController : ControllerBase
             Issues = new List<string>()
         };
 
-        var issues = (List<string>)detailedValidation.Issues;
+        var issues = detailedValidation.Issues;
 
         if (school.ScheduleConfig == null)
             issues.Add("Missing schedule configuration");
@@ -482,19 +476,19 @@ public class ScheduleController : ControllerBase
 
         // Check for matching between groups and level subject hours
         var groupLevels = school.Groups?.Where(g => g.Classroom?.SchoolLevelId != null)
-            .Select(g => g.Classroom.SchoolLevelId).Distinct().ToList() ?? new List<int>();
+            .Select(g => g.Classroom!.SchoolLevelId).Distinct().ToList() ?? [];
         var configuredLevels = levelSubjectHours.Select(lsh => lsh.LevelId).Distinct().ToList();
 
         var missingLevels = groupLevels.Except(configuredLevels).ToList();
-        if (missingLevels.Any())
+        if (missingLevels.Count != 0)
             issues.Add($"Groups exist for levels {string.Join(", ", missingLevels)} but no subject hours configured for these levels");
 
         // Check for teacher-subject matching
         var requiredSubjects = levelSubjectHours.Select(lsh => lsh.SubjectId).Distinct().ToList();
-        var teacherSubjects = school.Teachers?.SelectMany(t => t.Subjects?.Select(s => s.SubjectId) ?? new List<int>()).Distinct().ToList() ?? new List<int>();
+        var teacherSubjects = school.Teachers?.SelectMany(t => t.Subjects?.Select(s => s.SubjectId) ?? new List<int>()).Distinct().ToList() ?? [];
 
         var missingSubjects = requiredSubjects.Except(teacherSubjects).ToList();
-        if (missingSubjects.Any())
+        if (missingSubjects.Count != 0)
             issues.Add($"No teachers assigned for subjects: {string.Join(", ", missingSubjects)}");
 
         return Ok(detailedValidation);
@@ -508,14 +502,14 @@ public class ScheduleController : ControllerBase
         {
             var schedule = await _context.Lessons
                 .Include(l => l.Timeslot)
-                .Include(l => l.Teacher).ThenInclude(t => t.User)
+                .Include(l => l.Teacher).ThenInclude(t => t!.User)
                 .Include(l => l.Classroom)
                 .Include(l => l.Subject)
                 .Include(l => l.Group)
                 .Where(l => l.SchoolId == schoolId)
                 .ToListAsync();
 
-            if (!schedule.Any())
+            if (schedule.Count == 0)
                 return NotFound(new { Error = "No schedule found for given parameters" });
 
             return Ok(new
@@ -552,7 +546,7 @@ public class ScheduleController : ControllerBase
             // Remove existing availability
             if (teacher.Availabilities != null)
             {
-                _context.TeacherAvailabilities.RemoveRange(teacher.Availabilities.Where(a => a != null));
+                _context.TeacherAvailabilities.RemoveRange(teacher.Availabilities.Where(a => a != null)!);
             }
 
             var newAvailability = availability.Select(a => new TeacherAvailability

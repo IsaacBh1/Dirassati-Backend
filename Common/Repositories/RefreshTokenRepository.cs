@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dirassati_Backend.Common.Repositories;
 
-public class RefreshTokenRepository(AppDbContext context, TokenProvider provider):IRefreshTokenRepository
+public class RefreshTokenRepository(AppDbContext context) : IRefreshTokenRepository
 {
     public async Task<string> AddNewRefreshTokenAsync(string userId)
     {
         var currentToken = await context.RefreshTokens
             .FirstOrDefaultAsync(rt => rt.UserId == userId);
-        var newToken = provider.GenerateRefreshToken();
+        var newToken = TokenProvider.GenerateRefreshToken();
         if (currentToken is null)
         {
             var refreshToken = new RefreshToken
@@ -20,7 +20,7 @@ public class RefreshTokenRepository(AppDbContext context, TokenProvider provider
                 ExpiresOn = DateTime.UtcNow.AddDays(7),
                 UserId = userId,
             };
-            context.RefreshTokens.Add(refreshToken);     
+            context.RefreshTokens.Add(refreshToken);
         }
         else
         {
@@ -28,10 +28,10 @@ public class RefreshTokenRepository(AppDbContext context, TokenProvider provider
             currentToken.ExpiresOn = DateTime.UtcNow.AddDays(7);
             context.RefreshTokens.Update(currentToken);
         }
-     
-       
-         await context.SaveChangesAsync();
-         return newToken;
+
+
+        await context.SaveChangesAsync();
+        return newToken;
     }
 
     public Task UpdateAsync(RefreshToken refreshToken)
@@ -51,28 +51,28 @@ public class RefreshTokenRepository(AppDbContext context, TokenProvider provider
 
     public async Task<RefreshToken?> FindByTokenAsync(string token)
     {
-        return await  context.RefreshTokens
+        return await context.RefreshTokens
             .FirstOrDefaultAsync(rt => rt.Token == token);
     }
 
-   public async Task<bool> RevokeRefreshTokenAsync(string token)
+    public async Task<bool> RevokeRefreshTokenAsync(string token)
     {
         var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == token);
         if (refreshToken == null)
             return false;
-    
+
         context.RefreshTokens.Remove(refreshToken);
         await context.SaveChangesAsync();
         return true;
     }
-    
+
     public async Task<bool> RevokeAllRefreshTokensAsync()
     {
-      var allTokens = await context.RefreshTokens.ToListAsync();
-              if (allTokens.Count == 0)
-                  return false;
-              context.RefreshTokens.RemoveRange(allTokens);
-              await context.SaveChangesAsync();
-              return true;
+        var allTokens = await context.RefreshTokens.ToListAsync();
+        if (allTokens.Count == 0)
+            return false;
+        context.RefreshTokens.RemoveRange(allTokens);
+        await context.SaveChangesAsync();
+        return true;
     }
 }

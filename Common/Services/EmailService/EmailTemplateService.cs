@@ -1,3 +1,4 @@
+#pragma warning disable S2139 // Exceptions should be either logged or rethrown but not both
 using System.Security.Claims;
 using Dirassati_Backend.Persistence;
 using FluentEmail.Core;
@@ -6,32 +7,22 @@ using Fluid;
 
 namespace Dirassati_Backend.Common.Services.EmailService;
 
-public class EmailTemplateService : IEmailService
+public class EmailTemplateService(
+    IFluentEmail fluentEmail,
+    IHttpContextAccessor httpContextAccessor,
+    AppDbContext dbContext,
+    ILogger<EmailTemplateService> logger,
+    IWebHostEnvironment hostEnvironment) : IEmailService
 {
-    private readonly IFluentEmail _fluentEmail;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly AppDbContext _dbContext;
-    private readonly ILogger<EmailTemplateService> _logger;
-    private readonly FluidParser _parser;
-    private readonly string _templatePath;
+    private readonly IFluentEmail _fluentEmail = fluentEmail;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly AppDbContext _dbContext = dbContext;
+    private readonly ILogger<EmailTemplateService> _logger = logger;
+    private readonly FluidParser _parser = new FluidParser();
+    private readonly string _templatePath = Path.Combine(hostEnvironment.ContentRootPath, "Common", "Services", "EmailService", "Templates", "EmailTemplate.liquid");
 
     private string? _schoolEmail;
     private string? _schoolName;
-
-    public EmailTemplateService(
-        IFluentEmail fluentEmail,
-        IHttpContextAccessor httpContextAccessor,
-        AppDbContext dbContext,
-        ILogger<EmailTemplateService> logger,
-        IWebHostEnvironment hostEnvironment)
-    {
-        _fluentEmail = fluentEmail;
-        _httpContextAccessor = httpContextAccessor;
-        _dbContext = dbContext;
-        _logger = logger;
-        _parser = new FluidParser();
-        _templatePath = Path.Combine(hostEnvironment.ContentRootPath, "Common", "Services", "EmailService", "Templates", "EmailTemplate.liquid");
-    }
 
     private async Task<bool> InitializeSchoolInfoAsync()
     {
@@ -108,7 +99,7 @@ public class EmailTemplateService : IEmailService
         }
     }
 
-    public async Task SendEmailAsync(string to, string subject, string body, string? fromName = null, string? fromEmail = null, bool isHTML = false)
+    public async Task SendEmailAsync(string to, string subject, string body, string? fromName, string? fromEmail, bool isHTML = false)
     {
         try
         {

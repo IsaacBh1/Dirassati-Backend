@@ -103,7 +103,7 @@ public class ParentNotificationHub(
                     return;
 
                 }
-                _dbContext.Entry(teacher).Reference(t => t.User).Load();
+                await _dbContext.Entry(teacher).Reference(t => t.User).LoadAsync();
                 var notification = _mapper.Map<GetStudentReportDto>(report);
                 notification.Teacher = new BasePersonDto
                 {

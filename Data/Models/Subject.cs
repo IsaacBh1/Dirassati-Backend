@@ -11,6 +11,6 @@ public partial class Subject
     public int SubjectId { get; set; }
     public string Name { get; set; } = null!;
     public SchoolTypeEnum SchoolType { get; set; }
-    public virtual ICollection<Teacher> Teachers { get; set; } = new List<Teacher>();
+    public virtual ICollection<Teacher> Teachers { get; set; } = [];
 
 }

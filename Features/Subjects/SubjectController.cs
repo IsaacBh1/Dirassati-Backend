@@ -10,20 +10,15 @@ namespace Dirassati_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SubjectsController : ControllerBase
+    [Authorize(Roles = "Employee,Teacher,Parent")]
+    public class SubjectsController(AppDbContext context) : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public SubjectsController(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly AppDbContext _context = context;
 
         [HttpGet("BySchoolLevel")]
+
         public async Task<IActionResult> GetSubjectsBySchoolLevel()
         {
-
-
             var schoolLevelClaim = User.Claims.FirstOrDefault(c => c.Type == "SchoolTypeId");
 
             if (schoolLevelClaim == null || !int.TryParse(schoolLevelClaim.Value, out int SchoolTypeId))
@@ -77,9 +72,11 @@ namespace Dirassati_Backend.Controllers
             return Ok(subject);
         }
         [HttpPost]
+        [Authorize(Roles = "Employee")]
+
         public async Task<IActionResult> CreateSubject([FromBody] Subject subject)
         {
-            if (!Enum.IsDefined(typeof(SchoolTypeEnum), subject.SchoolType))
+            if (!Enum.IsDefined(subject.SchoolType))
             {
                 return BadRequest("Invalid SchoolType");
             }
@@ -88,6 +85,7 @@ namespace Dirassati_Backend.Controllers
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetSubject), new { id = subject.SubjectId }, subject);
         }
+        [Authorize(Roles = "Employee")]
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSubject(int id, [FromBody] Subject updatedSubject)
@@ -97,7 +95,7 @@ namespace Dirassati_Backend.Controllers
                 return BadRequest("Subject ID mismatch.");
             }
 
-            if (!Enum.IsDefined(typeof(SchoolTypeEnum), updatedSubject.SchoolType))
+            if (!Enum.IsDefined(updatedSubject.SchoolType))
             {
                 return BadRequest("Invalid SchoolType");
             }
@@ -119,6 +117,8 @@ namespace Dirassati_Backend.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Employee")]
+
         public async Task<IActionResult> DeleteSubject(int id)
         {
             var subject = await _context.Subjects.FindAsync(id);

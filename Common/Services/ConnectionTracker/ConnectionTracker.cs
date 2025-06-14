@@ -27,7 +27,7 @@ namespace Dirassati_Backend.Common.Services.ConnectionTracker
                     return existingList;
                 });
 
-            if (_userConnections.TryGetValue(userId, out var connections) && !connections.Any())
+            if (_userConnections.TryGetValue(userId, out var connections) && connections.Count == 0)
             {
                 _userConnections.TryRemove(userId, out _);
             }
@@ -35,7 +35,7 @@ namespace Dirassati_Backend.Common.Services.ConnectionTracker
 
         public bool IsUserOnline(string userId)
         {
-            return _userConnections.ContainsKey(userId) && _userConnections[userId].Any();
+            return _userConnections.ContainsKey(userId) && _userConnections[userId].Count != 0;
         }
     }
 }

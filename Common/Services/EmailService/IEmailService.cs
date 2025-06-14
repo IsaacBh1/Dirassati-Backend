@@ -1,6 +1,4 @@
-using Dirassati_Backend.Common.Services.EmailService;
-
-namespace Dirassati_Backend.Common.Services;
+namespace Dirassati_Backend.Common.Services.EmailService;
 
 /// <summary>
 /// Defines a contract for an email service that provides functionality to send emails.

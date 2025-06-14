@@ -8,14 +8,9 @@ using Dirassati_Backend.Data.Models;
 
 namespace Dirassati_Backend.Features.Students.Repositories
 {
-    public class StudentRepository : IStudentRepository
+    public class StudentRepository(AppDbContext context) : IStudentRepository
     {
-        private readonly AppDbContext _context;
-
-        public StudentRepository(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly AppDbContext _context = context;
 
         public async Task<StudentDetailsDto?> GetStudentByIdAsync(Guid studentId)
         {

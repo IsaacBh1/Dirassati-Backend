@@ -16,6 +16,8 @@ public class AccountsController(AccountServices accountServices, UserManager<App
     private readonly UserManager<AppUser> _userManager = userManager;
 
     [HttpPost("request-password-reset")]
+    [Authorize(Roles = "Employee,Teacher, Parent")]
+
     public async Task<ActionResult> ReqeuestPasswordReset(RequestPasswordResetDto requestPasswordResetDTO)
     {
 
@@ -23,6 +25,8 @@ public class AccountsController(AccountServices accountServices, UserManager<App
     }
 
     [HttpPut("reset-password", Name = "ResetPassword"),]
+    [Authorize(Roles = "Employee,Teacher, Parent")]
+
     public async Task<ActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
     {
         return HandleResult(await _accountServices.ResetPasswordAsync(resetPasswordDto));
@@ -31,6 +35,8 @@ public class AccountsController(AccountServices accountServices, UserManager<App
 
     [Authorize]
     [HttpPost("change-password")]
+    [Authorize(Roles = "Employee,Teacher, Parent")]
+
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
     {
         var user = await _userManager.GetUserAsync(User);

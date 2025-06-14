@@ -3,14 +3,9 @@ using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
 namespace Dirassati_Backend.Features.Groups.Repos
 {
-    public class GroupRepository : IGroupRepository
+    public class GroupRepository(AppDbContext context) : IGroupRepository
     {
-        private readonly AppDbContext _context;
-
-        public GroupRepository(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly AppDbContext _context = context;
 
         public async Task<Group> GetGroupWithStudentsAsync(Guid groupId)
         {

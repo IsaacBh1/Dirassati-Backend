@@ -5,14 +5,9 @@ using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Features.Notes.Repos;
 
-public class NoteRepository : INoteRepository
+public class NoteRepository(AppDbContext context) : INoteRepository
 {
-    private readonly AppDbContext _context;
-
-    public NoteRepository(AppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly AppDbContext _context = context;
 
     public async Task<Note> AddNoteAsync(Note note)
     {
