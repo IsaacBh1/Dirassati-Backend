@@ -25,6 +25,7 @@ using Dirassati_Backend.Features.Notes.Services;
 using Dirassati_Backend.Persistence;
 using Infrastructure.PhotoUpload;
 using Dirassati_Backend.Features.Employees.Services;
+using Dirassati_Backend.Common.Services;
 
 namespace Dirassati_Backend.Common;
 

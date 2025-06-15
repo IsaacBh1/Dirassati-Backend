@@ -15,9 +15,8 @@ public class ScheduleResult
 }
 
 public class AdvancedScheduler(AppDbContext context)
-public class AdvancedScheduler(AppDbContext context)
+
 {
-    private readonly AppDbContext _context = context;
     private readonly AppDbContext _context = context;
     private readonly TimeSpan _lessonDuration = TimeSpan.FromMinutes(45); // Fixed: 45 minutes, not 60
 

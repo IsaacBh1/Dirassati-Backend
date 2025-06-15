@@ -1,6 +1,7 @@
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Persistence;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Features.Subjects.Dtos;
@@ -118,6 +119,7 @@ namespace Dirassati_Backend.Controllers
         [HttpDelete("{id}")]
         [Authorize(Roles = "Employee")]
 
+
         public async Task<IActionResult> DeleteSubject(int id)
         {
             var subject = await _context.Subjects.FindAsync(id);
@@ -136,3 +138,4 @@ namespace Dirassati_Backend.Controllers
         }
 
     }
+}

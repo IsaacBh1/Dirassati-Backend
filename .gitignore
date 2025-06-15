@@ -23,8 +23,7 @@ dirasatiDb.db
 *.puml
 # Diagrams folder
 Diagrams/
-
-# User-specific files (MonoDevelop/Xamarin Studio)
+appsettings.Development.json
 *.userprefs
 
 # Mono auto generated files
