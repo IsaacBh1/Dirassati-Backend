@@ -11,16 +11,10 @@ namespace Dirassati_Backend.Features.Employees.Controllers
     [Tags("Employee Management")]
     [Authorize(Roles = "Employee")]
     [Produces("application/json")]
-    public class EmployeeController : ControllerBase
+    public class EmployeeController(IEmployeeService employeeService, ILogger<EmployeeController> logger) : ControllerBase
     {
-        private readonly IEmployeeService _employeeService;
-        private readonly ILogger<EmployeeController> _logger;
-
-        public EmployeeController(IEmployeeService employeeService, ILogger<EmployeeController> logger)
-        {
-            _employeeService = employeeService;
-            _logger = logger;
-        }
+        private readonly IEmployeeService _employeeService = employeeService;
+        private readonly ILogger<EmployeeController> _logger = logger;
 
         /// <summary>
         /// Creates a new employee account and sends credentials via email
@@ -40,7 +34,7 @@ namespace Dirassati_Backend.Features.Employees.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                    _logger.LogWarning(ex, "Failed to create employee: {Message}", ex.Message);
+                _logger.LogWarning(ex, "Failed to create employee: {Message}", ex.Message);
                 return Conflict(new { message = ex.Message });
             }
             catch (Exception ex)
@@ -92,7 +86,7 @@ namespace Dirassati_Backend.Features.Employees.Controllers
                 page = Math.Max(page, 1);
 
                 var employees = await _employeeService.GetAllEmployeesAsync(page, pageSize);
-                
+
                 return Ok(new
                 {
                     data = employees,

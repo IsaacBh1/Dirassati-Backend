@@ -3,13 +3,9 @@ using Dirassati_Backend.Persistence;
 
 namespace Dirassati_Backend.Repositories
 {
-    public class TeacherRepository : ITeacherRepository
+    public class TeacherRepository(AppDbContext context) : ITeacherRepository
     {
-        private readonly AppDbContext _context;
-        public TeacherRepository(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly AppDbContext _context = context;
 
         public async Task AddTeacherAsync(Teacher teacher)
         {

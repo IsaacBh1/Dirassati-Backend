@@ -1,3 +1,6 @@
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+
 using System.ComponentModel.DataAnnotations;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Scheduling.Dtos;
@@ -6,20 +9,14 @@ using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dirassati_Backend.Features.Scheduling;
+namespace Dirassati_Backend.Features.Scheduling.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ScheduleController : ControllerBase
+public class ScheduleController(AdvancedScheduler schedulingService, AppDbContext context) : ControllerBase
 {
-    private readonly AdvancedScheduler _schedulingService;
-    private readonly AppDbContext _context;
-
-    public ScheduleController(AdvancedScheduler schedulingService, AppDbContext context)
-    {
-        _schedulingService = schedulingService;
-        _context = context;
-    }
+    private readonly AdvancedScheduler _schedulingService = schedulingService;
+    private readonly AppDbContext _context = context;
 
     [HttpPost("schools/{schoolId}/configure")]
     public async Task<IActionResult> ConfigureSchoolSchedule(
@@ -84,7 +81,7 @@ public class ScheduleController : ControllerBase
     /// <summary>
     /// Generates default availability for all teachers based on school schedule configuration
     /// </summary>
-    private async Task GenerateDefaultTeacherAvailability(Dirassati_Backend.Data.Models.School school)
+    private async Task GenerateDefaultTeacherAvailability(Data.Models.School school)
     {
         if (school.ScheduleConfig == null || school.Teachers == null)
             return;
@@ -314,7 +311,7 @@ public class ScheduleController : ControllerBase
                     Message = "No lessons were generated. Check data requirements.",
                     TotalLessons = 0,
                     ConflictsResolved = result.TotalConflicts,
-                    HoursCompliance = result.HoursCompliance
+                    result.HoursCompliance
                 });
             }
 
@@ -394,9 +391,9 @@ public class ScheduleController : ControllerBase
                     g.GroupId,
                     g.GroupName,
                     HasClassroom = g.Classroom != null,
-                    ClassroomId = g.ClassroomId,
-                    SchoolLevelId = g.Classroom?.SchoolLevelId,
-                    LevelYear = g.Classroom?.SchoolLevel?.LevelYear
+                    g.ClassroomId,
+                    g.Classroom?.SchoolLevelId,
+                    g.Classroom?.SchoolLevel?.LevelYear
                 }).ToList()
             },
 
@@ -438,7 +435,7 @@ public class ScheduleController : ControllerBase
                 Details = levelSubjectHours.Select(lsh => new
                 {
                     lsh.LevelId,
-                    LevelYear = lsh.SchoolLevel?.LevelYear,
+                    lsh.SchoolLevel?.LevelYear,
                     lsh.SubjectId,
                     SubjectName = lsh.Subject?.Name,
                     lsh.HoursPerWeek,
@@ -449,7 +446,7 @@ public class ScheduleController : ControllerBase
             Issues = new List<string>()
         };
 
-        var issues = (List<string>)detailedValidation.Issues;
+        var issues = detailedValidation.Issues;
 
         if (school.ScheduleConfig == null)
             issues.Add("Missing schedule configuration");

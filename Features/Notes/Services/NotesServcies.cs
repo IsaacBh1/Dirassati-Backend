@@ -5,14 +5,9 @@ using Dirassati_Backend.Features.Notes.Repos;
 
 namespace Dirassati_Backend.Features.Notes.Services
 {
-    public class NoteService : INotesServices
+    public class NoteService(INoteRepository noteRepository) : INotesServices
     {
-        private readonly INoteRepository _noteRepository;
-
-        public NoteService(INoteRepository noteRepository)
-        {
-            _noteRepository = noteRepository;
-        }
+        private readonly INoteRepository _noteRepository = noteRepository;
 
         public async Task<Result<List<StudentNotesResponseDto>, string>> GetStudentNotesByParentIdAsync(Guid parentId)
         {

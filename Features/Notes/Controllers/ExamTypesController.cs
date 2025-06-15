@@ -7,16 +7,12 @@ namespace Dirassati_Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ExamTypesController : ControllerBase
+    public class ExamTypesController(AppDbContext context) : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public ExamTypesController(AppDbContext context)
-        {
-            _context = context;
-        }
+        private readonly AppDbContext _context = context;
 
         [HttpGet]
+        [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<IEnumerable<ExamType>>> GetExamTypes()
         {
             var examTypes = await _context.ExamTypes.ToListAsync();

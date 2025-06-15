@@ -10,7 +10,6 @@ using Dirassati_Backend.Features.Teachers.Services;
 using Dirassati_Backend.Hubs;
 using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Http.Json;
-using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
@@ -55,7 +54,8 @@ builder.Services.AddSignalR(options =>
 builder.Services.AddRepositories();
 builder.Services.AddScoped<AbsenceService>();
 builder.Services.Configure<CloudinaryConfig>(builder.Configuration.GetSection("CloudinaryConfig"));
-
+builder.Services.AddMemoryCache();
+builder.Services.AddResponseCaching();
 var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseMiddleware<RequestLoggingMiddleware>();

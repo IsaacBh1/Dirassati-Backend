@@ -8,14 +8,9 @@ namespace Dirassati_Backend.Features.Parents.Controllers
     [Route("api/parents")]
     [ApiController]
 
-    public class ParentController : ControllerBase
+    public class ParentController(IParentRepository parentRepository) : ControllerBase
     {
-        private readonly IParentRepository _parentRepository;
-
-        public ParentController(IParentRepository parentRepository)
-        {
-            _parentRepository = parentRepository;
-        }
+        private readonly IParentRepository _parentRepository = parentRepository;
 
         [HttpGet]
         public async Task<IActionResult> GetAll(Guid SchoolId)

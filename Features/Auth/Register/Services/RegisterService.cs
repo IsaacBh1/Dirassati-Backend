@@ -6,7 +6,6 @@ using Dirassati_Backend.Data;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Extensions;
-using Dirassati_Backend.Features.Auth.SignUp;
 using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +17,7 @@ namespace Dirassati_Backend.Features.Auth.Register.Services;
 
 public class RegisterService(UserManager<AppUser> userManager, AppDbContext dbContext, IMapper mapper, IPhotoUploadService photoUploadService)
 {
-    public async Task<Result<CreatedEmployeeDto, string>> Register(RegisterDto dto )
+    public async Task<Result<CreatedEmployeeDto, string>> Register(RegisterDto dto)
     {
         var result = new Result<CreatedEmployeeDto, string>();
         using var transaction = await dbContext.Database.BeginTransactionAsync();
@@ -32,7 +31,7 @@ public class RegisterService(UserManager<AppUser> userManager, AppDbContext dbCo
                 PhoneNumber = dto.Employee.PhoneNumber,
                 UserName = dto.Employee.Email
             };
-            
+
             var CreateResult = await userManager.CreateAsync(user, dto.Employee.Password);
             if (!CreateResult.Succeeded)
             {

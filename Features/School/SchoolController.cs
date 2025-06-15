@@ -3,6 +3,7 @@ using Dirassati_Backend.Features.School.DTOs;
 using Dirassati_Backend.Features.School.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Dirassati_Backend.Features.School;
 
@@ -16,7 +17,7 @@ public class SchoolController(ISchoolService schoolService) : BaseController
 
     public async Task<ActionResult<GetSchoolInfoDto>> GetSchoolInfo()
     {
-        var result = await _schoolService.GetSchoolInfosAsync();
+        var result = await _schoolService.GetSchoolInfoAsync();
         return HandleResult(result);
     }
 
@@ -27,7 +28,7 @@ public class SchoolController(ISchoolService schoolService) : BaseController
 
     public async Task<IActionResult> UpdateSchoolInfos(UpdateSchoolInfosDto schoolInfosDTO)
     {
-        var result = await _schoolService.UpdateSchoolInfos(schoolInfosDTO);
+        var result = await _schoolService.UpdateSchoolInfo(schoolInfosDTO);
         return HandleResult(result);
     }
 

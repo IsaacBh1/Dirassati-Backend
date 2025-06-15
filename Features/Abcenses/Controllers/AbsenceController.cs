@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Dirassati_Backend.Features.Abcenses.Dtos;
 using Dirassati_Backend.Features.Abcenses.services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,14 +6,9 @@ namespace Dirassati_Backend.Features.Abcenses.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AbsenceController : ControllerBase
+    public class AbsenceController(AbsenceService absenceService) : ControllerBase
     {
-        private readonly AbsenceService _absenceService;
-
-        public AbsenceController(AbsenceService absenceService)
-        {
-            _absenceService = absenceService;
-        }
+        private readonly AbsenceService _absenceService = absenceService;
 
         /// <summary>
         /// Mark students as absent for a group

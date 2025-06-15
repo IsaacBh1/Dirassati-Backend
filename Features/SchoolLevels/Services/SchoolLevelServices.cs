@@ -1,14 +1,17 @@
 using Dirassati_Backend.Common;
 using Dirassati_Backend.Common.Dtos;
+using Dirassati_Backend.Common.Services;
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Features.SchoolLevels.DTOs;
 using Dirassati_Backend.Persistence;
+using Fluid;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using System.Net;
 
 namespace Dirassati_Backend.Features.SchoolLevels.Services;
 
-public class SchoolLevelServices(AppDbContext dbContext)
+public class SchoolLevelServices(AppDbContext dbContext, IMemoryCache cache, ILogger<CachedServiceBase> cacheLogger) : CachedServiceBase(cache, cacheLogger)
 {
     public async Task<List<GetSchoolLevelDto>> GetAllLevelsAsync()
     {
@@ -25,26 +28,34 @@ public class SchoolLevelServices(AppDbContext dbContext)
     public async Task<Result<List<SpecializationDto>, string>> GetSchoolSpecializations(string schoolId)
     {
         var result = new Result<List<SpecializationDto>, string>();
-
         if (!Guid.TryParse(schoolId, out var schoolIdGuid))
             return result.Failure("Invalid School Id", (int)HttpStatusCode.BadRequest);
-        var school = await dbContext.Schools
-            .Include(s => s.SchoolType)
 
-            .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
 
-        if (school is null)
-            return result.Failure("School Not Found", 404);
+        var cacheKey = $"school_specs_${schoolIdGuid}";
+        var cacheOptions = new MemoryCacheEntryOptions
+        {
 
-        if (school.SchoolTypeId != (int)SchoolTypeEnum.Lycee)
-            return result.Failure("School Is Not High School", 400);
+        };
+        return await GetOrSetCacheAsync(cacheKey, cacheOptions, async () =>
+          {
+              var cachingResult = new Result<List<SpecializationDto>, string>();
+              var school = await dbContext.Schools
+                         .Include(s => s.Specializations)
+                         .FirstOrDefaultAsync(s => s.SchoolId == schoolIdGuid);
 
-        await dbContext.Entry(school)
-        .Collection(s => s.Specializations)
-        .LoadAsync();
-        var specs = school.Specializations.Select(s => new SpecializationDto { Name = s.Name, SpecializationId = s.SpecializationId }).ToList();
+              if (school is null)
+                  return cachingResult.Failure("School Not Found", 404);
 
-        return result.Success(specs);
+              if (school.SchoolTypeId != (int)SchoolTypeEnum.Lycee)
+                  return result.Failure("School Is Not High School", 400);
+              var specs = school.Specializations.Select(s => new SpecializationDto
+              {
+                  Name = s.Name,
+                  SpecializationId = s.SpecializationId
+              }).ToList();
+              return cachingResult.Success(specs);
+          });
     }
 
     public async Task<Result<Unit, string>> EditSchoolSpecializations(

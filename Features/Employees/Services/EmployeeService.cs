@@ -1,6 +1,4 @@
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 using Dirassati_Backend.Common.Services;
 using Dirassati_Backend.Common.Services.EmailService;
 using Dirassati_Backend.Data;
@@ -24,27 +22,18 @@ namespace Dirassati_Backend.Features.Employees.Services
         Task<bool> ToggleEmployeeStatusAsync(Guid employeeId);
     }
 
-    public class EmployeeService : IEmployeeService
+    public class EmployeeService(
+        UserManager<AppUser> userManager,
+        AppDbContext context,
+        IEmailService emailService,
+        IHttpContextAccessor httpContextAccessor,
+        ILogger<EmployeeService> logger) : IEmployeeService
     {
-        private readonly UserManager<AppUser> _userManager;
-        private readonly AppDbContext _context;
-        private readonly IEmailService _emailService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ILogger<EmployeeService> _logger;
-
-        public EmployeeService(
-            UserManager<AppUser> userManager,
-            AppDbContext context,
-            IEmailService emailService,
-            IHttpContextAccessor httpContextAccessor,
-            ILogger<EmployeeService> logger)
-        {
-            _userManager = userManager;
-            _context = context;
-            _emailService = emailService;
-            _httpContextAccessor = httpContextAccessor;
-            _logger = logger;
-        }
+        private readonly UserManager<AppUser> _userManager = userManager;
+        private readonly AppDbContext _context = context;
+        private readonly IEmailService _emailService = emailService;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        private readonly ILogger<EmployeeService> _logger = logger;
 
         private Guid GetCurrentSchoolId()
         {
@@ -397,10 +386,10 @@ namespace Dirassati_Backend.Features.Employees.Services
             var rand = new Random();
             var passwordChars = new List<char>
             {
-                upper[rand.Next(upper.Length)],       
-                lower[rand.Next(lower.Length)],       
-                digits[rand.Next(digits.Length)],     
-                special[rand.Next(special.Length)]    
+                upper[rand.Next(upper.Length)],
+                lower[rand.Next(lower.Length)],
+                digits[rand.Next(digits.Length)],
+                special[rand.Next(special.Length)]
             };
 
             // Fill the rest of the password with a mix of all characters

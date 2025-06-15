@@ -10,7 +10,6 @@ using Dirassati_Backend.Hubs.Interfaces;
 using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Parlot.Fluent;
 namespace Dirassati_Backend.Features.Payments.Services;
 
 public class PaymentService(

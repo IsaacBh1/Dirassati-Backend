@@ -2,7 +2,6 @@ using System.Globalization;
 using Dirassati_Backend.Common.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Dtos;
 using Dirassati_Backend.Features.Auth.Register.Services;
-using Dirassati_Backend.Features.Auth.SignUp;
 using Dirassati_Backend.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -65,7 +64,7 @@ namespace Dirassati_Backend.Data.Seeders
                 Console.WriteLine("Failed to seed Greenwood High School and employee.");
                 if (result.Errors != null)
                 {
-                   Console.WriteLine(result.Errors);
+                    Console.WriteLine(result.Errors);
                 }
                 else
                 {

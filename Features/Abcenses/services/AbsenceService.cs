@@ -9,22 +9,14 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Dirassati_Backend.Features.Abcenses.services
 {
-    public class AbsenceService
+    public class AbsenceService(
+        IAbsenceRepository absenceRepository,
+        IGroupRepository groupRepository,
+        IHubContext<ParentNotificationHub> hubContext)
     {
-        private readonly IAbsenceRepository _absenceRepository;
-        private readonly IGroupRepository _groupRepository;
-        private readonly IHubContext<ParentNotificationHub> _hubContext;
-
-        public AbsenceService(
-            IAbsenceRepository absenceRepository,
-            IGroupRepository groupRepository,
-            IConnectionTracker connectionTracker,
-            IHubContext<ParentNotificationHub> hubContext)
-        {
-            _absenceRepository = absenceRepository;
-            _groupRepository = groupRepository;
-            _hubContext = hubContext;
-        }
+        private readonly IAbsenceRepository _absenceRepository = absenceRepository;
+        private readonly IGroupRepository _groupRepository = groupRepository;
+        private readonly IHubContext<ParentNotificationHub> _hubContext = hubContext;
 
         public async Task MarkAbsencesAsync(Guid groupId, List<Guid> absentStudentIds)
         {

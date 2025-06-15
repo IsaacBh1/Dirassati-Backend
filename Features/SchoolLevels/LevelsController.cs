@@ -6,10 +6,12 @@ using Dirassati_Backend.Features.SchoolLevels.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dirassati_Backend.Features.SchoolLevels;
+
 [Route("api/[controller]")]
 public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseController
 {
     [HttpGet]
+    [ResponseCache(Duration = 7200, Location = ResponseCacheLocation.Any)]
     public async Task<ActionResult<List<GetSchoolLevelDto>>> GetLevels()
     {
         return await schoolLevelServices.GetAllLevelsAsync();
@@ -17,6 +19,8 @@ public class LevelsController(SchoolLevelServices schoolLevelServices) : BaseCon
 
 
     [HttpGet("specializations")]
+    [ResponseCache(Duration = 7200, Location = ResponseCacheLocation.Any)]
+
     public async Task<ActionResult<List<SpecializationDto>>> GetAllSpecializations()
     {
         return await schoolLevelServices.GetAllSpecializationsAsync();
