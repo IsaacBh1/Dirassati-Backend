@@ -12,6 +12,7 @@ namespace Dirassati_Backend.Features.Notes.Controllers
         private readonly AppDbContext _context = context;
 
         [HttpGet]
+        [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
         public async Task<ActionResult<IEnumerable<ExamType>>> GetExamTypes()
         {
             var examTypes = await _context.ExamTypes.ToListAsync();

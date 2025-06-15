@@ -58,6 +58,7 @@ public class TeacherController(TeacherServices teacherServices) : BaseController
     }
 
     [HttpGet("contract-types")]
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
     public async Task<ActionResult<List<ContractTypeDto>>> GetContractTypes()
     {
         return HandleResult(await _teacherServices.GetContractTypes());

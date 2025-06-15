@@ -53,6 +53,8 @@ builder.Services.AddSignalR(options =>
 builder.Services.AddRepositories();
 builder.Services.AddScoped<AbsenceService>();
 builder.Services.Configure<CloudinaryConfig>(builder.Configuration.GetSection("CloudinaryConfig"));
+builder.Services.AddMemoryCache();
+builder.Services.AddResponseCaching();
 var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");

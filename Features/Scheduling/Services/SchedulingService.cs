@@ -15,7 +15,9 @@ public class ScheduleResult
 }
 
 public class AdvancedScheduler(AppDbContext context)
+public class AdvancedScheduler(AppDbContext context)
 {
+    private readonly AppDbContext _context = context;
     private readonly AppDbContext _context = context;
     private readonly TimeSpan _lessonDuration = TimeSpan.FromMinutes(45); // Fixed: 45 minutes, not 60
 
@@ -52,9 +54,9 @@ public class AdvancedScheduler(AppDbContext context)
         Console.WriteLine($"Generated {timeslots.Count} timeslots");
 
         var initialSchedule = GreedyScheduler.CreateInitialSchedule(
-            school.Groups.ToList(),
-            school.Teachers.ToList(),
-            school.Classrooms.ToList(),
+            [.. school.Groups],
+            [.. school.Teachers],
+            [.. school.Classrooms],
             timeslots,
             levelSubjectHours,
             schoolId,
@@ -184,7 +186,7 @@ public class AdvancedScheduler(AppDbContext context)
                             .Where(t => t.Subjects != null &&
                                        t.Subjects.Any(s => s.SubjectId == subjectHours.SubjectId) &&
                                        t.Availabilities != null &&
-                                       t.Availabilities.Count != 0)
+                                       t.Availabilities.Any())
                             .ToList();
 
                         if (availableTeachers.Count == 0)
@@ -277,13 +279,13 @@ public class AdvancedScheduler(AppDbContext context)
             }
 
             // Create hours compliance report
-            result.HoursCompliance = levelSubjectHours.Select(lsh => new SubjectHoursStatus
+            result.HoursCompliance = [.. levelSubjectHours.Select(lsh => new SubjectHoursStatus
             {
                 LevelId = lsh.LevelId,
                 SubjectId = lsh.SubjectId,
                 RequiredHours = lsh.HoursPerWeek,
                 ScheduledHours = hoursTracking.GetValueOrDefault((lsh.LevelId, lsh.SubjectId), 0)
-            }).ToList();
+            })];
 
             Console.WriteLine($"Final result: {result.TeacherSchedules.Count} lessons scheduled");
 
@@ -417,7 +419,7 @@ public class AdvancedScheduler(AppDbContext context)
         {
             return new ScheduleResult
             {
-                TeacherSchedules = source.TeacherSchedules
+                TeacherSchedules = [.. source.TeacherSchedules
                     .Select(l => new Lesson
                     {
                         LessonId = l.LessonId,
@@ -428,8 +430,8 @@ public class AdvancedScheduler(AppDbContext context)
                         SubjectId = l.SubjectId,
                         TeacherId = l.TeacherId,
                         AcademicYearId = l.AcademicYearId
-                    }).ToList(),
-                GroupSchedules = source.GroupSchedules
+                    })],
+                GroupSchedules = [.. source.GroupSchedules
                     .Select(l => new Lesson
                     {
                         LessonId = l.LessonId,
@@ -440,16 +442,16 @@ public class AdvancedScheduler(AppDbContext context)
                         SubjectId = l.SubjectId,
                         TeacherId = l.TeacherId,
                         AcademicYearId = l.AcademicYearId
-                    }).ToList(),
+                    })],
                 TotalConflicts = source.TotalConflicts,
-                HoursCompliance = source.HoursCompliance
+                HoursCompliance = [.. source.HoursCompliance
                     .Select(h => new SubjectHoursStatus
                     {
                         LevelId = h.LevelId,
                         SubjectId = h.SubjectId,
                         RequiredHours = h.RequiredHours,
                         ScheduledHours = h.ScheduledHours
-                    }).ToList(),
+                    })],
                 DebugMessages = new List<string>(source.DebugMessages)
             };
         }

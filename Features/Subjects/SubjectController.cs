@@ -1,7 +1,6 @@
 using Dirassati_Backend.Data.Enums;
 using Dirassati_Backend.Data.Models;
 using Dirassati_Backend.Persistence;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SchoolManagement.Features.Subjects.Dtos;
@@ -49,7 +48,7 @@ namespace Dirassati_Backend.Controllers
 
             return Ok(new
             {
-                SchoolTypeId = SchoolTypeId,
+                SchoolTypeId,
                 Subjects = subjects
             });
         }
@@ -137,4 +136,3 @@ namespace Dirassati_Backend.Controllers
         }
 
     }
-}

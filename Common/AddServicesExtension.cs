@@ -134,7 +134,7 @@ public static class AddServicesExtension
         builder.Services.AddScoped<RefreshTokenProvider>();
         builder.Services.AddScoped<IPhotoUploadService, PhotoUploadService>();
         builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-
+        builder.Services.AddScoped<CachedServiceBase>();
         return builder;
     }
 }
