@@ -39,7 +39,7 @@ public class SchoolServices(
             SlidingExpiration = TimeSpan.FromMinutes(30),
             Priority = CacheItemPriority.High
         };
-
+        logger.LogInformation("I am trying to fetch from Cache");
         return await GetOrSetCacheAsync(cacheKey, cacheOptions, async () =>
         {
             var cachingResult = new Result<GetSchoolInfoDto, string>();

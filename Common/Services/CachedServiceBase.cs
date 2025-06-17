@@ -20,6 +20,7 @@ public class CachedServiceBase(IMemoryCache cache, ILogger<CachedServiceBase> lo
 
         if (factoryResult.IsSuccess)
         {
+            cacheOptions.Size ??= 1;
             cache.Set(cacheKey, factoryResult.Value, cacheOptions);
             logger.LogDebug("Cache set for key: {CacheKey}", cacheKey);
         }

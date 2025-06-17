@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Dirassati_Backend.Common;
+using Dirassati_Backend.Common.Middlwares;
 using Dirassati_Backend.Configurations;
 using Dirassati_Backend.Data.Seeders;
 using Dirassati_Backend.Extensions;
@@ -53,11 +54,25 @@ builder.Services.AddSignalR(options =>
 builder.Services.AddRepositories();
 builder.Services.AddScoped<AbsenceService>();
 builder.Services.Configure<CloudinaryConfig>(builder.Configuration.GetSection("CloudinaryConfig"));
-builder.Services.AddMemoryCache();
-builder.Services.AddResponseCaching();
+builder.Services.AddMemoryCache(options =>
+{
+    options.SizeLimit = 1024; // Limit number of entries
+    options.CompactionPercentage = 0.25; // Remove 25% when limit reached
+    options.ExpirationScanFrequency = TimeSpan.FromMinutes(5); // Scan for expired items every 5 minutes
+});
+builder.Services.AddResponseCaching(options =>
+{
+    options.MaximumBodySize = 1024 * 1024; // 1MB
+    options.UseCaseSensitivePaths = false;
+    options.SizeLimit = 100 * 1024 * 1024; // 100MB total cache size
+});
 var app = builder.Build();
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+app.UseResponseCaching();
+app.UseAuthentication();
 app.UseAuthorization();
 // Configure Swagger UI only in development mode
 if (app.Environment.IsDevelopment())

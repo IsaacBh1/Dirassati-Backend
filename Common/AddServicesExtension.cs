@@ -41,7 +41,7 @@ public static class AddServicesExtension
         // Register DbContext
         builder.Services.AddDbContext<AppDbContext>(opt =>
         {
-            opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
+            opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException("Connection string not found."));
         });
 
