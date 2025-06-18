@@ -3,3 +3,4 @@ obj/
 *.md
 .git
 .vscode
+.env

@@ -21,114 +21,73 @@ public static class TeacherSeeder
     }
     public static async Task SeedTeachersAsync(Guid schoolId, TeacherServices teacherServices)
     {
+        var random = new Random();
 
-        var teachers = new List<TeacherInfosDto>
+        // Algerian names for teachers
+        var maleNames = new[] { "Ahmed", "Mohamed", "Abderrahim", "Karim", "Youcef", "Omar", "Ali", "Sofiane", "Hamid", "Farid", "Rachid", "Tarek", "Bilal", "Walid", "Samir", "Nabil", "Amine", "Hakim", "Riad", "Djamel" };
+        var femaleNames = new[] { "Fatima", "Aicha", "Khadija", "Yamina", "Zohra", "Amina", "Malika", "Samira", "Naima", "Farida", "Zineb", "Leila", "Nadia", "Warda", "Houria", "Karima", "Souad", "Hafida", "Djamila", "Sabrina" };
+        var lastNames = new[] { "Benali", "Boumediene", "Cherif", "Djebbar", "Ferhat", "Ghazi", "Hamdi", "Ikhlef", "Jazairi", "Karim", "Lamri", "Meziane", "Nouri", "Ouali", "Pasha", "Qadri", "Rahmi", "Saadi", "Tebboune", "Umar" };
+
+        var teachers = new List<TeacherInfosDto>();
+        var usedCombinations = new HashSet<string>();
+
+        // Create 8-12 teachers per school
+        var teacherCount = random.Next(8, 13);
+
+        for (int i = 0; i < teacherCount; i++)
         {
-            new() {
-                    FirstName = "Alice",
-                    LastName = "Johnson",
-                    Email = "alice.johnson@example.com",
-                    PhoneNumber = "+1234567891",
+            string firstName, lastName, email;
+            int attempts = 0;
 
-                HireDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-5)),
-                ContractTypeId = 1, // Contrats Permanents
-                SchoolId = schoolId
-            },
-            new() {
-                    FirstName = "Bob",
-                    LastName = "Smith",
-                    Email = "bob.smith@example.com",
-                    PhoneNumber = "+1234567892",
+            // Keep trying until we get a unique combination
+            do
+            {
+                var isFemale = random.Next(2) == 0;
+                firstName = isFemale ?
+                    femaleNames[random.Next(femaleNames.Length)] :
+                    maleNames[random.Next(maleNames.Length)];
+                lastName = lastNames[random.Next(lastNames.Length)];
 
-                HireDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-3)),
-                ContractTypeId = 2, // Contrats à Durée Déterminée
-                SchoolId = schoolId
-            },
-            new() {
-                    FirstName = "Charlie",
-                    LastName = "Brown",
-                    Email = "charlie.brown@example.com",
-                    PhoneNumber = "+1234567893",
+                // Add school-specific identifier to ensure uniqueness across schools
+                email = $"{firstName.ToLower()}.{lastName.ToLower()}.{schoolId.ToString()[..8]}@teacher.dz";
+                attempts++;
 
-                HireDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-2)),
-                ContractTypeId = 3, // Contrats à Temps Partiel ou Horaire
-                SchoolId = schoolId
-            },
-            new() {
-                    FirstName = "Diana",
-                    LastName = "Prince",
-                    Email = "diana.prince@example.com",
-                    PhoneNumber = "+1234567894",
-
-                HireDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-1)),
-                ContractTypeId = 4, // Stagiaire
-                SchoolId = schoolId
-            },
-            new() {
-                    FirstName = "Eve",
-                    LastName = "Adams",
-                    Email = "eve.adams@example.com",
-                    PhoneNumber = "+1234567895",
-
-                HireDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-4)),
-                ContractTypeId = 5, // Consultant Pédagogique
-                SchoolId = schoolId
-            },
-            new() {
-                    FirstName = "Frank",
-                    LastName = "Miller",
-                    Email = "frank.miller@example.com",
-                    PhoneNumber = "+1234567896",
-
-                HireDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-6)),
-                ContractTypeId = 6, // Bénévole
-                SchoolId = schoolId
-            },
-            new() {
-                    FirstName = "Grace",
-                    LastName = "Hopper",
-                    Email = "grace.hopper@example.com",
-                    PhoneNumber = "+1234567897",
-
-                HireDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-7)),
-                ContractTypeId = 1, // Contrats Permanents
-                SchoolId = schoolId
-            },
-            new() {
-                    FirstName = "Henry",
-                    LastName = "Ford",
-                    Email = "henry.ford@example.com",
-                    PhoneNumber = "+1234567898",
-
-                HireDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-8)),
-                ContractTypeId = 2, // Contrats à Durée Déterminée
-                SchoolId = schoolId
-            },
-            new() {
-                    FirstName = "Ivy",
-                    LastName = "Green",
-                    Email = "ivy.green@example.com",
-                    PhoneNumber = "+1234567899",
-
-                HireDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-9)),
-                ContractTypeId = 3, // Contrats à Temps Partiel ou Horaire
-                SchoolId = schoolId
-            },
-            new() {
-                    FirstName = "Jack",
-                    LastName = "White",
-                    Email = "jack.white@example.com",
-                    PhoneNumber = "+1234567800",
-
-                HireDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-10)),
-                ContractTypeId = 4, // Stagiaire
-                SchoolId = schoolId
+                // Fallback: add number if still duplicate after many attempts
+                if (attempts > 10)
+                {
+                    email = $"{firstName.ToLower()}.{lastName.ToLower()}.{i}@teacher.dz";
+                    break;
+                }
             }
-        };
+            while (usedCombinations.Contains(email));
+
+            usedCombinations.Add(email);
+
+            teachers.Add(new TeacherInfosDto
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                PhoneNumber = GenerateAlgerianPhoneNumber(random),
+                HireDate = DateOnly.FromDateTime(DateTime.Now.AddYears(-random.Next(1, 15))),
+                ContractTypeId = random.Next(1, 7), // Random contract type
+                SchoolId = schoolId
+            });
+        }
+
         foreach (var teacher in teachers)
         {
             await teacherServices.RegisterTeacherAsync(teacher, schoolId.ToString(), true);
-
         }
+
+        Console.WriteLine($"Successfully seeded {teachers.Count} teachers for school {schoolId}");
+    }
+
+    private static string GenerateAlgerianPhoneNumber(Random random)
+    {
+        var prefixes = new[] { "05", "06", "07" };
+        var prefix = prefixes[random.Next(prefixes.Length)];
+        var number = random.Next(10000000, 99999999);
+        return $"+213{prefix}{number:D8}";
     }
 }

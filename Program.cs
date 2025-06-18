@@ -12,6 +12,9 @@ using Dirassati_Backend.Persistence;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using Microsoft.AspNetCore.Identity;
+using Dirassati_Backend.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServices();
@@ -96,12 +99,27 @@ var service = scope.ServiceProvider;
 try
 {
     var context = service.GetRequiredService<AppDbContext>();
-    var registerService = service.GetRequiredService<RegisterService>();
-    var teacherServices = service.GetRequiredService<TeacherServices>();
+
+
     await context.Database.MigrateAsync();
-    string? schoolId = await SchoolSeeder.SeedAsync(registerService, context) ?? throw new InvalidOperationException("School Has not been created");
-    if ((await context.Teachers.FirstOrDefaultAsync(t => t.SchoolId == Guid.Parse(schoolId))) == null)
-        await TeacherSeeder.SeedTeachersAsync(Guid.Parse(schoolId), teacherServices);
+
+    // Check if we already have schools seeded
+    if (app.Environment.IsDevelopment())
+    {
+
+        var existingSchoolsCount = await context.Schools.CountAsync();
+        if (existingSchoolsCount == 0)
+        {
+            var registerService = service.GetRequiredService<RegisterService>();
+            var teacherServices = service.GetRequiredService<TeacherServices>();
+            var userManager = service.GetRequiredService<UserManager<AppUser>>();
+            await ComprehensiveSeeder.SeedAllSchoolsAsync(registerService, teacherServices, context, userManager);
+        }
+        else
+        {
+            Console.WriteLine($"Database already contains {existingSchoolsCount} schools. Skipping seeding.");
+        }
+    }
 }
 catch (Exception e)
 {
@@ -111,7 +129,7 @@ catch (Exception e)
 }
 
 app.MapHub<ParentNotificationHub>("/parentNotificationHub").RequireCors("AllowAll");
-
+app.MapGet("/health", () => Results.Ok("I am healthy"));
 app.MapControllers();
 
 await app.RunAsync();

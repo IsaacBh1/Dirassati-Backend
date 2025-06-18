@@ -5,6 +5,7 @@ using Dirassati_Backend.Domain.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 namespace Dirassati_Backend.Persistence;
+
 public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<AppUser>(options)
 {
     public virtual DbSet<Absence> Absences { get; set; }
@@ -36,7 +37,7 @@ public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<
     public virtual DbSet<TeacherAvailability> TeacherAvailabilities { get; set; }
     public virtual DbSet<ExamType> ExamTypes { get; set; }
     public virtual DbSet<Note> Notes { get; set; }
-    
+
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
 
@@ -59,7 +60,6 @@ public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<
         builder.Entity<School>()
         .HasMany(sch => sch.Specializations)
         .WithMany(sp => sp.Schools);
-
         builder.Entity<SchoolType>()
         .HasMany(st => st.Schools)
         .WithOne(s => s.SchoolType)
@@ -147,7 +147,7 @@ public partial class AppDbContext(DbContextOptions options) : IdentityDbContext<
             new { StudentReportStatusId = 3, Name = "Viewed" }
         );
         builder.Entity<Timeslot>()
-            .ToTable(t => t.HasCheckConstraint("CK_Timeslot_EndAfterStart", "EndTime > StartTime"));
+            .ToTable(tb => tb.HasCheckConstraint("CK_Timeslot_EndAfterStart", "\"EndTime\" > \"StartTime\""));
         base.OnModelCreating(builder);
     }
 }

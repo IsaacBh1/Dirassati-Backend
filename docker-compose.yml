@@ -1,0 +1,105 @@
+services:
+  postgres:
+    image: postgres
+    container_name: dirasati-postgres
+    environment:
+      POSTGRES_DB: dirasati_db
+      POSTGRES_USER: dirasati_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dirasati_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dirasati-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dirasati_user -d dirasati_db"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+  backend:
+    build:
+      dockerfile: Docker/Backend_Docker/Dockerfile
+    container_name: dirasati-backend
+    ports:
+      - "5080:8080"
+      - "5081:5081"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development # Change to Production when needed
+      # Database
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=dirasati_db;Username=dirasati_user;Password=${POSTGRES_PASSWORD:-dirasati_password}
+      # JWT
+      - Jwt__Key=${JWT_KEY:-s9h+GlT3PfE+LDVwRlz0GIAobCdHayjSgtBh1pf5VDk=}
+      - Jwt__Issuer=${JWT_ISSUER:-Dirasati}
+      - Jwt__Audience=${JWT_AUDIENCE:-DirasatiUsers}
+      - Jwt__RefreshTokenExpiry=${JWT_REFRESH_TOKEN_EXPIRY:-30}
+      - Jwt__AccessTokenExpiry=${JWT_ACCESS_TOKEN_EXPIRY:-2}
+      # Email
+      - Email__SenderEmail=mohamed@dirasati.org
+      - Email__SenderName=Dirasati
+      - Email__Host=mailserver
+      - Email__Port=25
+      - Email__PostMartAPI_KEY=${POSTMART_API_KEY:-default_postmart_key}
+      # Frontend
+      - FrontendUrl=http://localhost:5173
+      # Payment Gateway
+      - ChargilyConfigs__ApiKey=${CHARGILY_API_KEY:-default_api_key}
+      - ChargilyConfigs__PublicKey=${CHARGILY_PUBLIC_KEY:-default_public_key}
+      - ChargilyConfigs__SecretKey=${CHARGILY_SECRET_KEY:-default_secret_key}
+      - ChargilyConfigs__ApiBaseUrl=https://pay.chargily.net/test/api/v2
+      - ChargilyConfigs__SuccessUrl=http://localhost:5173
+      - ChargilyConfigs__FailureUrl=http://localhost:5173
+      - ChargilyConfigs__WebhookUrl=${CHARGILY_WEBHOOK_URL:-http://localhost:5080/api/webhook/chargily}
+      # Cloud Storage
+      - CloudinaryConfig__CloudName=${CLOUDINARY_CLOUD_NAME:-default_cloud_name}
+      - CloudinaryConfig__ApiKey=${CLOUDINARY_API_KEY:-default_api_key}
+      - CloudinaryConfig__ApiSecret=${CLOUDINARY_API_SECRET:-default_secret}
+      # Logging
+      - Logging__LogLevel__Default=${LOG_LEVEL:-Information}
+    volumes:
+      - ./Migrations:/app/Migrations
+      - ./logs:/app/logs # For application logs
+    networks:
+      - dirasati-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailserver:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
+    container_name: dirasati-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - dirasati-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+  mailserver:
+    image: rnwood/smtp4dev:latest
+    container_name: dirasati-mailserver
+    ports:
+      - "5025:25" # SMTP port
+      - "6080:80" # Web interface
+    networks:
+      - dirasati-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  dirasati-network:
+    driver: bridge

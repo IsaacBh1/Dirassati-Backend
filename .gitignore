@@ -1,6 +1,7 @@
 # SQLite files
 .fuse*
 swagger.json
+nginx/
 *.sqlite
 *.sqlite3
 *.db-shm
@@ -25,6 +26,8 @@ dirasatiDb.db
 Diagrams/
 appsettings.Development.json
 *.userprefs
+postgres_data/
+logs/
 
 # Mono auto generated files
 mono_crash.*
@@ -497,3 +500,6 @@ test*
 todo.txt
 dirassati.drawio
 
+.env
+.env.production
+.env.staging

@@ -15,6 +15,8 @@ using Dirassati_Backend.Data;
 using Dirassati_Backend.Hubs;
 using Dirassati_Backend.Persistence;
 using Dirassati_Backend.Common.Services.EmailService;
+using AutoMapper.QueryableExtensions;
+using Dirassati_Backend.Features.School.DTOs;
 namespace Dirassati_Backend.Features.Teachers.Services;
 
 public class TeacherServices(
@@ -230,22 +232,13 @@ public class TeacherServices(
     public async Task<Result<List<GetTeacherInfosDto>, string>> GetTeachers(string SchoolId)
     {
         var result = new Result<List<GetTeacherInfosDto>, string>();
-        if (!Guid.TryParse(SchoolId, out _))
+        if (!Guid.TryParse(SchoolId, out Guid schoolIdGuid))
         {
             return result.Failure($"Invalid teacher ID or school ID format ", 400);
         }
 
-        var rerult = _dbContext.Teachers.Include(t => t.ContractType).Include(t => t.User);
-        foreach (var item in rerult)
-        {
-            Console.WriteLine(item.User.Email);
-        }
-        var teachers = await rerult.Select(t => _mapper.Map<GetTeacherInfosDto>(t)).ToListAsync();
-        foreach (var item in teachers)
-        {
-            Console.WriteLine(item.Email);
-        }
-        return result.Success(teachers);
+        var queryResult = await _dbContext.Teachers.Where(t => t.SchoolId == schoolIdGuid).ProjectTo<GetTeacherInfosDto>(_mapper.ConfigurationProvider).ToListAsync();
+        return result.Success(queryResult);
 
     }
 
